@@ -3,10 +3,7 @@ python:
   - "2.7"
   - "3.5"
 install:
-  - pip install nose
-  - pip install mock
-  - pip install requests
-  - pip install coveralls
-script: nosetests --with-coverage --cover-package=fbmessenger
+  - pip install -r requirements.txt
+script: make test
 after_success:
   - coveralls

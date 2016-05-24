@@ -1,5 +1,7 @@
 # fbmessenger
 
+https://travis-ci.com/rehabstudio/fbmessenger.svg?token=GC74DPVqhupkfZm2TAsz&branch=master
+
 A python library to integrate with Facebook Messenger
 
 ## Installation

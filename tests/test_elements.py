@@ -45,7 +45,7 @@ class TestElements:
         with pytest.raises(ValueError) as err:
             res = elements.Button(title='This button text is over the limit', url='http://facebook.com')
             res.to_dict()
-        assert err.value.message == 'Title cannot be longer 20 characters.'
+        assert str(err.value) == 'Title cannot be longer 20 characters.'
 
     def test_element(self):
         btn = elements.Button(title='Web button', url='http://facebook.com')
@@ -87,7 +87,7 @@ class TestElements:
                 ]
             )
             res.to_dict()
-        assert err.value.message == 'Title cannot be longer 45 characters'
+        assert str(err.value) == 'Title cannot be longer 45 characters'
 
     def test_element_subtitle_validation(self):
         with pytest.raises(ValueError) as err:
@@ -103,7 +103,7 @@ class TestElements:
                 ]
             )
             res.to_dict()
-        assert err.value.message == 'Subtitle cannot be longer 80 characters'
+        assert str(err.value) == 'Subtitle cannot be longer 80 characters'
 
     def test_adjustment(self):
         res = elements.Adjustment(name='discount', amount=1)

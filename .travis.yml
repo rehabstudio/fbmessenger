@@ -8,7 +8,5 @@ install:
   - pip install requests
   - pip install coveralls
 script: nosetests --with-coverage --cover-package=fbmessenger
-before_install:
-  - sed -i 's/git:/https:/g' .git/config
 after_success:
   - coveralls

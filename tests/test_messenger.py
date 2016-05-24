@@ -85,7 +85,7 @@ def test_verify(client):
 def test_verify_with_incorrect_token(client):
     with pytest.raises(ValueError) as err:
         client.verify(verify_token=5678, challenge='challenge')
-    assert err.value.message == 'FB_VERIFY_TOKEN does not match.'
+    assert str(err.value) == 'FB_VERIFY_TOKEN does not match.'
 
 
 def test_get_user_id(client, entry):
@@ -97,25 +97,25 @@ def test_get_user_id(client, entry):
 def test_handle_message_received_throws_exception(client):
     with pytest.raises(NotImplementedError) as err:
         client.handle_message_received('')
-    assert err.value.message == 'Please implement `handle_message_received` to process messages.'
+    assert str(err.value) == 'Please implement `handle_message_received` to process messages.'
 
 
 def test_handle_message_delivered_throws_exception(client):
     with pytest.raises(NotImplementedError) as err:
         client.handle_message_delivered('')
-    assert err.value.message == 'Please implement `handle_message_delivered` to process delivery messages.'
+    assert str(err.value) == 'Please implement `handle_message_delivered` to process delivery messages.'
 
 
 def test_handle_postback_throws_exception(client):
     with pytest.raises(NotImplementedError) as err:
         client.handle_postback('')
-    assert err.value.message == 'Please implement `handle_postback` to process postbacks.'
+    assert str(err.value) == 'Please implement `handle_postback` to process postbacks.'
 
 
 def test_handle_optin_throws_exception(client):
     with pytest.raises(NotImplementedError) as err:
         client.handle_optin('')
-    assert err.value.message == 'Please implement `handle_optin` to process optins.'
+    assert str(err.value) == 'Please implement `handle_optin` to process optins.'
 
 
 def test_handle_message_received(client, payload, monkeypatch):

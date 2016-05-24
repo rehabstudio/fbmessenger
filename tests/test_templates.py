@@ -148,7 +148,7 @@ class TestTemplates:
         with pytest.raises(ValueError) as err:
             res = templates.GenericTemplate(elements=elem_list)
             res.to_dict()
-        assert err.value.message == 'You cannot have more than 10 elements in the template.'
+        assert str(err.value) == 'You cannot have more than 10 elements in the template.'
 
     def test_receipt_template(self):
         element = elements.Element(

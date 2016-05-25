@@ -1,12 +1,12 @@
 import pytest
 from mock import Mock
 
-from fbmessenger import Messenger
+from fbmessenger import BaseMessenger
 
 
 @pytest.fixture
 def client():
-    return Messenger(page_access_token=12345678, verify_token=1234)
+    return BaseMessenger(page_access_token=12345678, verify_token=1234)
 
 
 @pytest.fixture
@@ -94,39 +94,39 @@ def test_get_user_id(client, entry):
     assert res == client.last_message['sender']['id']
 
 
-def test_handle_message_received_throws_exception(client):
+def test_messages_throws_exception(client):
     with pytest.raises(NotImplementedError) as err:
-        client.handle_message_received('')
-    assert str(err.value) == 'Please implement `handle_message_received` to process messages.'
+        client.messages('')
+    assert str(err.value) == '`messages` is not implemented.'
 
 
-def test_handle_message_delivered_throws_exception(client):
+def test_message_deliveries_throws_exception(client):
     with pytest.raises(NotImplementedError) as err:
-        client.handle_message_delivered('')
-    assert str(err.value) == 'Please implement `handle_message_delivered` to process delivery messages.'
+        client.message_deliveries('')
+    assert str(err.value) == '`message_deliveries` is not implemented.'
 
 
-def test_handle_postback_throws_exception(client):
+def test_messaging_postbacks_throws_exception(client):
     with pytest.raises(NotImplementedError) as err:
-        client.handle_postback('')
-    assert str(err.value) == 'Please implement `handle_postback` to process postbacks.'
+        client.messaging_postbacks('')
+    assert str(err.value) == '`messaging_postbacks` is not implemented.'
 
 
-def test_handle_optin_throws_exception(client):
+def test_messaging_optins_throws_exception(client):
     with pytest.raises(NotImplementedError) as err:
-        client.handle_optin('')
-    assert str(err.value) == 'Please implement `handle_optin` to process optins.'
+        client.messaging_optins('')
+    assert str(err.value) == '`messaging_optins` is not implemented.'
 
 
-def test_handle_message_received(client, payload, monkeypatch):
-    mock_handle_message = Mock()
-    client.handle_message_received = mock_handle_message
+def test_messages(client, payload, monkeypatch):
+    mock_messages = Mock()
+    client.messages = mock_messages
     client.handle(payload)
-    mock_handle_message.assert_called_with(payload['entry'][0]['messaging'][0])
+    mock_messages.assert_called_with(payload['entry'][0]['messaging'][0])
 
 
-def test_handle_message_delivered(client, payload_delivered, monkeypatch):
-    mock_handle_message = Mock()
-    client.handle_message_delivered = mock_handle_message
+def test_message_deliveries(client, payload_delivered, monkeypatch):
+    mock_message_deliveries = Mock()
+    client.message_deliveries = mock_message_deliveries
     client.handle(payload_delivered)
-    mock_handle_message.assert_called_with(payload_delivered['entry'][0]['messaging'][0])
+    mock_message_deliveries.assert_called_with(payload_delivered['entry'][0]['messaging'][0])

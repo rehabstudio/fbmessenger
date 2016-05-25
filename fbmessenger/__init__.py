@@ -68,7 +68,7 @@ class MessengerClient(object):
         return r.json()
 
 
-class Messenger(object):
+class BaseMessenger(object):
 
     last_message = {}
 
@@ -82,17 +82,17 @@ class Messenger(object):
             return challenge
         raise ValueError('FB_VERIFY_TOKEN does not match.')
 
-    def handle_message_received(self, message):
-        raise NotImplementedError('Please implement `handle_message_received` to process messages.')
+    def messages(self, message):
+        raise NotImplementedError('`messages` is not implemented.')
 
-    def handle_message_delivered(self, message):
-        raise NotImplementedError('Please implement `handle_message_delivered` to process delivery messages.')
+    def message_deliveries(self, message):
+        raise NotImplementedError('`message_deliveries` is not implemented.')
 
-    def handle_postback(self, message):
-        raise NotImplementedError('Please implement `handle_postback` to process postbacks.')
+    def messaging_postbacks(self, message):
+        raise NotImplementedError('`messaging_postbacks` is not implemented.')
 
-    def handle_optin(self, message):
-        raise NotImplementedError('Please implement `handle_optin` to process optins.')
+    def messaging_optins(self, message):
+        raise NotImplementedError('`messaging_optins` is not implemented.')
 
     def handle(self, payload):
         for entry in payload['entry']:
@@ -100,24 +100,24 @@ class Messenger(object):
                 self.last_message = message
                 if message.get('message'):
                     try:
-                        return self.handle_message_received(message)
+                        return self.messages(message)
                     except NotImplementedError:
-                        logger.error('handle_message_received is not implemented.')
+                        logger.error('messages is not implemented.')
                 elif message.get('delivery'):
                     try:
-                        return self.handle_message_delivered(message)
+                        return self.message_deliveries(message)
                     except NotImplementedError:
-                        logger.error('handle_message_delivered is not implemented.')
+                        logger.error('message_deliveries is not implemented.')
                 elif message.get('postback'):
                     try:
-                        return self.handle_postback(message)
+                        return self.messaging_postbacks(message)
                     except NotImplementedError:
-                        logger.error('handle_postback is not implemented.')
+                        logger.error('messaging_postbacks is not implemented.')
                 elif message.get('optin'):
                     try:
-                        return self.handle_optin(message)
+                        return self.messaging_optins(message)
                     except NotImplementedError:
-                        logger.error('handle_optin is not implemented.')
+                        logger.error('messaging_optins is not implemented.')
 
     def get_user(self):
         return self.client.get_user_data(self.last_message)

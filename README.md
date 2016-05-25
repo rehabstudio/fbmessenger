@@ -87,6 +87,8 @@ if __name__ == "__main__":
 
 ## Elements
 
+Import the elements (or just the ones you need)
+
 `from fbmessenger import elements`
 
 ### Text
@@ -108,17 +110,95 @@ messenger.send(image.to_dict())
 ```
 
 ### Web button
+
 ```
 btn = elements.Button(title='Web button', url='http://example.com')
 messenger.send(btn.to_dict())
 ```
 
 ### Payload button
+
 To use these buttons you must have the `message_deliveries` subscription enabled
 
 ```
 btn = elements.Button(title='Postback button', payload='payload')
 messenger.send(btn.to_dict())
+```
+
+## Templates
+
+Import the templates (or just the ones you need)
+
+`from fbmessenger import templates`
+
+### Generic template
+
+```
+btn = elements.Button(title='Web button', url='http://facebook.com')
+elems = elements.Element(
+    title='Element',
+    item_url='http://facebook.com',
+    image_url='http://facebook.com/image.jpg',
+    subtitle='Subtitle',
+    buttons=[
+        btn
+    ]
+)
+res = templates.GenericTemplate(elements=[elems])
+messenger.send(res.to_dict())
+```
+
+### Button template
+
+```
+btn = elements.Button(title='Web button', url='http://facebook.com')
+btn2 = elements.Button(title='Postback button', payload='payload')
+res = templates.ButtonTemplate(
+    text='Button template',
+    buttons=[btn, btn2]
+)
+messenger.send(res.to_dict())
+```
+
+### Receipt template
+
+```
+element = elements.Element(
+    title='Classic White T-Shirt',
+    subtitle='100% Soft and Luxurious Cotton',
+    quantity=2,
+    price=50,
+    currency='USD',
+    image_url='http://petersapparel.parseapp.com/img/whiteshirt.png',
+)
+adjustment1 = elements.Adjustment(name='New Customer Discount', amount=20)
+adjustment2 = elements.Adjustment(name='$10 Off Coupon', amount=10)
+address = elements.Address(
+    street_1='1 Hacker Way',
+    city='Menlo Park',
+    postal_code='94025',
+    state='CA',
+    country='US'
+)
+summary = elements.Summary(
+    subtotal=75.00,
+    shipping_cost=4.95,
+    total_tax=6.19,
+    total_cost=56.14
+)
+res = templates.ReceiptTemplate(
+    recipient_name='Stephane Crozatier',
+    order_number='12345678902',
+    currency='USD',
+    payment_method='Visa 2345',
+    order_url='http://petersapparel.parseapp.com/order?order_id=123456',
+    timestamp='1428444852',
+    address=address,
+    summary=summary,
+    adjustments=[adjustment1, adjustment2],
+    elements=[element]
+)
+messenger.send(res.to_dict())
 ```
 
 ## Development Notes

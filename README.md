@@ -2,6 +2,8 @@
 
 ![https://travis-ci.com/rehabstudio/fbmessenger.svg?token=GC74DPVqhupkfZm2TAsz&branch=master](https://travis-ci.com/rehabstudio/fbmessenger.svg?token=GC74DPVqhupkfZm2TAsz&branch=master)
 
+[![Coverage Status](https://coveralls.io/repos/github/rehabstudio/fbmessenger/badge.svg?branch=master)](https://coveralls.io/github/rehabstudio/fbmessenger?branch=master)
+
 A python library to communicate with the Facebook Messenger API's
 
 
@@ -120,4 +122,4 @@ messenger.send(btn.to_dict())
 
 ## Development Notes
 
-Pydoc should be installed locally to convert the README to reStructuredText format for uploading to PyPi
+[Pandoc](http://pandoc.org/installing.html) should be installed locally to convert the README to reStructuredText format for uploading to PyPi

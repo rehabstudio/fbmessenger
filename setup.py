@@ -5,10 +5,30 @@ import sys
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
+long_description = ''
 
-# Get the long description from the README file
-with open('README.rst', encoding='utf-8') as f:
-    long_description = f.read()
+try:
+    import subprocess
+    import pandoc
+
+    process = subprocess.Popen(
+        ['which pandoc'],
+        shell=True,
+        stdout=subprocess.PIPE,
+        universal_newlines=True
+    )
+
+    pandoc_path = process.communicate()[0]
+    pandoc_path = pandoc_path.strip('\n')
+
+    pandoc.core.PANDOC_PATH = pandoc_path
+
+    doc = pandoc.Document()
+    doc.markdown = open('README.md').read()
+
+    long_description = doc.rst
+except:
+    pass
 
 test_requirements = [
     'pytest',
@@ -51,9 +71,9 @@ class PyTest(TestCommand):
 setup(
     name='fbmessenger',
     version=VERSION,
-    description='Facebook Messenger',
+    description='A python library to communicate with the Facebook Messenger API\'s',
     long_description=long_description,
-    url='https://github.com/pypa/sampleproject',
+    url='https://github.com/rehabstudio/fbmessenger',
     author='Ricky Dunlop',
     author_email='ricky@rehabstudio.com',
     license='Apache',

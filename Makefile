@@ -1,5 +1,3 @@
-.PHONY: docs
-
 init:
 	pip install -r requirements.txt
 
@@ -9,10 +7,7 @@ test:
 	py.test tests
 
 coverage:
-	py.test --verbose --cov-report term --cov=fbmessenger tests
-
-ci: init
-	py.test --junitxml=junit.xml
+	py.test --verbose --cov-report term-missing --cov=fbmessenger tests
 
 publish:
 	python setup.py register

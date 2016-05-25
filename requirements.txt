@@ -3,6 +3,7 @@ funcsigs==1.0.2
 mock==2.0.0
 pbr==1.9.1
 py==1.4.31
+pyandoc==0.2.0
 pytest==2.8.7
 pytest-cov==2.2.1
 requests==2.10.0

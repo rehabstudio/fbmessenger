@@ -5,8 +5,21 @@ from fbmessenger import BaseMessenger
 
 
 @pytest.fixture
-def client():
-    return BaseMessenger(page_access_token=12345678, verify_token=1234)
+def messenger():
+    class Messenger(BaseMessenger):
+        def messages(self, payload):
+            pass
+
+        def message_deliveries(self, payload):
+            pass
+
+        def messaging_postbacks(self, payload):
+            pass
+
+        def messaging_optins(self, payload):
+            pass
+
+    return Messenger(page_access_token=12345678, verify_token=1234)
 
 
 @pytest.fixture
@@ -77,56 +90,145 @@ def payload_delivered():
     }
 
 
-def test_verify(client):
-    res = client.verify(verify_token=1234, challenge='challenge')
+@pytest.fixture
+def payload_postback():
+    return {
+        'object': 'page',
+        'entry': [
+            {
+                'id': 1234,
+                'time': 1458668856451,
+                'messaging': [
+                    {
+                        'sender': {
+                            'id': 1234
+                        },
+                        'recipient': {
+                            'id': 1234
+                        },
+                        'timestamp': 1457764197627,
+                        'postback': {
+                            'payload': 'USER_DEFINED_PAYLOAD'
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+
+
+@pytest.fixture
+def payload_optin():
+    return {
+        'object': 'page',
+        'entry': [
+            {
+                'id': 1234,
+                'time': 1458668856451,
+                'messaging': [
+                    {
+                        'sender': {
+                            'id': 1234
+                        },
+                        'recipient': {
+                            'id': 1234
+                        },
+                        'timestamp': 1457764197627,
+                        'optin': {
+                            'ref': 'PASS_THROUGH_PARAM'
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+
+
+def test_verify(messenger):
+    res = messenger.verify(verify_token=1234, challenge='challenge')
     assert res == 'challenge'
 
 
-def test_verify_with_incorrect_token(client):
+def test_verify_with_incorrect_token(messenger):
     with pytest.raises(ValueError) as err:
-        client.verify(verify_token=5678, challenge='challenge')
+        messenger.verify(verify_token=5678, challenge='challenge')
     assert str(err.value) == 'FB_VERIFY_TOKEN does not match.'
 
 
-def test_get_user_id(client, entry):
-    client.last_message = entry
-    res = client.get_user_id()
-    assert res == client.last_message['sender']['id']
+def test_get_user_id(messenger, entry):
+    messenger.last_message = entry
+    res = messenger.get_user_id()
+    assert res == messenger.last_message['sender']['id']
 
 
-def test_messages_throws_exception(client):
-    with pytest.raises(NotImplementedError) as err:
-        client.messages('')
-    assert str(err.value) == '`messages` is not implemented.'
-
-
-def test_message_deliveries_throws_exception(client):
-    with pytest.raises(NotImplementedError) as err:
-        client.message_deliveries('')
-    assert str(err.value) == '`message_deliveries` is not implemented.'
-
-
-def test_messaging_postbacks_throws_exception(client):
-    with pytest.raises(NotImplementedError) as err:
-        client.messaging_postbacks('')
-    assert str(err.value) == '`messaging_postbacks` is not implemented.'
-
-
-def test_messaging_optins_throws_exception(client):
-    with pytest.raises(NotImplementedError) as err:
-        client.messaging_optins('')
-    assert str(err.value) == '`messaging_optins` is not implemented.'
-
-
-def test_messages(client, payload, monkeypatch):
+def test_messages(messenger, payload):
     mock_messages = Mock()
-    client.messages = mock_messages
-    client.handle(payload)
+    messenger.messages = mock_messages
+    messenger.handle(payload)
     mock_messages.assert_called_with(payload['entry'][0]['messaging'][0])
 
 
-def test_message_deliveries(client, payload_delivered, monkeypatch):
+def test_message_deliveries(messenger, payload_delivered):
     mock_message_deliveries = Mock()
-    client.message_deliveries = mock_message_deliveries
-    client.handle(payload_delivered)
+    messenger.message_deliveries = mock_message_deliveries
+    messenger.handle(payload_delivered)
     mock_message_deliveries.assert_called_with(payload_delivered['entry'][0]['messaging'][0])
+
+
+def test_messaging_postbacks(messenger, payload_postback):
+    mock_messaging_postbacks = Mock()
+    messenger.messaging_postbacks = mock_messaging_postbacks
+    messenger.handle(payload_postback)
+    mock_messaging_postbacks.assert_called_with(payload_postback['entry'][0]['messaging'][0])
+
+
+def test_messaging_optins(messenger, payload_optin):
+    mock_messaging_optins = Mock()
+    messenger.messaging_optins = mock_messaging_optins
+    messenger.handle(payload_optin)
+    mock_messaging_optins.assert_called_with(payload_optin['entry'][0]['messaging'][0])
+
+
+def test_messages_subscribe(messenger, monkeypatch):
+    mock = Mock(return_value='subscribe')
+    monkeypatch.setattr(messenger.client, 'subscribe_app_to_page', mock)
+    res = messenger.subscribe()
+    assert mock.called
+    assert res == 'subscribe'
+
+
+def test_get_user(messenger, payload, monkeypatch):
+    mock = Mock()
+    mock.return_value = {
+        'first_name': 'Testy',
+        'last_name': 'McTestface',
+        'profile': 'profile'
+    }
+    monkeypatch.setattr(messenger.client, 'get_user_data', mock)
+    messenger.handle(payload)
+    user = messenger.get_user()
+    assert user == {
+        'first_name': 'Testy',
+        'last_name': 'McTestface',
+        'profile': 'profile'
+    }
+
+
+def test_send(messenger, monkeypatch):
+    mock = Mock()
+    mock.return_value = {
+        'success': True
+    }
+    monkeypatch.setattr(messenger.client, 'send_data', mock)
+    res = messenger.send({'text': 'message'})
+    assert res == mock()
+
+
+def test_set_welcome_message(messenger, monkeypatch):
+    mock = Mock()
+    mock.return_value = {
+        'success': True
+    }
+    monkeypatch.setattr(messenger.client, 'set_welcome_message', mock)
+    res = messenger.set_welcome_message({'text': 'Welcome'})
+    assert res == mock()

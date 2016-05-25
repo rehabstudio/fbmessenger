@@ -49,13 +49,13 @@ class Messenger(BaseMessenger):
     def messages(self, message):
         self.send({'text': 'Received: {0}'.format(message['message']['text'])})
 
-    def messages_delivered(self, message):
+    def message_deliveries(self, message):
         pass
 
     def messaging_postbacks(self, messages):
         pass
 
-    def messagin_optins(self, messages):
+    def messaging_optins(self, messages):
         pass
 ```
 

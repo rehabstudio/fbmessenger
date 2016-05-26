@@ -1,7 +1,7 @@
 # Facebook Messenger
 
 [![PyPI](https://img.shields.io/pypi/v/fbmessenger.svg?maxAge=2592000)](https://pypi.python.org/pypi/fbmessenger)
-![https://travis-ci.com/rehabstudio/fbmessenger.svg?token=GC74DPVqhupkfZm2TAsz&branch=master](https://travis-ci.com/rehabstudio/fbmessenger.svg?token=GC74DPVqhupkfZm2TAsz&branch=master)
+[![Build Status](https://travis-ci.org/rehabstudio/fbmessenger.svg?branch=master)](https://travis-ci.org/rehabstudio/fbmessenger)
 [![Coverage Status](https://coveralls.io/repos/github/rehabstudio/fbmessenger/badge.svg?branch=master)](https://coveralls.io/github/rehabstudio/fbmessenger?branch=master)
 [![PyPI](https://img.shields.io/pypi/l/fbmessenger.svg?maxAge=2592000)](https://pypi.python.org/pypi/fbmessenger)
 

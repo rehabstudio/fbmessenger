@@ -1,5 +1,8 @@
 # Release History
 
+## 1.1.0
+- Added `BaseMessenger#send_actions` method
+
 ## 1.0.0
 
 ### Breaking changes

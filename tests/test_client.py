@@ -1,7 +1,7 @@
 from mock import Mock
 import pytest
 
-from fbmessenger import MessengerClient, elements, templates, thread_settings
+from fbmessenger import MessengerClient, thread_settings
 
 
 @pytest.fixture
@@ -90,7 +90,26 @@ def test_send_data(client, monkeypatch, entry):
             },
             'message': payload
         }
+    )
 
+
+def test_send_action(client, monkeypatch, entry):
+    mock_post = Mock()
+    mock_post.return_value.status_code = 200
+    monkeypatch.setattr('requests.post', mock_post)
+    client = MessengerClient(page_access_token=12345678)
+    client.send_action('typing_on', entry)
+
+    assert mock_post.call_count == 1
+    mock_post.assert_called_with(
+        'https://graph.facebook.com/v2.6/me/messages',
+        params={'access_token': 12345678},
+        json={
+            'recipient': {
+                'id': entry['sender']['id']
+            },
+            'sender_action': 'typing_on'
+        }
     )
 
 
@@ -126,8 +145,7 @@ def test_set_greeting_text_too_long(client, monkeypatch):
         "result": "Successfully added new_thread's CTAs"
     }
     monkeypatch.setattr('requests.post', mock_post)
-    client = MessengerClient(page_access_token=12345678)
 
     with pytest.raises(ValueError) as err:
-        welcome_message = thread_settings.GreetingText(text='x' * 161)
+        thread_settings.GreetingText(text='x' * 161)
     assert str(err.value) == 'Text cannot be longer 160 characters.'

@@ -7,23 +7,17 @@ class TestSenderActions:
 
     def test_mark_seen(self):
         res = SenderAction(sender_action='mark_seen')
-        expected = {
-            'sender_action': 'mark_seen'
-        }
+        expected = 'mark_seen'
         assert expected == res.to_dict()
 
     def test_typing_on(self):
         res = SenderAction(sender_action='typing_on')
-        expected = {
-            'sender_action': 'typing_on'
-        }
+        expected = 'typing_on'
         assert expected == res.to_dict()
 
     def test_typing_off(self):
         res = SenderAction(sender_action='typing_off')
-        expected = {
-            'sender_action': 'typing_off'
-        }
+        expected = 'typing_off'
         assert expected == res.to_dict()
 
     def test_invalid_action(self):

@@ -230,6 +230,13 @@ def test_send(messenger, monkeypatch):
     assert res == mock()
 
 
+def test_send_action(messenger, monkeypatch):
+    mock = Mock()
+    monkeypatch.setattr(messenger.client, 'send_action', mock)
+    res = messenger.send_action('typing_on')
+    assert res == mock()
+
+
 def test_set_thread_setting(messenger, monkeypatch):
     mock = Mock()
     mock.return_value = {

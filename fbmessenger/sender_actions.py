@@ -11,6 +11,4 @@ class SenderAction(object):
         self.sender_action = sender_action
 
     def to_dict(self):
-        return {
-            'sender_action': self.sender_action
-        }
+        return self.sender_action

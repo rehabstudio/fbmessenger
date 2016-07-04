@@ -238,21 +238,21 @@ messenger.send(res.to_dict())
 
 ```
 typing_on = SenderAction(sender_action='typing_on')
-messenger.send(typing_on.to_dict())
+messenger.send_action(typing_on.to_dict())
 ```
 
 ### Typing off
 
 ```
 typing_ffn = SenderAction(sender_action='typing_off')
-messenger.send(typing_off.to_dict())
+messenger.send_action(typing_off.to_dict())
 ```
 
 ### Mark seen
 
 ```
 mark_seen = SenderAction(sender_action='mark_seen')
-messenger.send(mark_seen.to_dict())
+messenger.send_action(mark_seen.to_dict())
 ```
 
 ## Quick Replies

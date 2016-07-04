@@ -4,7 +4,7 @@ import logging
 
 import requests
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -40,6 +40,21 @@ class MessengerClient(object):
         )
         return r.json()
 
+    def send_action(self, sender_action, entry):
+        r = requests.post(
+            'https://graph.facebook.com/v2.6/me/messages',
+            params={
+                'access_token': self.page_access_token
+            },
+            json={
+                'recipient': {
+                    'id': entry['sender']['id']
+                },
+                'sender_action': sender_action
+            }
+        )
+        return r.json()
+
     def subscribe_app_to_page(self):
         r = requests.post(
             'https://graph.facebook.com/v2.6/me/subscribed_apps',
@@ -50,7 +65,6 @@ class MessengerClient(object):
         return r.json()
 
     def set_thread_setting(self, data):
-        actions = []
         r = requests.post(
             'https://graph.facebook.com/v2.6/me/thread_settings',
             params={
@@ -118,6 +132,9 @@ class BaseMessenger(object):
 
     def send(self, payload):
         return self.client.send(payload, self.last_message)
+
+    def send_action(self, sender_action):
+        return self.client.send_action(sender_action, self.last_message)
 
     def get_user_id(self):
         return self.last_message['sender']['id']

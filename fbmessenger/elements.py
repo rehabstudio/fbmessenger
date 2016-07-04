@@ -8,41 +8,33 @@ class Text(object):
         }
 
 
-class Image(object):
-    def __init__(self, url):
-        self.url = url
-
-    def to_dict(self):
-        return {
-            'attachment': {
-                'type': 'image',
-                'payload': {
-                    'url': self.url
-                }
-            }
-        }
-
-
 class Button(object):
-    def __init__(self, title, url=None, payload=None):
+    BUTTON_TYPES = [
+        'web_url',
+        'postback',
+        'phone_number'
+    ]
+
+    def __init__(self, button_type, title, url=None, payload=None):
+        if button_type not in self.BUTTON_TYPES:
+            raise ValueError('Invalid button_type provided.')
         if len(title) > 20:
             raise ValueError('Title cannot be longer 20 characters.')
+        self.type = button_type
         self.title = title
         self.url = url
         self.payload = payload
 
     def to_dict(self):
-        data = {
+        res = {
+            'type': self.type,
             'title': self.title
         }
         if self.url:
-            data['type'] = 'web_url'
-            data['url'] = self.url
-        elif self.payload:
-            data['type'] = 'postback'
-            data['payload'] = self.payload
-
-        return data
+            res['url'] = self.url
+        if self.payload:
+            res['payload'] = self.payload
+        return res
 
 
 class Element(object):

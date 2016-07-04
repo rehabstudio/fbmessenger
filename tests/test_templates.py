@@ -6,7 +6,7 @@ from fbmessenger import elements, templates
 class TestTemplates:
 
     def test_button_template_with_single_button(self):
-        btn = elements.Button(title='Web button', url='http://facebook.com')
+        btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
         res = templates.ButtonTemplate(
             text='Button template',
             buttons=btn
@@ -30,8 +30,8 @@ class TestTemplates:
         assert expected == res.to_dict()
 
     def test_button_template_with_multiple_buttons(self):
-        btn = elements.Button(title='Web button', url='http://facebook.com')
-        btn2 = elements.Button(title='Postback button', payload='payload')
+        btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
+        btn2 = elements.Button(button_type='postback', title='Postback button', payload='payload')
         res = templates.ButtonTemplate(
             text='Button template',
             buttons=[btn, btn2]
@@ -60,7 +60,7 @@ class TestTemplates:
         assert expected == res.to_dict()
 
     def test_generic_template(self):
-        btn = elements.Button(title='Web button', url='http://facebook.com')
+        btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
         elems = elements.Element(
             title='Element',
             item_url='http://facebook.com',
@@ -97,7 +97,7 @@ class TestTemplates:
         assert expected == res.to_dict()
 
     def test_generic_template_with_single_element(self):
-        btn = elements.Button(title='Web button', url='http://facebook.com')
+        btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
         elems = elements.Element(
             title='Element',
             item_url='http://facebook.com',
@@ -134,7 +134,7 @@ class TestTemplates:
         assert expected == res.to_dict()
 
     def test_template_with_too_many_elements(self):
-        btn = elements.Button(title='Web button', url='http://facebook.com')
+        btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
         elem = elements.Element(
             title='Element',
             item_url='http://facebook.com',

@@ -33,6 +33,8 @@ We need to extend the `BaseMessenger` class and implement methods for each of th
 
 - `messages`
 - `message_deliveries`
+- `message_reads`
+- `message_echoes`
 - `messaging_optins`
 - `messaging_postbacks`
 
@@ -50,6 +52,12 @@ class Messenger(BaseMessenger):
         self.send({'text': 'Received: {0}'.format(message['message']['text'])})
 
     def message_deliveries(self, message):
+        pass
+
+    def message_reads(self, message):
+        pass
+
+    def message_echoes(self, message):
         pass
 
     def messaging_postbacks(self, messages):
@@ -102,13 +110,6 @@ elem = elements.Text('Your Message')
 messenger.send(elem.to_dict())
 ```
 
-### Images
-
-```
-image = elements.Image(url='http://example.com/image.jpg')
-messenger.send(image.to_dict())
-```
-
 ### Web button
 
 ```
@@ -123,6 +124,36 @@ To use these buttons you must have the `message_deliveries` subscription enabled
 ```
 btn = elements.Button(title='Postback button', payload='payload')
 messenger.send(btn.to_dict())
+```
+
+## Attachments
+
+### Images
+
+```
+image = attachments.Image(url='http://example.com/image.jpg')
+messenger.send(image.to_dict())
+```
+
+### Audio
+
+```
+audio = attachments.Image(url='http://example.com/audio.mp3')
+messenger.send(audio.to_dict())
+```
+
+### Video
+
+```
+video = attachments.Video(url='http://example.com/video.mp4')
+messenger.send(video.to_dict())
+```
+
+### Files
+
+```
+file = attachments.File(url='http://example.com/file.txt')
+messenger.send(file.to_dict())
 ```
 
 ## Templates
@@ -199,6 +230,41 @@ res = templates.ReceiptTemplate(
     elements=[element]
 )
 messenger.send(res.to_dict())
+```
+
+## Sender Actions
+
+### Typing on
+
+```
+typing_on = SenderAction(sender_action='typing_on')
+messenger.send(typing_on.to_dict())
+```
+
+### Typing off
+
+```
+typing_ffn = SenderAction(sender_action='typing_off')
+messenger.send(typing_off.to_dict())
+```
+
+### Mark seen
+
+```
+mark_seen = SenderAction(sender_action='mark_seen')
+messenger.send(mark_seen.to_dict())
+```
+
+## Quick Replies
+
+```
+quick_reply_1 = QuickReply(title='Do something', payload='Send me this payload')
+quick_reply_2 = QuickReply(title='Do something else', payload='Send me this other payload')
+result = QuickReplies(quick_replies=[
+	quick_reply_1,
+	quick_reply_2
+])
+messenger.send(result.to_dict())
 ```
 
 ## Development Notes

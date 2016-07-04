@@ -4,7 +4,7 @@ import logging
 
 import requests
 
-__version__ = '0.1.0'
+__version__ = '1.0.0'
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -19,13 +19,13 @@ class MessengerClient(object):
         r = requests.get(
             'https://graph.facebook.com/v2.6/{sender}'.format(sender=entry['sender']['id']),
             params={
-                'fields': 'first_name,last_name,profile_pic',
+                'fields': 'first_name,last_name,profile_pic,locale,timezone,gender',
                 'access_token': self.page_access_token
             }
         )
         return r.json()
 
-    def send_data(self, payload, entry):
+    def send(self, payload, entry):
         r = requests.post(
             'https://graph.facebook.com/v2.6/me/messages',
             params={
@@ -49,22 +49,14 @@ class MessengerClient(object):
         )
         return r.json()
 
-    def set_welcome_message(self, payload=None):
+    def set_thread_setting(self, data):
         actions = []
-        if payload:
-            actions = [{
-                'message': payload
-            }]
         r = requests.post(
             'https://graph.facebook.com/v2.6/me/thread_settings',
             params={
                 'access_token': self.page_access_token
             },
-            json={
-                'setting_type': 'call_to_actions',
-                'thread_state': 'new_thread',
-                'call_to_actions': actions
-            }
+            json=data
         )
         return r.json()
 
@@ -93,6 +85,14 @@ class BaseMessenger(object):
         """Method to handle `message_deliveries`"""
 
     @abc.abstractmethod
+    def message_echoes(self, message):
+        """Method to handle `message_echoes`"""
+
+    @abc.abstractmethod
+    def message_reads(self, message):
+        """Method to handle `message_reads`"""
+
+    @abc.abstractmethod
     def messaging_postbacks(self, message):
         """Method to handle `messaging_postbacks`"""
 
@@ -117,7 +117,7 @@ class BaseMessenger(object):
         return self.client.get_user_data(self.last_message)
 
     def send(self, payload):
-        return self.client.send_data(payload, self.last_message)
+        return self.client.send(payload, self.last_message)
 
     def get_user_id(self):
         return self.last_message['sender']['id']
@@ -125,5 +125,5 @@ class BaseMessenger(object):
     def subscribe(self):
         return self.client.subscribe_app_to_page()
 
-    def set_welcome_message(self, payload):
-        return self.client.set_welcome_message(payload)
+    def set_thread_setting(self, data):
+        return self.client.set_thread_setting(data)

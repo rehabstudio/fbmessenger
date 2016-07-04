@@ -11,20 +11,8 @@ class TestElements:
         }
         assert expected == res.to_dict()
 
-    def test_image(self):
-        res = elements.Image(url='http://facebook.com/image.jpg')
-        expected = {
-            'attachment': {
-                'type': 'image',
-                'payload': {
-                    'url': 'http://facebook.com/image.jpg'
-                }
-            }
-        }
-        assert expected == res.to_dict()
-
     def test_web_button(self):
-        res = elements.Button(title='Web button', url='http://facebook.com')
+        res = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
         expected = {
             'type': 'web_url',
             'title': 'Web button',
@@ -33,7 +21,7 @@ class TestElements:
         assert expected == res.to_dict()
 
     def test_postback_button(self):
-        res = elements.Button(title='Postback button', payload='payload')
+        res = elements.Button(button_type='postback', title='Postback button', payload='payload')
         expected = {
             'type': 'postback',
             'title': 'Postback button',
@@ -43,12 +31,13 @@ class TestElements:
 
     def test_button_with_title_over_limit(self):
         with pytest.raises(ValueError) as err:
-            res = elements.Button(title='This button text is over the limit', url='http://facebook.com')
+            res = elements.Button(button_type='web_url', title='This button text is over the limit',
+                                  url='http://facebook.com')
             res.to_dict()
         assert str(err.value) == 'Title cannot be longer 20 characters.'
 
     def test_element(self):
-        btn = elements.Button(title='Web button', url='http://facebook.com')
+        btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
         res = elements.Element(
             title='Element',
             item_url='http://facebook.com',
@@ -74,9 +63,14 @@ class TestElements:
         }
         assert expected == res.to_dict()
 
+    def test_button_type_validation(self):
+        with pytest.raises(ValueError) as err:
+            elements.Button(button_type='incorrect', title='Button', url='http://facebook.com')
+        assert str(err.value) == 'Invalid button_type provided.'
+
     def test_element_title_validation(self):
         with pytest.raises(ValueError) as err:
-            btn = elements.Button(title='Web button', url='http://facebook.com')
+            btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
             res = elements.Element(
                 title='This element title is over the allowed number of characters',
                 item_url='http://facebook.com',
@@ -91,7 +85,7 @@ class TestElements:
 
     def test_element_subtitle_validation(self):
         with pytest.raises(ValueError) as err:
-            btn = elements.Button(title='Web button', url='http://facebook.com')
+            btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
             res = elements.Element(
                 title='Title',
                 item_url='http://facebook.com',

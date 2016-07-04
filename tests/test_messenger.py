@@ -1,7 +1,7 @@
 import pytest
 from mock import Mock
 
-from fbmessenger import BaseMessenger
+from fbmessenger import BaseMessenger, thread_settings
 
 
 @pytest.fixture
@@ -17,6 +17,12 @@ def messenger():
             pass
 
         def messaging_optins(self, payload):
+            pass
+
+        def message_reads(self, payload):
+            pass
+
+        def message_echoes(self, payload):
             pass
 
     return Messenger(page_access_token=12345678, verify_token=1234)
@@ -219,16 +225,17 @@ def test_send(messenger, monkeypatch):
     mock.return_value = {
         'success': True
     }
-    monkeypatch.setattr(messenger.client, 'send_data', mock)
+    monkeypatch.setattr(messenger.client, 'send', mock)
     res = messenger.send({'text': 'message'})
     assert res == mock()
 
 
-def test_set_welcome_message(messenger, monkeypatch):
+def test_set_thread_setting(messenger, monkeypatch):
     mock = Mock()
     mock.return_value = {
         'success': True
     }
-    monkeypatch.setattr(messenger.client, 'set_welcome_message', mock)
-    res = messenger.set_welcome_message({'text': 'Welcome'})
+    monkeypatch.setattr(messenger.client, 'set_thread_setting', mock)
+    welcome_message = thread_settings.GreetingText(text='Welcome message')
+    res = messenger.set_thread_setting(welcome_message.to_dict())
     assert res == mock()

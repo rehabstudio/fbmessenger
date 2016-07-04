@@ -1,7 +1,7 @@
 from mock import Mock
 import pytest
 
-from fbmessenger import MessengerClient, elements, templates
+from fbmessenger import MessengerClient, elements, templates, thread_settings
 
 
 @pytest.fixture
@@ -40,7 +40,7 @@ def test_get_user_data(client, monkeypatch):
     mock_get.assert_called_with(
         'https://graph.facebook.com/v2.6/12345678',
         params={
-            'fields': 'first_name,last_name,profile_pic',
+            'fields': 'first_name,last_name,profile_pic,locale,timezone,gender',
             'access_token': 12345678
         }
     )
@@ -74,7 +74,7 @@ def test_send_data(client, monkeypatch, entry):
     monkeypatch.setattr('requests.post', mock_post)
     client = MessengerClient(page_access_token=12345678)
     payload = {'text': 'Test message'}
-    resp = client.send_data(payload, entry)
+    resp = client.send(payload, entry)
 
     assert resp == {
         "recipient_id": 12345678,
@@ -94,7 +94,7 @@ def test_send_data(client, monkeypatch, entry):
     )
 
 
-def test_set_welcome_message_text(client, monkeypatch):
+def test_set_greeting_text(client, monkeypatch):
     mock_post = Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
@@ -102,7 +102,8 @@ def test_set_welcome_message_text(client, monkeypatch):
     }
     monkeypatch.setattr('requests.post', mock_post)
     client = MessengerClient(page_access_token=12345678)
-    resp = client.set_welcome_message({'text': 'Welcome message'})
+    welcome_message = thread_settings.GreetingText(text='Welcome message')
+    resp = client.set_thread_setting(welcome_message.to_dict())
 
     assert resp == {"result": "Successfully added new_thread's CTAs"}
     assert mock_post.call_count == 1
@@ -110,65 +111,15 @@ def test_set_welcome_message_text(client, monkeypatch):
         'https://graph.facebook.com/v2.6/me/thread_settings',
         params={'access_token': 12345678},
         json={
-            'setting_type': 'call_to_actions',
-            'thread_state': 'new_thread',
-            'call_to_actions': [{
-                'message': {
-                    'text': 'Welcome message'
-                }
-            }]
-        }
-
-    )
-
-
-def test_set_welcome_message_structured(client, monkeypatch):
-    mock_post = Mock()
-    mock_post.return_value.status_code = 200
-    mock_post.return_value.json.return_value = {
-        "result": "Successfully added new_thread's CTAs"
-    }
-    monkeypatch.setattr('requests.post', mock_post)
-    client = MessengerClient(page_access_token=12345678)
-
-    btn = elements.Button(title='Web button', url='http://facebook.com')
-    msg = templates.ButtonTemplate(
-        text='Button template',
-        buttons=[btn]
-    )
-    resp = client.set_welcome_message(msg.to_dict())
-
-    assert resp == {"result": "Successfully added new_thread's CTAs"}
-    assert mock_post.call_count == 1
-    mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/thread_settings',
-        params={'access_token': 12345678},
-        json={
-            'setting_type': 'call_to_actions',
-            'thread_state': 'new_thread',
-            'call_to_actions': [{
-                'message': {
-                    'attachment': {
-                        'type': 'template',
-                        'payload': {
-                            'template_type': 'button',
-                            'text': 'Button template',
-                            'buttons': [
-                                {
-                                    'type': 'web_url',
-                                    'title': 'Web button',
-                                    'url': 'http://facebook.com'
-                                }
-                            ]
-                        }
-                    }
-                }
-            }]
+            'setting_type': 'greeting',
+            'greeting': {
+                'text': 'Welcome message'
+            }
         }
     )
 
 
-def test_delete_welcome_message(client, monkeypatch):
+def test_set_greeting_text_too_long(client, monkeypatch):
     mock_post = Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
@@ -177,16 +128,6 @@ def test_delete_welcome_message(client, monkeypatch):
     monkeypatch.setattr('requests.post', mock_post)
     client = MessengerClient(page_access_token=12345678)
 
-    resp = client.set_welcome_message()
-
-    assert resp == {"result": "Successfully added new_thread's CTAs"}
-    assert mock_post.call_count == 1
-    mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/thread_settings',
-        params={'access_token': 12345678},
-        json={
-            'setting_type': 'call_to_actions',
-            'thread_state': 'new_thread',
-            'call_to_actions': []
-        }
-    )
+    with pytest.raises(ValueError) as err:
+        welcome_message = thread_settings.GreetingText(text='x' * 161)
+    assert str(err.value) == 'Text cannot be longer 160 characters.'

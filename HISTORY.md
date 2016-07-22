@@ -1,5 +1,13 @@
 # Release History
 
+## 2.0.0
+- Removed need for verify token when instanciating class
+- Removed verify function
+- Added callback account_linking webhook
+- Support account_link and account_unlink button types
+- Message echoes removed, should be handled in messages callback and checking for `"is_echo": "true"`
+- Added delete_thread_setting method
+
 ## 1.1.0
 - Added `BaseMessenger#send_actions` method
 
@@ -21,4 +29,4 @@
 - Support for quick replies
 - Support for get started button and persistent menus
 - locale, timezone and gender now returned for user
-- Support for phone_number button types 
+- Support for phone_number button types

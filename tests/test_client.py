@@ -149,3 +149,61 @@ def test_set_greeting_text_too_long(client, monkeypatch):
     with pytest.raises(ValueError) as err:
         thread_settings.GreetingText(text='x' * 161)
     assert str(err.value) == 'Text cannot be longer 160 characters.'
+
+
+def test_delete_get_started(client, monkeypatch):
+    mock_delete = Mock()
+    mock_delete.return_value.status_code = 200
+    monkeypatch.setattr('requests.delete', mock_delete)
+    client = MessengerClient(page_access_token=12345678)
+    client.delete_get_started()
+
+    assert mock_delete.call_count == 1
+    mock_delete.assert_called_with(
+        'https://graph.facebook.com/v2.6/me/thread_settings',
+        params={'access_token': 12345678},
+        json={
+            'setting_type': 'call_to_actions',
+            'thread_state': 'new_thread'
+        }
+    )
+
+
+def test_link_account(client, monkeypatch, entry):
+    mock_post = Mock()
+    mock_post.return_value.status_code = 200
+    monkeypatch.setattr('requests.post', mock_post)
+    client = MessengerClient(page_access_token=12345678)
+    client.link_account(1234)
+
+    assert mock_post.call_count == 1
+    mock_post.assert_called_with(
+        'https://graph.facebook.com/v2.6/me',
+        params={
+            'access_token': 12345678,
+            'fields': 'recipient',
+            'account_linking_token': 1234
+        }
+    )
+
+
+def test_unlink_account(client, monkeypatch, entry):
+    mock_post = Mock()
+    mock_post.return_value.status_code = 200
+    mock_post.return_value.json.return_value = {
+        "result": "unlink account success"
+    }
+    monkeypatch.setattr('requests.post', mock_post)
+    client = MessengerClient(page_access_token=12345678)
+    res = client.unlink_account(1234)
+    assert res == {"result": "unlink account success"}
+    assert mock_post.call_count == 1
+    mock_post.assert_called_with(
+        'https://graph.facebook.com/v2.6/me/unlink_accounts',
+        params={
+            'access_token': 12345678,
+        },
+        json={
+            'psid': 1234
+        }
+    )

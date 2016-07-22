@@ -4,7 +4,7 @@ import logging
 
 import requests
 
-__version__ = '1.1.0'
+__version__ = '2.0.0'
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -74,21 +74,55 @@ class MessengerClient(object):
         )
         return r.json()
 
+    def delete_get_started(self):  # pragma: no cover
+        r = requests.delete(
+            'https://graph.facebook.com/v2.6/me/thread_settings',
+            params={
+                'access_token': self.page_access_token
+            },
+            json={
+                'setting_type': 'call_to_actions',
+                'thread_state': 'new_thread'
+            }
+        )
+        return r.json()
+
+    def link_account(self, account_linking_token):
+        r = requests.post(
+            'https://graph.facebook.com/v2.6/me',
+            params={
+                'access_token': self.page_access_token,
+                'fields': 'recipient',
+                'account_linking_token': account_linking_token
+            }
+        )
+        return r.json()
+
+    def unlink_account(self, psid):
+        r = requests.post(
+            'https://graph.facebook.com/v2.6/me/unlink_accounts',
+            params={
+                'access_token': self.page_access_token
+            },
+            json={
+                'psid': psid
+            }
+        )
+        return r.json()
+
 
 class BaseMessenger(object):
     __metaclass__ = abc.ABCMeta
 
     last_message = {}
 
-    def __init__(self, verify_token, page_access_token):
-        self.verify_token = verify_token
+    def __init__(self, page_access_token):
         self.page_access_token = page_access_token
         self.client = MessengerClient(self.page_access_token)
 
-    def verify(self, verify_token, challenge):
-        if (verify_token == self.verify_token):
-            return challenge
-        raise ValueError('FB_VERIFY_TOKEN does not match.')
+    @abc.abstractmethod
+    def account_linking(self, message):
+        """Method to handle `account_linking`"""
 
     @abc.abstractmethod
     def messages(self, message):
@@ -99,33 +133,33 @@ class BaseMessenger(object):
         """Method to handle `message_deliveries`"""
 
     @abc.abstractmethod
-    def message_echoes(self, message):
-        """Method to handle `message_echoes`"""
-
-    @abc.abstractmethod
-    def message_reads(self, message):
-        """Method to handle `message_reads`"""
+    def messaging_optins(self, message):
+        """Method to handle `messaging_optins`"""
 
     @abc.abstractmethod
     def messaging_postbacks(self, message):
         """Method to handle `messaging_postbacks`"""
 
     @abc.abstractmethod
-    def messaging_optins(self, message):
-        """Method to handle `messaging_optins`"""
+    def message_reads(self, message):
+        """Method to handle `message_reads`"""
 
     def handle(self, payload):
         for entry in payload['entry']:
             for message in entry['messaging']:
                 self.last_message = message
-                if message.get('message'):
-                    return self.messages(message)
+                if message.get('account_linking'):
+                    return self.account_linking(message)
                 elif message.get('delivery'):
                     return self.message_deliveries(message)
-                elif message.get('postback'):
-                    return self.messaging_postbacks(message)
+                elif message.get('message'):
+                    return self.messages(message)
                 elif message.get('optin'):
                     return self.messaging_optins(message)
+                elif message.get('postback'):
+                    return self.messaging_postbacks(message)
+                elif message.get('read'):
+                    return self.message_reads(message)
 
     def get_user(self):
         return self.client.get_user_data(self.last_message)
@@ -144,3 +178,12 @@ class BaseMessenger(object):
 
     def set_thread_setting(self, data):
         return self.client.set_thread_setting(data)
+
+    def delete_get_started(self):
+        return self.client.delete_get_started()
+
+    def link_account(self, account_linking_token):
+        return self.client.link_account(account_linking_token)
+
+    def unlink_account(self, psid):
+        return self.client.unlink_account(psid)

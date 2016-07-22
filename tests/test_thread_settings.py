@@ -130,5 +130,5 @@ class TestThreadSettings:
         )
         item_list = [item] * 6
         with pytest.raises(ValueError) as err:
-            res = thread_settings.PersistentMenu(menu_items=item_list)
+            thread_settings.PersistentMenu(menu_items=item_list)
         assert str(err.value) == 'You cannot have more than 5 menu_items.'

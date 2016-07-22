@@ -29,24 +29,22 @@ First you need to create a verify token, this can be any string e.g. `'my_verify
 
 ### Messenger class
 
-We need to extend the `BaseMessenger` class and implement methods for each of the following subscription fields.
+We need to extend the `BaseMessenger` abstract class and implement methods for each of the following subscription fields.
 
 - `messages`
 - `message_deliveries`
 - `message_reads`
-- `message_echoes`
 - `messaging_optins`
 - `messaging_postbacks`
+- `account_linking`
 
 ```
 from fbmessenger import BaseMessenger
 
 class Messenger(BaseMessenger):
     def __init__(self, verify_token, page_access_token):
-        self.verify_token = verify_token
         self.page_access_token = page_access_token
-        super(BaseMessenger, self).__init__(self.verify_token,
-                                            self.page_access_token)
+        super(BaseMessenger, self).__init__(self.page_access_token)
 
     def messages(self, message):
         self.send({'text': 'Received: {0}'.format(message['message']['text'])})
@@ -57,7 +55,7 @@ class Messenger(BaseMessenger):
     def message_reads(self, message):
         pass
 
-    def message_echoes(self, message):
+    def account_linking(self, message):
         pass
 
     def messaging_postbacks(self, messages):
@@ -83,7 +81,9 @@ messenger = Messenger(os.environ.get('FB_VERIFY_TOKEN'), os.environ.get('FB_PAGE
 @app.route('/webhook')
 def webhook():
     if request.method == 'GET':
-        return messenger.verify(request.args.get('hub.verify_token'), request.args.get('hub.challenge'))
+        if (request.args.get('hub.verify_token') == os.environ.get('FB_VERIFY_TOKEN')):
+            return request.args.get('hub.challenge')
+        raise ValueError('FB_VERIFY_TOKEN does not match.')
     elif request.method == 'POST':
         messenger.handle(request.get_json(force=True))
     return ''

@@ -1,3 +1,5 @@
+import copy
+
 import pytest
 from mock import Mock
 
@@ -22,10 +24,31 @@ def messenger():
         def message_reads(self, payload):
             pass
 
-        def message_echoes(self, payload):
+        def account_linking(self, payload):
             pass
 
-    return Messenger(page_access_token=12345678, verify_token=1234)
+    return Messenger(page_access_token=12345678)
+
+base_payload = {
+    'object': 'page',
+    'entry': [
+        {
+            'id': 1234,
+            'time': 1457764198246,
+            'messaging': [
+                {
+                    'sender': {
+                        'id': 1234
+                    },
+                    'recipient': {
+                        'id': 1234
+                    },
+                    'timestamp': 1457764197627,
+                }
+            ]
+        }
+    ]
+}
 
 
 @pytest.fixture
@@ -38,127 +61,68 @@ def entry():
 
 
 @pytest.fixture
-def payload():
-    return {
-        'object': 'page',
-        'entry': [
-            {
-                'id': 1234,
-                'time': 1457764198246,
-                'messaging': [
-                    {
-                        'sender': {
-                            'id': 1234
-                        },
-                        'recipient': {
-                            'id': 1234
-                        },
-                        'timestamp': 1457764197627,
-                        'message': {
-                            'mid': 'mid.1457764197618:41d102a3e1ae206a38',
-                            'seq': 73,
-                            'text': 'hello, world!'
-                        }
-                    }
-                ]
-            }
-        ]
+def payload_message():
+    payload1 = copy.deepcopy(base_payload)
+    payload1['entry'][0]['messaging'][0]['message'] = {
+        'mid': 'mid.1457764197618:41d102a3e1ae206a38',
+        'seq': 73,
+        'text': 'hello, world!'
     }
+    print(payload1)
+    return payload1
+
+
+@pytest.fixture
+def payload_message_read():
+    payload2 = copy.deepcopy(base_payload)
+    payload2['entry'][0]['messaging'][0]['read'] = {
+        'watermark': 1458668856253,
+        'seq': 38
+    }
+    print(payload2)
+    return payload2
+
+
+@pytest.fixture
+def payload_account_linking():
+    payload = copy.deepcopy(base_payload)
+    payload['entry'][0]['messaging'][0]['account_linking'] = {
+        'status': 'linked',
+        'authorization_code': 'PASS_THROUGH_AUTHORIZATION_CODE'
+    }
+    return payload
 
 
 @pytest.fixture
 def payload_delivered():
-    return {
-        'object': 'page',
-        'entry': [
-            {
-                'id': 1234,
-                'time': 1458668856451,
-                'messaging': [
-                    {
-                        'sender': {
-                            'id': 1234
-                        },
-                        'recipient': {
-                            'id': 1234
-                        },
-                        'delivery': {
-                            'mids': [
-                                'mid.1458668856218:ed81099e15d3f4f233'
-                            ],
-                            'watermark': 1458668856253,
-                            'seq': 37
-                        }
-                    }
-                ]
-            }
-        ]
+    payload = copy.deepcopy(base_payload)
+    payload['entry'][0]['messaging'][0]['delivery'] = {
+        'mids': [
+            'mid.1458668856218:ed81099e15d3f4f233'
+        ],
+        'watermark': 1458668856253,
+        'seq': 37
     }
+    return payload
 
 
 @pytest.fixture
 def payload_postback():
-    return {
-        'object': 'page',
-        'entry': [
-            {
-                'id': 1234,
-                'time': 1458668856451,
-                'messaging': [
-                    {
-                        'sender': {
-                            'id': 1234
-                        },
-                        'recipient': {
-                            'id': 1234
-                        },
-                        'timestamp': 1457764197627,
-                        'postback': {
-                            'payload': 'USER_DEFINED_PAYLOAD'
-                        }
-                    }
-                ]
-            }
-        ]
+    payload = copy.deepcopy(base_payload)
+    payload['entry'][0]['messaging'][0]['postback'] = {
+        'payload': 'USER_DEFINED_PAYLOAD'
     }
+    print(payload)
+    return payload
 
 
 @pytest.fixture
 def payload_optin():
-    return {
-        'object': 'page',
-        'entry': [
-            {
-                'id': 1234,
-                'time': 1458668856451,
-                'messaging': [
-                    {
-                        'sender': {
-                            'id': 1234
-                        },
-                        'recipient': {
-                            'id': 1234
-                        },
-                        'timestamp': 1457764197627,
-                        'optin': {
-                            'ref': 'PASS_THROUGH_PARAM'
-                        }
-                    }
-                ]
-            }
-        ]
+    payload = copy.deepcopy(base_payload)
+    payload['entry'][0]['messaging'][0]['optin'] = {
+        'ref': 'PASS_THROUGH_PARAM'
     }
-
-
-def test_verify(messenger):
-    res = messenger.verify(verify_token=1234, challenge='challenge')
-    assert res == 'challenge'
-
-
-def test_verify_with_incorrect_token(messenger):
-    with pytest.raises(ValueError) as err:
-        messenger.verify(verify_token=5678, challenge='challenge')
-    assert str(err.value) == 'FB_VERIFY_TOKEN does not match.'
+    return payload
 
 
 def test_get_user_id(messenger, entry):
@@ -167,11 +131,11 @@ def test_get_user_id(messenger, entry):
     assert res == messenger.last_message['sender']['id']
 
 
-def test_messages(messenger, payload):
+def test_messages(messenger, payload_message):
     mock_messages = Mock()
     messenger.messages = mock_messages
-    messenger.handle(payload)
-    mock_messages.assert_called_with(payload['entry'][0]['messaging'][0])
+    messenger.handle(payload_message)
+    mock_messages.assert_called_with(payload_message['entry'][0]['messaging'][0])
 
 
 def test_message_deliveries(messenger, payload_delivered):
@@ -195,6 +159,13 @@ def test_messaging_optins(messenger, payload_optin):
     mock_messaging_optins.assert_called_with(payload_optin['entry'][0]['messaging'][0])
 
 
+def test_message_reads(messenger, payload_message_read):
+    mock_message_reads = Mock()
+    messenger.message_reads = mock_message_reads
+    messenger.handle(payload_message_read)
+    mock_message_reads.assert_called_with(payload_message_read['entry'][0]['messaging'][0])
+
+
 def test_messages_subscribe(messenger, monkeypatch):
     mock = Mock(return_value='subscribe')
     monkeypatch.setattr(messenger.client, 'subscribe_app_to_page', mock)
@@ -203,7 +174,14 @@ def test_messages_subscribe(messenger, monkeypatch):
     assert res == 'subscribe'
 
 
-def test_get_user(messenger, payload, monkeypatch):
+def test_account_linking(messenger, payload_account_linking):
+    mock_account_linking = Mock()
+    messenger.account_linking = mock_account_linking
+    messenger.handle(payload_account_linking)
+    mock_account_linking.assert_called_with(payload_account_linking['entry'][0]['messaging'][0])
+
+
+def test_get_user(messenger, monkeypatch):
     mock = Mock()
     mock.return_value = {
         'first_name': 'Testy',
@@ -211,7 +189,6 @@ def test_get_user(messenger, payload, monkeypatch):
         'profile': 'profile'
     }
     monkeypatch.setattr(messenger.client, 'get_user_data', mock)
-    messenger.handle(payload)
     user = messenger.get_user()
     assert user == {
         'first_name': 'Testy',
@@ -245,4 +222,31 @@ def test_set_thread_setting(messenger, monkeypatch):
     monkeypatch.setattr(messenger.client, 'set_thread_setting', mock)
     welcome_message = thread_settings.GreetingText(text='Welcome message')
     res = messenger.set_thread_setting(welcome_message.to_dict())
+    assert res == mock()
+
+
+def test_delete_get_started(messenger, monkeypatch):
+    mock = Mock()
+    mock.return_value = {
+        'success': True
+    }
+    monkeypatch.setattr(messenger.client, 'delete_get_started', mock)
+    res = messenger.delete_get_started()
+    assert res == mock()
+
+
+def test_link_account(messenger, monkeypatch):
+    mock = Mock()
+    monkeypatch.setattr(messenger.client, 'link_account', mock)
+    res = messenger.link_account(1234)
+    assert res == mock()
+
+
+def test_unlink_account(messenger, monkeypatch):
+    mock = Mock()
+    mock.return_value = {
+        'success': True
+    }
+    monkeypatch.setattr(messenger.client, 'unlink_account', mock)
+    res = messenger.unlink_account(1234)
     assert res == mock()

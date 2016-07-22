@@ -12,7 +12,9 @@ class Button(object):
     BUTTON_TYPES = [
         'web_url',
         'postback',
-        'phone_number'
+        'phone_number',
+        'account_link',
+        'account_unlink'
     ]
 
     def __init__(self, button_type, title, url=None, payload=None):

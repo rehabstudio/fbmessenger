@@ -125,23 +125,23 @@ class BaseMessenger(object):
         """Method to handle `account_linking`"""
 
     @abc.abstractmethod
-    def messages(self, message):
+    def message(self, message):
         """Method to handle `messages`"""
 
     @abc.abstractmethod
-    def message_deliveries(self, message):
+    def delivery(self, message):
         """Method to handle `message_deliveries`"""
 
     @abc.abstractmethod
-    def messaging_optins(self, message):
+    def optin(self, message):
         """Method to handle `messaging_optins`"""
 
     @abc.abstractmethod
-    def messaging_postbacks(self, message):
+    def postback(self, message):
         """Method to handle `messaging_postbacks`"""
 
     @abc.abstractmethod
-    def message_reads(self, message):
+    def read(self, message):
         """Method to handle `message_reads`"""
 
     def handle(self, payload):
@@ -151,15 +151,15 @@ class BaseMessenger(object):
                 if message.get('account_linking'):
                     return self.account_linking(message)
                 elif message.get('delivery'):
-                    return self.message_deliveries(message)
+                    return self.delivery(message)
                 elif message.get('message'):
-                    return self.messages(message)
+                    return self.message(message)
                 elif message.get('optin'):
-                    return self.messaging_optins(message)
+                    return self.optin(message)
                 elif message.get('postback'):
-                    return self.messaging_postbacks(message)
+                    return self.postback(message)
                 elif message.get('read'):
-                    return self.message_reads(message)
+                    return self.read(message)
 
     def get_user(self):
         return self.client.get_user_data(self.last_message)
@@ -173,7 +173,7 @@ class BaseMessenger(object):
     def get_user_id(self):
         return self.last_message['sender']['id']
 
-    def subscribe(self):
+    def subscribe_app_to_page(self):
         return self.client.subscribe_app_to_page()
 
     def set_thread_setting(self, data):

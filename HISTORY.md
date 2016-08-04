@@ -1,5 +1,13 @@
 # Release History
 
+## 3.0.0
+
+### Breaking changes
+
+- Renamed abstract methods to match data structure
+  Methods are now `message`, `delivery`, `optin`, `postback`, `read` and `account_linking`
+- Renamed `subscribe` to `subscribe_app_to_page`
+
 ## 2.0.0
 - Removed need for verify token when instanciating class
 - Removed verify function

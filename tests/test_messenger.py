@@ -9,19 +9,19 @@ from fbmessenger import BaseMessenger, thread_settings
 @pytest.fixture
 def messenger():
     class Messenger(BaseMessenger):
-        def messages(self, payload):
+        def message(self, payload):
             pass
 
-        def message_deliveries(self, payload):
+        def delivery(self, payload):
             pass
 
-        def messaging_postbacks(self, payload):
+        def postback(self, payload):
             pass
 
-        def messaging_optins(self, payload):
+        def optin(self, payload):
             pass
 
-        def message_reads(self, payload):
+        def read(self, payload):
             pass
 
         def account_linking(self, payload):
@@ -132,44 +132,44 @@ def test_get_user_id(messenger, entry):
 
 
 def test_messages(messenger, payload_message):
-    mock_messages = Mock()
-    messenger.messages = mock_messages
+    mock_message = Mock()
+    messenger.message = mock_message
     messenger.handle(payload_message)
-    mock_messages.assert_called_with(payload_message['entry'][0]['messaging'][0])
+    mock_message.assert_called_with(payload_message['entry'][0]['messaging'][0])
 
 
 def test_message_deliveries(messenger, payload_delivered):
-    mock_message_deliveries = Mock()
-    messenger.message_deliveries = mock_message_deliveries
+    mock_delivery = Mock()
+    messenger.delivery = mock_delivery
     messenger.handle(payload_delivered)
-    mock_message_deliveries.assert_called_with(payload_delivered['entry'][0]['messaging'][0])
+    mock_delivery.assert_called_with(payload_delivered['entry'][0]['messaging'][0])
 
 
 def test_messaging_postbacks(messenger, payload_postback):
-    mock_messaging_postbacks = Mock()
-    messenger.messaging_postbacks = mock_messaging_postbacks
+    mock_postback = Mock()
+    messenger.postback = mock_postback
     messenger.handle(payload_postback)
-    mock_messaging_postbacks.assert_called_with(payload_postback['entry'][0]['messaging'][0])
+    mock_postback.assert_called_with(payload_postback['entry'][0]['messaging'][0])
 
 
 def test_messaging_optins(messenger, payload_optin):
-    mock_messaging_optins = Mock()
-    messenger.messaging_optins = mock_messaging_optins
+    mock_optin = Mock()
+    messenger.optin = mock_optin
     messenger.handle(payload_optin)
-    mock_messaging_optins.assert_called_with(payload_optin['entry'][0]['messaging'][0])
+    mock_optin.assert_called_with(payload_optin['entry'][0]['messaging'][0])
 
 
 def test_message_reads(messenger, payload_message_read):
-    mock_message_reads = Mock()
-    messenger.message_reads = mock_message_reads
+    mock_read = Mock()
+    messenger.read = mock_read
     messenger.handle(payload_message_read)
-    mock_message_reads.assert_called_with(payload_message_read['entry'][0]['messaging'][0])
+    mock_read.assert_called_with(payload_message_read['entry'][0]['messaging'][0])
 
 
-def test_messages_subscribe(messenger, monkeypatch):
+def test_subscribe(messenger, monkeypatch):
     mock = Mock(return_value='subscribe')
     monkeypatch.setattr(messenger.client, 'subscribe_app_to_page', mock)
-    res = messenger.subscribe()
+    res = messenger.subscribe_app_to_page()
     assert mock.called
     assert res == 'subscribe'
 

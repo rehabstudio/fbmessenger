@@ -270,3 +270,14 @@ messenger.send(result.to_dict())
 ## Development Notes
 
 [Pandoc](http://pandoc.org/installing.html) should be installed locally to convert the README to reStructuredText format for uploading to PyPi
+
+### Creating a new release
+
+Commit latest changes
+
+```
+git push --tags
+python setup.py sdist bdist_wheel
+twine upload -r pypi dist/fbmessenger-<version>*
+```
+

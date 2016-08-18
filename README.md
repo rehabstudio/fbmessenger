@@ -267,17 +267,29 @@ result = QuickReplies(quick_replies=[
 messenger.send(result.to_dict())
 ```
 
-## Development Notes
+## Code Contributions
 
-[Pandoc](http://pandoc.org/installing.html) should be installed locally to convert the README to reStructuredText format for uploading to PyPi
+When contributing code, you'll want to follow this checklist:
+
+1. Fork the repository on GitHub.
+2. Run the tests to confirm they all pass on your system. If they don't, you'll need to investigate why they fail. If you're unable to diagnose this yourself, raise it as a bug report by following the guidelines in this document: Bug Reports.
+3. Write tests that demonstrate your bug or feature. Ensure that they fail.
+4. Make your change.
+5. Run the entire test suite again, confirming that all tests pass including the ones you just added.
+6. Send a GitHub Pull Request to the main repository's master branch. 7. GitHub Pull Requests are the expected method of code collaboration on this project.
 
 ### Creating a new release
 
-Commit latest changes
+_nb. [Pandoc](http://pandoc.org/installing.html) is required as it is used to convert the README to reStructuredText format_
+
+
+- Commit latest changes
+- Update in `__version__` in `init.py`
 
 ```
 git push --tags
 python setup.py sdist bdist_wheel
 twine upload -r pypi dist/fbmessenger-<version>*
 ```
+
 

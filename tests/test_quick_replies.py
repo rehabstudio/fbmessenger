@@ -50,5 +50,5 @@ class TestQuickReplies:
         qr = quick_replies.QuickReply(title='QR', payload='QR payload')
         qr_list = [qr] * 11
         with pytest.raises(ValueError) as err:
-            res = quick_replies.QuickReplies(quick_replies=qr_list)
+            quick_replies.QuickReplies(quick_replies=qr_list)
         assert str(err.value) == 'You cannot have more than 10 quick replies.'

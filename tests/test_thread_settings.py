@@ -95,7 +95,7 @@ class TestThreadSettings:
                 item_type='postback',
                 title='Link',
             )
-        assert str(err.value) == '`postback` must be supplied for `payload` type menu items.'
+        assert str(err.value) == '`payload` must be supplied for `postback` type menu items.'
 
     def test_persistent_menu(self):
         item = thread_settings.PersistentMenuItem(

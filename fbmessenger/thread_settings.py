@@ -45,7 +45,7 @@ class PersistentMenuItem(object):
         if item_type == 'web_url' and url is None:
             raise ValueError('`url` must be supplied for `web_url` type menu items.')
         if item_type == 'postback' and payload is None:
-            raise ValueError('`postback` must be supplied for `payload` type menu items.')
+            raise ValueError('`payload` must be supplied for `postback` type menu items.')
 
         self.item_type = item_type
         self.title = title

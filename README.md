@@ -31,11 +31,11 @@ First you need to create a verify token, this can be any string e.g. `'my_verify
 
 We need to extend the `BaseMessenger` abstract class and implement methods for each of the following subscription fields.
 
-- `messages`
-- `message_deliveries`
-- `message_reads`
-- `messaging_optins`
-- `messaging_postbacks`
+- `message`
+- `delivery`
+- `read`
+- `optin`
+- `postback`
 - `account_linking`
 
 ```
@@ -46,22 +46,22 @@ class Messenger(BaseMessenger):
         self.page_access_token = page_access_token
         super(BaseMessenger, self).__init__(self.page_access_token)
 
-    def messages(self, message):
+    def message(self, message):
         self.send({'text': 'Received: {0}'.format(message['message']['text'])})
 
-    def message_deliveries(self, message):
+    def delivery(self, message):
         pass
 
-    def message_reads(self, message):
+    def read(self, message):
         pass
 
     def account_linking(self, message):
         pass
 
-    def messaging_postbacks(self, messages):
+    def postback(self, messages):
         pass
 
-    def messaging_optins(self, messages):
+    def optin(self, messages):
         pass
 ```
 

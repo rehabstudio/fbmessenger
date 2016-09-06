@@ -26,7 +26,7 @@ def test_get_user_data(client, monkeypatch):
         "last_name": "User",
         "profile_pic": "profile"
     }
-    monkeypatch.setattr('requests.get', mock_get)
+    monkeypatch.setattr('requests.Session.get', mock_get)
     entry = {
         'sender': {
             'id': 12345678
@@ -52,7 +52,7 @@ def test_subscribe_app_to_page(client, monkeypatch):
     mock_post.return_value.json.return_value = {
         "success": True
     }
-    monkeypatch.setattr('requests.post', mock_post)
+    monkeypatch.setattr('requests.Session.post', mock_post)
     client = MessengerClient(page_access_token=12345678)
     resp = client.subscribe_app_to_page()
 
@@ -71,7 +71,7 @@ def test_send_data(client, monkeypatch, entry):
         "recipient_id": 12345678,
         "message_id": "mid.1456970487936:c34767dfe57ee6e339"
     }
-    monkeypatch.setattr('requests.post', mock_post)
+    monkeypatch.setattr('requests.Session.post', mock_post)
     client = MessengerClient(page_access_token=12345678)
     payload = {'text': 'Test message'}
     resp = client.send(payload, entry)
@@ -96,7 +96,7 @@ def test_send_data(client, monkeypatch, entry):
 def test_send_action(client, monkeypatch, entry):
     mock_post = Mock()
     mock_post.return_value.status_code = 200
-    monkeypatch.setattr('requests.post', mock_post)
+    monkeypatch.setattr('requests.Session.post', mock_post)
     client = MessengerClient(page_access_token=12345678)
     client.send_action('typing_on', entry)
 
@@ -119,7 +119,7 @@ def test_set_greeting_text(client, monkeypatch):
     mock_post.return_value.json.return_value = {
         "result": "Successfully added new_thread's CTAs"
     }
-    monkeypatch.setattr('requests.post', mock_post)
+    monkeypatch.setattr('requests.Session.post', mock_post)
     client = MessengerClient(page_access_token=12345678)
     welcome_message = thread_settings.GreetingText(text='Welcome message')
     resp = client.set_thread_setting(welcome_message.to_dict())
@@ -144,7 +144,7 @@ def test_set_greeting_text_too_long(client, monkeypatch):
     mock_post.return_value.json.return_value = {
         "result": "Successfully added new_thread's CTAs"
     }
-    monkeypatch.setattr('requests.post', mock_post)
+    monkeypatch.setattr('requests.Session.post', mock_post)
 
     with pytest.raises(ValueError) as err:
         thread_settings.GreetingText(text='x' * 161)
@@ -154,7 +154,7 @@ def test_set_greeting_text_too_long(client, monkeypatch):
 def test_delete_get_started(client, monkeypatch):
     mock_delete = Mock()
     mock_delete.return_value.status_code = 200
-    monkeypatch.setattr('requests.delete', mock_delete)
+    monkeypatch.setattr('requests.Session.delete', mock_delete)
     client = MessengerClient(page_access_token=12345678)
     client.delete_get_started()
 
@@ -172,7 +172,7 @@ def test_delete_get_started(client, monkeypatch):
 def test_link_account(client, monkeypatch, entry):
     mock_post = Mock()
     mock_post.return_value.status_code = 200
-    monkeypatch.setattr('requests.post', mock_post)
+    monkeypatch.setattr('requests.Session.post', mock_post)
     client = MessengerClient(page_access_token=12345678)
     client.link_account(1234)
 
@@ -193,7 +193,7 @@ def test_unlink_account(client, monkeypatch, entry):
     mock_post.return_value.json.return_value = {
         "result": "unlink account success"
     }
-    monkeypatch.setattr('requests.post', mock_post)
+    monkeypatch.setattr('requests.Session.post', mock_post)
     client = MessengerClient(page_access_token=12345678)
     res = client.unlink_account(1234)
     assert res == {"result": "unlink account success"}

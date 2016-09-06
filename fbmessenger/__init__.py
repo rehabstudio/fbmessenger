@@ -14,9 +14,10 @@ class MessengerClient(object):
 
     def __init__(self, page_access_token):
         self.page_access_token = page_access_token
+        self.session = requests.Session()
 
     def get_user_data(self, entry):
-        r = requests.get(
+        r = self.session.get(
             'https://graph.facebook.com/v2.6/{sender}'.format(sender=entry['sender']['id']),
             params={
                 'fields': 'first_name,last_name,profile_pic,locale,timezone,gender',
@@ -26,7 +27,7 @@ class MessengerClient(object):
         return r.json()
 
     def send(self, payload, entry):
-        r = requests.post(
+        r = self.session.post(
             'https://graph.facebook.com/v2.6/me/messages',
             params={
                 'access_token': self.page_access_token
@@ -41,7 +42,7 @@ class MessengerClient(object):
         return r.json()
 
     def send_action(self, sender_action, entry):
-        r = requests.post(
+        r = self.session.post(
             'https://graph.facebook.com/v2.6/me/messages',
             params={
                 'access_token': self.page_access_token
@@ -56,7 +57,7 @@ class MessengerClient(object):
         return r.json()
 
     def subscribe_app_to_page(self):
-        r = requests.post(
+        r = self.session.post(
             'https://graph.facebook.com/v2.6/me/subscribed_apps',
             params={
                 'access_token': self.page_access_token
@@ -65,7 +66,7 @@ class MessengerClient(object):
         return r.json()
 
     def set_thread_setting(self, data):
-        r = requests.post(
+        r = self.session.post(
             'https://graph.facebook.com/v2.6/me/thread_settings',
             params={
                 'access_token': self.page_access_token
@@ -75,7 +76,7 @@ class MessengerClient(object):
         return r.json()
 
     def delete_get_started(self):  # pragma: no cover
-        r = requests.delete(
+        r = self.session.delete(
             'https://graph.facebook.com/v2.6/me/thread_settings',
             params={
                 'access_token': self.page_access_token
@@ -88,7 +89,7 @@ class MessengerClient(object):
         return r.json()
 
     def link_account(self, account_linking_token):
-        r = requests.post(
+        r = self.session.post(
             'https://graph.facebook.com/v2.6/me',
             params={
                 'access_token': self.page_access_token,
@@ -99,7 +100,7 @@ class MessengerClient(object):
         return r.json()
 
     def unlink_account(self, psid):
-        r = requests.post(
+        r = self.session.post(
             'https://graph.facebook.com/v2.6/me/unlink_accounts',
             params={
                 'access_token': self.page_access_token

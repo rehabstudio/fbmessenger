@@ -24,7 +24,9 @@ Install from pip
 
 ## Example usage with Flask
 
-First you need to create a verify token, this can be any string e.g. `'my_verify_token'`.
+First you need to create a verify token, this can be any string e.g. 
+	
+	'my_verify_token'
 
 
 ### Messenger class
@@ -38,11 +40,11 @@ We need to extend the `BaseMessenger` abstract class and implement methods for e
 - `postback`
 - `account_linking`
 
-```
+```python
 from fbmessenger import BaseMessenger
 
 class Messenger(BaseMessenger):
-    def __init__(self, verify_token, page_access_token):
+    def __init__(self, page_access_token):
         self.page_access_token = page_access_token
         super(BaseMessenger, self).__init__(self.page_access_token)
 
@@ -70,7 +72,7 @@ class Messenger(BaseMessenger):
 
 This can be used to process any messages received and also to verify your app
 
-```
+```python
 import os
 from flask import Flask, request
 
@@ -97,13 +99,13 @@ if __name__ == "__main__":
 
 Import the elements (or just the ones you need)
 
-`from fbmessenger import elements`
+	from fbmessenger import elements
 
 ### Text
 
-You can pass a simple dict  or use the Class
+You can pass a simple dict or use the Class
 
-```
+```python
 messenger.send({'text': msg})
 
 elem = elements.Text('Your Message')
@@ -112,7 +114,7 @@ messenger.send(elem.to_dict())
 
 ### Web button
 
-```
+```python
 btn = elements.Button(title='Web button', url='http://example.com')
 messenger.send(btn.to_dict())
 ```
@@ -121,7 +123,7 @@ messenger.send(btn.to_dict())
 
 To use these buttons you must have the `message_deliveries` subscription enabled
 
-```
+```python
 btn = elements.Button(title='Postback button', payload='payload')
 messenger.send(btn.to_dict())
 ```
@@ -130,28 +132,28 @@ messenger.send(btn.to_dict())
 
 ### Images
 
-```
+```python
 image = attachments.Image(url='http://example.com/image.jpg')
 messenger.send(image.to_dict())
 ```
 
 ### Audio
 
-```
+```python
 audio = attachments.Image(url='http://example.com/audio.mp3')
 messenger.send(audio.to_dict())
 ```
 
 ### Video
 
-```
+```python
 video = attachments.Video(url='http://example.com/video.mp4')
 messenger.send(video.to_dict())
 ```
 
 ### Files
 
-```
+```python
 file = attachments.File(url='http://example.com/file.txt')
 messenger.send(file.to_dict())
 ```
@@ -160,11 +162,11 @@ messenger.send(file.to_dict())
 
 Import the templates (or just the ones you need)
 
-`from fbmessenger import templates`
+	from fbmessenger import templates
 
 ### Generic template
 
-```
+```python
 btn = elements.Button(title='Web button', url='http://facebook.com')
 elems = elements.Element(
     title='Element',
@@ -181,7 +183,7 @@ messenger.send(res.to_dict())
 
 ### Button template
 
-```
+```python
 btn = elements.Button(title='Web button', url='http://facebook.com')
 btn2 = elements.Button(title='Postback button', payload='payload')
 res = templates.ButtonTemplate(
@@ -193,7 +195,7 @@ messenger.send(res.to_dict())
 
 ### Receipt template
 
-```
+```python
 element = elements.Element(
     title='Classic White T-Shirt',
     subtitle='100% Soft and Luxurious Cotton',
@@ -236,28 +238,28 @@ messenger.send(res.to_dict())
 
 ### Typing on
 
-```
+```python
 typing_on = SenderAction(sender_action='typing_on')
 messenger.send_action(typing_on.to_dict())
 ```
 
 ### Typing off
 
-```
+```python
 typing_ffn = SenderAction(sender_action='typing_off')
 messenger.send_action(typing_off.to_dict())
 ```
 
 ### Mark seen
 
-```
+```python
 mark_seen = SenderAction(sender_action='mark_seen')
 messenger.send_action(mark_seen.to_dict())
 ```
 
 ## Quick Replies
 
-```
+```python
 quick_reply_1 = QuickReply(title='Do something', payload='Send me this payload')
 quick_reply_2 = QuickReply(title='Do something else', payload='Send me this other payload')
 result = QuickReplies(quick_replies=[
@@ -265,6 +267,41 @@ result = QuickReplies(quick_replies=[
 	quick_reply_2
 ])
 messenger.send(result.to_dict())
+```
+
+## Thread settings
+
+### Greeting Text
+
+```python
+
+from fbmessenger.thread_settings import GreetingText
+
+greeting_text = new GreetingText('Welcome to my bot')
+messenger.send(greeting_text.to_dict())
+```
+### Get Started Button
+
+```python
+from fbmessenger.thread_settings import GetStartedButton
+
+get_started = new GetStartedButton(payload='GET_STARTED')
+messenger.send(get_started.to_dict())
+```
+
+You can then check for this payload in the `postback` method
+
+### Persistent Menu
+
+```python
+from fbmessenger.thread_settings import PersistentMenu, PersistentMenuItem
+
+menu_item_1 = new PersistentMenuItem(item_type='web_url', title='Menu Item 1', url='https://facebook.com')
+menu_item_2 = new PersistentMenuItem(item_type='postback', title='Menu Item 2', payload='PAYLOAD')
+
+menu = new PersistentMenu(menu_items=[menu_item_1, menu_item_2])
+
+messenger.send(menu.to_dict())
 ```
 
 ## Code Contributions
@@ -286,7 +323,7 @@ _nb. [Pandoc](http://pandoc.org/installing.html) is required as it is used to co
 - Commit latest changes
 - Update in `__version__` in `init.py`
 
-```
+```bash
 git push --tags
 python setup.py sdist bdist_wheel
 twine upload -r pypi dist/fbmessenger-<version>*

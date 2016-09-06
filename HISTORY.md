@@ -1,5 +1,9 @@
 # Release History
 
+## 3.0.1
+
+- Added use of requests.Session for connection reuse
+
 ## 3.0.0
 
 ### Breaking changes

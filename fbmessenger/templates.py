@@ -1,4 +1,6 @@
-from quick_replies import QuickReplies
+from __future__ import absolute_import
+
+from .quick_replies import QuickReplies
 
 
 class BaseTemplate(object):

@@ -1,8 +1,10 @@
-from quick_replies import QuickReplies
+from __future__ import absolute_import
+
+from .quick_replies import QuickReplies
 
 
 class BaseAttachment(object):
-    def __init__(self, attachment_type, url, quick_replies=None):
+    def __init__(self, attachment_type, url, is_reusable, quick_replies=None):
         self.type = attachment_type
         self.url = url
 

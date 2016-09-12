@@ -67,7 +67,10 @@ class PersistentMenuItem(object):
 
 
 class PersistentMenu(object):
-    def __init__(self, menu_items):
+    def __init__(self, menu_items=None):
+        if menu_items is None:
+            menu_items = []
+
         if len(menu_items) > 5:
             raise ValueError('You cannot have more than 5 menu_items.')
         self.menu_items = menu_items

@@ -111,6 +111,20 @@ class MessengerClient(object):
         )
         return r.json()
 
+    def update_whitelisted_domains(self, action_type, domains):
+        r = self.session.post(
+            'https://graph.facebook.com/v2.6/me/thread_settings',
+            params={
+                'access_token': self.page_access_token
+            },
+            json={
+                'setting_type': 'domain_whitelisting',
+                'domain_action_type': action_type,
+                'whitelisted_domains': domains
+            }
+        )
+        return r.json()
+
 
 class BaseMessenger(object):
     __metaclass__ = abc.ABCMeta
@@ -188,3 +202,9 @@ class BaseMessenger(object):
 
     def unlink_account(self, psid):
         return self.client.unlink_account(psid)
+
+    def add_whitelisted_domains(self, domains):
+        return self.client.update_whitelisted_domains('add', domains)
+
+    def remove_whitelisted_domains(self, domains):
+        return self.client.update_whitelisted_domains('remove', domains)

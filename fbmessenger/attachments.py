@@ -4,9 +4,13 @@ from .quick_replies import QuickReplies
 
 
 class BaseAttachment(object):
-    def __init__(self, attachment_type, url, is_reusable, quick_replies=None):
+    def __init__(self, attachment_type, url, is_reusable=None, quick_replies=None):
         self.type = attachment_type
         self.url = url
+
+        if is_reusable is None:
+            is_reusable = False
+        self.is_reusable = is_reusable
 
         if quick_replies and not isinstance(quick_replies, QuickReplies):
             raise TypeError('quick_replies must be an instance of QuickReplies.')
@@ -21,6 +25,9 @@ class BaseAttachment(object):
                 }
             }
         }
+
+        if self.is_reusable:
+            d['attachment']['payload']['is_reusable'] = 'true'
 
         if self.quick_replies:
             d['attachment']['quick_replies'] = self.quick_replies.to_dict()

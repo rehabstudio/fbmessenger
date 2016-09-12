@@ -30,20 +30,18 @@ class TestQuickReplies:
     def test_quick_replies(self):
         qr = quick_replies.QuickReply(title='QR', payload='QR payload')
         res = quick_replies.QuickReplies(quick_replies=[qr] * 2)
-        expected = {
-            'quick_replies': [
-                {
-                    'content_type': 'text',
-                    'title': 'QR',
-                    'payload': 'QR payload'
-                },
-                {
-                    'content_type': 'text',
-                    'title': 'QR',
-                    'payload': 'QR payload'
-                }
-            ]
-        }
+        expected = [
+            {
+                'content_type': 'text',
+                'title': 'QR',
+                'payload': 'QR payload'
+            },
+            {
+                'content_type': 'text',
+                'title': 'QR',
+                'payload': 'QR payload'
+            }
+        ]
         assert expected == res.to_dict()
 
     def test_too_many_quick_replies(self):

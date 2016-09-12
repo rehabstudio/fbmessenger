@@ -7,7 +7,7 @@ test:
 	py.test tests
 
 coverage:
-	py.test --verbose --cov-report term-missing --cov=fbmessenger tests
+	py.test -vv --cov-report term-missing --cov=fbmessenger tests
 
 publish:
 	python setup.py register

@@ -24,8 +24,8 @@ Install from pip
 
 ## Example usage with Flask
 
-First you need to create a verify token, this can be any string e.g. 
-	
+First you need to create a verify token, this can be any string e.g.
+
 	'my_verify_token'
 
 
@@ -262,11 +262,13 @@ messenger.send_action(mark_seen.to_dict())
 ```python
 quick_reply_1 = QuickReply(title='Do something', payload='Send me this payload')
 quick_reply_2 = QuickReply(title='Do something else', payload='Send me this other payload')
-result = QuickReplies(quick_replies=[
+quick_replies = QuickReplies(quick_replies=[
 	quick_reply_1,
 	quick_reply_2
 ])
-messenger.send(result.to_dict())
+text = { text: 'A message' }
+text['quick_replies'] = quick_replies.to_dict()
+messenger.send(text)
 ```
 
 ## Thread settings

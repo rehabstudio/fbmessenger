@@ -1,65 +1,86 @@
+from quick_replies import QuickReplies
+
+
 class BaseTemplate(object):
-    def __init__(self, elements):
-        if not isinstance(elements, list):
+    def __init__(self, elements=None, quick_replies=None):
+        if elements and not isinstance(elements, list):
             elements = [elements]
         self._elements = elements
 
+        if quick_replies and not isinstance(quick_replies, QuickReplies):
+            raise TypeError('quick_replies must be an instance of QuickReplies.')
+        self._quick_replies = quick_replies
+
+        self._d = {
+            'attachment': {
+                'type': 'template',
+            },
+        }
+
     @property
     def elements(self):
-        if len(self._elements) > 10:
+        if self._elements and len(self._elements) > 10:
             raise ValueError('You cannot have more than 10 elements in the template.')
         return self._elements
+
+    @property
+    def quick_replies(self):
+        if self._quick_replies and len(self._quick_replies) > 10:
+            raise ValueError('You cannot have more than 10 quick_replies in the template.')
+        return self._quick_replies
+
+    def to_dict(self):
+        if self.quick_replies:
+            self._d['attachment']['quick_replies'] = self.quick_replies.to_dict()
+
+        return self._d
 
 
 class GenericTemplate(BaseTemplate):
 
-    def __init__(self, elements):
+    def __init__(self, elements, quick_replies=None):
         self._elements = elements
-        super(GenericTemplate, self).__init__(self._elements)
+        self._quick_replies = quick_replies
+        super(GenericTemplate, self).__init__(self._elements, self._quick_replies)
 
     def to_dict(self):
-        return {
-            'attachment': {
-                'type': 'template',
-                'payload': {
-                    'template_type': 'generic',
-                    'elements': [
-                        element.to_dict() for element in self.elements
-                    ]
-                }
-            },
+        self._d['attachment']['payload'] = {
+            'template_type': 'generic',
+            'elements': [
+                element.to_dict() for element in self.elements
+            ]
         }
+        return super(GenericTemplate, self).to_dict()
 
 
-class ButtonTemplate(object):
+class ButtonTemplate(BaseTemplate):
 
-    def __init__(self, text, buttons):
+    def __init__(self, text, buttons, quick_replies=None):
         self.text = text
+        self._quick_replies = quick_replies
 
         if not isinstance(buttons, list):
             buttons = [buttons]
         self.buttons = buttons
 
+        super(ButtonTemplate, self).__init__(None, self._quick_replies)
+
     def to_dict(self):
-        return {
-            'attachment': {
-                'type': 'template',
-                'payload': {
-                    'template_type': 'button',
-                    'text': self.text,
-                    'buttons': [
-                        button.to_dict() for button in self.buttons
-                    ]
-                }
-            }
+        self._d['attachment']['payload'] = {
+            'template_type': 'button',
+            'text': self.text,
+            'buttons': [
+                button.to_dict() for button in self.buttons
+            ]
         }
+        return super(ButtonTemplate, self).to_dict()
 
 
 class ReceiptTemplate(BaseTemplate):
 
     def __init__(self, recipient_name, order_number, currency, payment_method,
                  elements, summary, order_url=None, timestamp=None,
-                 address=None, adjustments=None):
+                 address=None, adjustments=None, quick_replies=None):
 
         self._elements = elements
         self.recipient_name = recipient_name
@@ -69,31 +90,33 @@ class ReceiptTemplate(BaseTemplate):
         self.summary = summary.to_dict()
         self.order_url = order_url
         self.timestamp = timestamp
-        self.address = {} if address is None else address.to_dict()
-        self.adjustments = [] if adjustments is None else adjustments
+        self.address = address
+        self.adjustments = adjustments
+        self._quick_replies = quick_replies
 
-        super(ReceiptTemplate, self).__init__(self._elements)
+        super(ReceiptTemplate, self).__init__(self._elements, self._quick_replies)
 
     def to_dict(self):
-        return {
-            'attachment': {
-                'type': 'template',
-                'payload': {
-                    'template_type': 'receipt',
-                    'recipient_name': self.recipient_name,
-                    'order_number': self.order_number,
-                    'order_url': self.order_url,
-                    'currency': self.currency,
-                    'timestamp': self.timestamp,
-                    'payment_method': self.payment_method,
-                    'elements': [
-                        element.to_dict() for element in self.elements
-                    ],
-                    'adjustments': [
-                        adjustment.to_dict() for adjustment in self.adjustments
-                    ],
-                    'address': self.address,
-                    'summary': self.summary
-                }
-            },
+        self._d['attachment']['payload'] = {
+            'template_type': 'receipt',
+            'recipient_name': self.recipient_name,
+            'order_number': self.order_number,
+            'order_url': self.order_url,
+            'currency': self.currency,
+            'timestamp': self.timestamp,
+            'payment_method': self.payment_method,
+            'elements': [
+                element.to_dict() for element in self.elements
+            ],
+            'summary': self.summary
         }
+
+        if self.address:
+            self._d['attachment']['payload']['address'] = self.address.to_dict()
+
+        if self.adjustments:
+            self._d['attachment']['payload']['adjustments'] = [
+                adjustment.to_dict() for adjustment in self.adjustments
+            ]
+
+        return super(ReceiptTemplate, self).to_dict()

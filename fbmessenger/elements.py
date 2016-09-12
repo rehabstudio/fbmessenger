@@ -1,11 +1,17 @@
 class Text(object):
-    def __init__(self, text):
+    def __init__(self, text, quick_replies=None):
         self.text = text
+        self.quick_replies = quick_replies
 
     def to_dict(self):
-        return {
+        d = {
             'text': self.text
         }
+
+        if self.quick_replies:
+            d['quick_replies'] = self.quick_replies
+
+        return d
 
 
 class Button(object):
@@ -14,13 +20,14 @@ class Button(object):
         'postback',
         'phone_number',
         'account_link',
-        'account_unlink'
+        'account_unlink',
+        'element_share',
     ]
 
-    def __init__(self, button_type, title, url=None, payload=None):
+    def __init__(self, button_type, title=None, url=None, payload=None):
         if button_type not in self.BUTTON_TYPES:
             raise ValueError('Invalid button_type provided.')
-        if len(title) > 20:
+        if title and len(title) > 20:
             raise ValueError('Title cannot be longer 20 characters.')
         self.type = button_type
         self.title = title
@@ -28,15 +35,18 @@ class Button(object):
         self.payload = payload
 
     def to_dict(self):
-        res = {
+        d = {
             'type': self.type,
-            'title': self.title
         }
+
+        if self.title:
+            d['title'] = self.title
         if self.url:
-            res['url'] = self.url
+            d['url'] = self.url
         if self.payload:
-            res['payload'] = self.payload
-        return res
+            d['payload'] = self.payload
+
+        return d
 
 
 class Element(object):
@@ -73,27 +83,27 @@ class Element(object):
         return self._subtitle
 
     def to_dict(self):
-        data = {
+        d = {
             'title': self.title,
         }
         if self.item_url:
-            data['item_url'] = self.item_url
+            d['item_url'] = self.item_url
         if self.image_url:
-            data['image_url'] = self.image_url
+            d['image_url'] = self.image_url
         if self._subtitle:
-            data['subtitle'] = self.subtitle
+            d['subtitle'] = self.subtitle
         if self.quantity:
-            data['quantity'] = self.quantity
+            d['quantity'] = self.quantity
         if self.price:
-            data['price'] = self.price
+            d['price'] = self.price
         if self.currency:
-            data['currency'] = self.currency
+            d['currency'] = self.currency
         if self.buttons:
-            data['buttons'] = [
+            d['buttons'] = [
                 button.to_dict() for button in self.buttons
             ]
 
-        return data
+        return d
 
 
 class Adjustment(object):

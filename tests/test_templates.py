@@ -1,6 +1,8 @@
 import pytest
 
-from fbmessenger import elements, templates
+from fbmessenger import elements
+from fbmessenger import templates
+from fbmessenger import quick_replies
 
 
 class TestTemplates:
@@ -60,7 +62,11 @@ class TestTemplates:
         assert expected == res.to_dict()
 
     def test_generic_template(self):
-        btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
+        btn = elements.Button(
+            button_type='web_url',
+            title='Web button',
+            url='http://facebook.com'
+        )
         elems = elements.Element(
             title='Element',
             item_url='http://facebook.com',
@@ -70,13 +76,26 @@ class TestTemplates:
                 btn
             ]
         )
-        res = templates.GenericTemplate(elements=[elems])
+        res = templates.GenericTemplate(elements=[elems] * 2)
         expected = {
             'attachment': {
                 'type': 'template',
                 'payload': {
                     'template_type': 'generic',
                     'elements': [
+                        {
+                            'title': 'Element',
+                            'item_url': 'http://facebook.com',
+                            'image_url': 'http://facebook.com/image.jpg',
+                            'subtitle': 'Subtitle',
+                            'buttons': [
+                                {
+                                    'type': 'web_url',
+                                    'title': 'Web button',
+                                    'url': 'http://facebook.com'
+                                }
+                            ]
+                        },
                         {
                             'title': 'Element',
                             'item_url': 'http://facebook.com',
@@ -97,7 +116,11 @@ class TestTemplates:
         assert expected == res.to_dict()
 
     def test_generic_template_with_single_element(self):
-        btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
+        btn = elements.Button(
+            button_type='web_url',
+            title='Web button',
+            url='http://facebook.com'
+        )
         elems = elements.Element(
             title='Element',
             item_url='http://facebook.com',
@@ -129,6 +152,64 @@ class TestTemplates:
                         }
                     ]
                 }
+            }
+        }
+        assert expected == res.to_dict()
+
+    def test_generic_template_with_quick_replies(self):
+        btn = elements.Button(
+            button_type='web_url',
+            title='Web button',
+            url='http://facebook.com'
+        )
+        elems = elements.Element(
+            title='Element',
+            item_url='http://facebook.com',
+            image_url='http://facebook.com/image.jpg',
+            subtitle='Subtitle',
+            buttons=[
+                btn
+            ]
+        )
+        qr = quick_replies.QuickReply(title='QR', payload='QR payload')
+        qrs = quick_replies.QuickReplies(quick_replies=[qr] * 2)
+        res = templates.GenericTemplate(
+            elements=[elems],
+            quick_replies=qrs
+        )
+        expected = {
+            'attachment': {
+                'type': 'template',
+                'payload': {
+                    'template_type': 'generic',
+                    'elements': [
+                        {
+                            'title': 'Element',
+                            'item_url': 'http://facebook.com',
+                            'image_url': 'http://facebook.com/image.jpg',
+                            'subtitle': 'Subtitle',
+                            'buttons': [
+                                {
+                                    'type': 'web_url',
+                                    'title': 'Web button',
+                                    'url': 'http://facebook.com'
+                                }
+                            ]
+                        }
+                    ],
+                },
+                'quick_replies': [
+                    {
+                        'content_type': 'text',
+                        'title': 'QR',
+                        'payload': 'QR payload'
+                    },
+                    {
+                        'content_type': 'text',
+                        'title': 'QR',
+                        'payload': 'QR payload'
+                    }
+                ]
             }
         }
         assert expected == res.to_dict()
@@ -235,3 +316,8 @@ class TestTemplates:
             }
         }
         assert expected == res.to_dict()
+
+    def test_template_with_invalid_quick_replies(self):
+        with pytest.raises(ValueError) as err:
+            templates.GenericTemplate(elements=None, quick_replies='wrong')
+        assert str(err.value) == 'quick_replies must be an instance of QuickReplies.'

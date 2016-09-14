@@ -12,7 +12,7 @@ class BaseAttachment(object):
         self.attachment_id = attachment_id
 
         if quick_replies and not isinstance(quick_replies, QuickReplies):
-            raise TypeError('quick_replies must be an instance of QuickReplies.')
+            raise ValueError('quick_replies must be an instance of QuickReplies.')
         self.quick_replies = quick_replies
 
     def to_dict(self):
@@ -39,7 +39,7 @@ class BaseAttachment(object):
 
 
 class Image(BaseAttachment):
-    def __init__(self, url, is_reusable=None, quick_replies=None, attachment_id=None):
+    def __init__(self, url=None, is_reusable=None, quick_replies=None, attachment_id=None):
         self.attachment_type = 'image'
         self.url = url
         self.is_reusable = is_reusable
@@ -50,7 +50,7 @@ class Image(BaseAttachment):
 
 
 class Audio(BaseAttachment):
-    def __init__(self, url, is_reusable=None, quick_replies=None, attachment_id=None):
+    def __init__(self, url=None, is_reusable=None, quick_replies=None, attachment_id=None):
         self.attachment_type = 'audio'
         self.url = url
         self.is_reusable = is_reusable
@@ -61,7 +61,7 @@ class Audio(BaseAttachment):
 
 
 class Video(BaseAttachment):
-    def __init__(self, url, is_reusable=None, quick_replies=None, attachment_id=None):
+    def __init__(self, url=None, is_reusable=None, quick_replies=None, attachment_id=None):
         self.attachment_type = 'video'
         self.url = url
         self.is_reusable = is_reusable
@@ -72,7 +72,7 @@ class Video(BaseAttachment):
 
 
 class File(BaseAttachment):
-    def __init__(self, url, is_reusable=None, quick_replies=None, attachment_id=None):
+    def __init__(self, url=None, is_reusable=None, quick_replies=None, attachment_id=None):
         self.attachment_type = 'file'
         self.url = url
         self.is_reusable = is_reusable

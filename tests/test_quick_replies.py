@@ -6,11 +6,16 @@ from fbmessenger import quick_replies
 class TestQuickReplies:
 
     def test_quick_reply(self):
-        res = quick_replies.QuickReply(title='QR', payload='QR payload')
+        res = quick_replies.QuickReply(
+            title='QR',
+            payload='QR payload',
+            image_url='QR image',
+        )
         expected = {
             'content_type': 'text',
             'title': 'QR',
-            'payload': 'QR payload'
+            'payload': 'QR payload',
+            'image_url': 'QR image'
         }
         assert expected == res.to_dict()
 
@@ -23,13 +28,17 @@ class TestQuickReplies:
     def test_quick_reply_payload_too_long(self):
         payload = 'x' * 1001
         with pytest.raises(ValueError) as err:
-            quick_replies.QuickReply(title='QR',
-                                           payload=payload)
+            quick_replies.QuickReply(title='QR', payload=payload)
         assert str(err.value) == 'Payload cannot be longer 1000 characters.'
+
+    def test_quick_reply_invalid_type(self):
+        with pytest.raises(ValueError) as err:
+            quick_replies.QuickReply(title='QR', payload='test', content_type='wrong')
+        assert str(err.value) == 'Invalid content_type provided.'
 
     def test_quick_replies(self):
         qr = quick_replies.QuickReply(title='QR', payload='QR payload')
-        res = quick_replies.QuickReplies(quick_replies=[qr] * 2)
+        qrs = quick_replies.QuickReplies(quick_replies=[qr] * 2)
         expected = [
             {
                 'content_type': 'text',
@@ -42,7 +51,7 @@ class TestQuickReplies:
                 'payload': 'QR payload'
             }
         ]
-        assert expected == res.to_dict()
+        assert expected == qrs.to_dict()
 
     def test_too_many_quick_replies(self):
         qr = quick_replies.QuickReply(title='QR', payload='QR payload')

@@ -250,3 +250,23 @@ def test_unlink_account(messenger, monkeypatch):
     monkeypatch.setattr(messenger.client, 'unlink_account', mock)
     res = messenger.unlink_account(1234)
     assert res == mock()
+
+
+def test_add_whitelisted_domains(messenger, monkeypatch):
+    mock = Mock()
+    mock.return_value = {
+        'success': True
+    }
+    monkeypatch.setattr(messenger.client, 'update_whitelisted_domains', mock)
+    res = messenger.add_whitelisted_domains('https://facebook.com')
+    assert res == mock()
+
+
+def test_remove_whitelisted_domains(messenger, monkeypatch):
+    mock = Mock()
+    mock.return_value = {
+        'success': True
+    }
+    monkeypatch.setattr(messenger.client, 'update_whitelisted_domains', mock)
+    res = messenger.remove_whitelisted_domains('https://facebook.com')
+    assert res == mock()

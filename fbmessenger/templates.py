@@ -10,8 +10,8 @@ class BaseTemplate(object):
         self._elements = elements
 
         if quick_replies and not isinstance(quick_replies, QuickReplies):
-            raise TypeError('quick_replies must be an instance of QuickReplies.')
-        self._quick_replies = quick_replies
+            raise ValueError('quick_replies must be an instance of QuickReplies.')
+        self.quick_replies = quick_replies
 
         self._d = {
             'attachment': {
@@ -25,12 +25,6 @@ class BaseTemplate(object):
             raise ValueError('You cannot have more than 10 elements in the template.')
         return self._elements
 
-    @property
-    def quick_replies(self):
-        if self._quick_replies and len(self._quick_replies) > 10:
-            raise ValueError('You cannot have more than 10 quick_replies in the template.')
-        return self._quick_replies
-
     def to_dict(self):
         if self.quick_replies:
             self._d['attachment']['quick_replies'] = self.quick_replies.to_dict()
@@ -42,8 +36,8 @@ class GenericTemplate(BaseTemplate):
 
     def __init__(self, elements, quick_replies=None):
         self._elements = elements
-        self._quick_replies = quick_replies
-        super(GenericTemplate, self).__init__(self._elements, self._quick_replies)
+        self.quick_replies = quick_replies
+        super(GenericTemplate, self).__init__(self._elements, self.quick_replies)
 
     def to_dict(self):
         self._d['attachment']['payload'] = {
@@ -59,13 +53,13 @@ class ButtonTemplate(BaseTemplate):
 
     def __init__(self, text, buttons, quick_replies=None):
         self.text = text
-        self._quick_replies = quick_replies
+        self.quick_replies = quick_replies
 
         if not isinstance(buttons, list):
             buttons = [buttons]
         self.buttons = buttons
 
-        super(ButtonTemplate, self).__init__(None, self._quick_replies)
+        super(ButtonTemplate, self).__init__(None, self.quick_replies)
 
     def to_dict(self):
         self._d['attachment']['payload'] = {
@@ -94,9 +88,9 @@ class ReceiptTemplate(BaseTemplate):
         self.timestamp = timestamp
         self.address = address
         self.adjustments = adjustments
-        self._quick_replies = quick_replies
+        self.quick_replies = quick_replies
 
-        super(ReceiptTemplate, self).__init__(self._elements, self._quick_replies)
+        super(ReceiptTemplate, self).__init__(self._elements, self.quick_replies)
 
     def to_dict(self):
         self._d['attachment']['payload'] = {

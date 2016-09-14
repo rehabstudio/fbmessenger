@@ -132,3 +132,8 @@ class TestThreadSettings:
         with pytest.raises(ValueError) as err:
             thread_settings.PersistentMenu(menu_items=item_list)
         assert str(err.value) == 'You cannot have more than 5 menu_items.'
+
+    def test_persistent_menu_no_items(self):
+        with pytest.raises(ValueError) as err:
+            thread_settings.PersistentMenu()
+        assert str(err.value) == 'You must supply at least one menu_item.'

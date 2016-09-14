@@ -112,6 +112,8 @@ class MessengerClient(object):
         return r.json()
 
     def update_whitelisted_domains(self, action_type, domains):
+        if not isinstance(domains, list):
+            domains = [domains]
         r = self.session.post(
             'https://graph.facebook.com/v2.6/me/thread_settings',
             params={

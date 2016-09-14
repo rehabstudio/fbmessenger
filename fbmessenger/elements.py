@@ -9,7 +9,7 @@ class Text(object):
         }
 
         if self.quick_replies:
-            d['quick_replies'] = self.quick_replies
+            d['quick_replies'] = self.quick_replies.to_dict()
 
         return d
 
@@ -24,19 +24,34 @@ class Button(object):
         'element_share',
     ]
 
-    def __init__(self, button_type, title=None, url=None, payload=None):
+    WEBVIEW_HEIGHT_RATIOS = [
+        'compact',
+        'tall',
+        'full',
+    ]
+
+    def __init__(self, button_type, title=None, url=None,
+                 payload=None, webview_height_ratio=None,
+                 messenger_extensions=None, fallback_url=None):
+
         if button_type not in self.BUTTON_TYPES:
             raise ValueError('Invalid button_type provided.')
+        if webview_height_ratio and webview_height_ratio not in self.WEBVIEW_HEIGHT_RATIOS:
+            raise ValueError('Invalid webview_height_ratio provided.')
         if title and len(title) > 20:
             raise ValueError('Title cannot be longer 20 characters.')
-        self.type = button_type
+
+        self.button_type = button_type
         self.title = title
         self.url = url
         self.payload = payload
+        self.webview_height_ratio = webview_height_ratio
+        self.messenger_extensions = messenger_extensions
+        self.fallback_url = fallback_url
 
     def to_dict(self):
         d = {
-            'type': self.type,
+            'type': self.button_type,
         }
 
         if self.title:
@@ -45,7 +60,13 @@ class Button(object):
             d['url'] = self.url
         if self.payload:
             d['payload'] = self.payload
-
+        if self.button_type == 'web_url':
+            if self.webview_height_ratio:
+                d['webview_height_ratio'] = self.webview_height_ratio
+            if self.messenger_extensions:
+                d['messenger_extensions'] = 'true'
+            if self.fallback_url:
+                d['fallback_url'] = self.fallback_url
         return d
 
 

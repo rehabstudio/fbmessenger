@@ -1,6 +1,7 @@
 import pytest
 
 from fbmessenger import elements
+from fbmessenger import quick_replies
 
 
 class TestElements:
@@ -8,6 +9,28 @@ class TestElements:
         res = elements.Text('Test Message')
         expected = {
             'text': 'Test Message'
+        }
+        assert expected == res.to_dict()
+
+    def test_text_with_quick_replies(self):
+        qr = quick_replies.QuickReply(title='QR', payload='QR payload')
+        qrs = quick_replies.QuickReplies(quick_replies=[qr] * 2)
+
+        res = elements.Text(text='Test Message', quick_replies=qrs)
+        expected = {
+            'text': 'Test Message',
+            'quick_replies': [
+                {
+                    'content_type': 'text',
+                    'title': 'QR',
+                    'payload': 'QR payload'
+                },
+                {
+                    'content_type': 'text',
+                    'title': 'QR',
+                    'payload': 'QR payload'
+                }
+            ]
         }
         assert expected == res.to_dict()
 
@@ -26,6 +49,25 @@ class TestElements:
             'type': 'postback',
             'title': 'Postback button',
             'payload': 'payload'
+        }
+        assert expected == res.to_dict()
+
+    def test_url_button(self):
+        res = elements.Button(
+            button_type='web_url',
+            title='Web button',
+            url='http://facebook.com',
+            webview_height_ratio='full',
+            messenger_extensions=True,
+            fallback_url='https://facebook.com'
+        )
+        expected = {
+            'type': 'web_url',
+            'title': 'Web button',
+            'url': 'http://facebook.com',
+            'webview_height_ratio': 'full',
+            'messenger_extensions': 'true',
+            'fallback_url': 'https://facebook.com'
         }
         assert expected == res.to_dict()
 
@@ -67,6 +109,16 @@ class TestElements:
         with pytest.raises(ValueError) as err:
             elements.Button(button_type='incorrect', title='Button', url='http://facebook.com')
         assert str(err.value) == 'Invalid button_type provided.'
+
+    def test_button_webview_height_ratio_validation(self):
+        with pytest.raises(ValueError) as err:
+            elements.Button(
+                button_type='web_url',
+                title='Button',
+                url='http://facebook.com',
+                webview_height_ratio='wrong'
+            )
+        assert str(err.value) == 'Invalid webview_height_ratio provided.'
 
     def test_element_title_validation(self):
         with pytest.raises(ValueError) as err:

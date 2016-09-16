@@ -1,5 +1,13 @@
 # Release History
 
+## 3.1.0
+
+- Fixed quick replies, added location and images to quick replies
+- Added webview and messenger extensions support
+- Added reusable attachment support
+- Can add and remove whitelisted domains
+- element_share button support
+
 ## 3.0.1
 
 - Added use of requests.Session for connection reuse

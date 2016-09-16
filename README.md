@@ -43,10 +43,11 @@ We need to extend the `BaseMessenger` abstract class and implement methods for e
 ```python
 from fbmessenger import BaseMessenger
 
+
 class Messenger(BaseMessenger):
     def __init__(self, page_access_token):
         self.page_access_token = page_access_token
-        super(BaseMessenger, self).__init__(self.page_access_token)
+        super(Messenger, self).__init__(self.page_access_token)
 
     def message(self, message):
         self.send({'text': 'Received: {0}'.format(message['message']['text'])})
@@ -60,10 +61,10 @@ class Messenger(BaseMessenger):
     def account_linking(self, message):
         pass
 
-    def postback(self, messages):
+    def postback(self, message):
         pass
 
-    def optin(self, messages):
+    def optin(self, message):
         pass
 ```
 
@@ -77,10 +78,11 @@ import os
 from flask import Flask, request
 
 app = Flask(__name__)
+app.debug = True
 
 messenger = Messenger(os.environ.get('FB_VERIFY_TOKEN'), os.environ.get('FB_PAGE_TOKEN'))
 
-@app.route('/webhook')
+@app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
     if request.method == 'GET':
         if (request.args.get('hub.verify_token') == os.environ.get('FB_VERIFY_TOKEN')):
@@ -89,6 +91,7 @@ def webhook():
     elif request.method == 'POST':
         messenger.handle(request.get_json(force=True))
     return ''
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')

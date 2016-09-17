@@ -90,11 +90,15 @@ class Element(object):
 
     @property
     def title(self):
-        if len(self._title) > 45:
+        if len(self._title) > 80:
             raise ValueError(
-                'Title cannot be longer 45 characters'
+                'Title cannot be longer 80 characters'
             )
         return self._title
+
+    @title.setter
+    def subtitle(self, title):
+        self._title = title
 
     @property
     def subtitle(self):
@@ -102,6 +106,10 @@ class Element(object):
             if len(self._subtitle) > 80:
                 raise ValueError('Subtitle cannot be longer 80 characters')
         return self._subtitle
+
+    @subtitle.setter
+    def subtitle(self, subtitle):
+        self._subtitle = subtitle
 
     def to_dict(self):
         d = {

@@ -97,7 +97,7 @@ class Element(object):
         return self._title
 
     @title.setter
-    def subtitle(self, title): # pragma: no cover
+    def title(self, title): # pragma: no cover
         self._title = title
 
     @property

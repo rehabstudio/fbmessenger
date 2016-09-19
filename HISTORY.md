@@ -1,5 +1,9 @@
 # Release History
 
+## 3.1.2
+
+- Fixed quick replies in templates and attachments
+
 ## 3.1.1
 
 - Added method to delete persistent menu

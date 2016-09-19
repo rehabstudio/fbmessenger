@@ -27,7 +27,7 @@ class BaseTemplate(object):
 
     def to_dict(self):
         if self.quick_replies:
-            self._d['attachment']['quick_replies'] = self.quick_replies.to_dict()
+            self._d['quick_replies'] = self.quick_replies.to_dict()
 
         return self._d
 

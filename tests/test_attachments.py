@@ -68,19 +68,19 @@ class TestAttachments:
                 'payload': {
                     'url': 'http://facebook.com/image.jpg'
                 },
-                'quick_replies': [
-                    {
-                        'content_type': 'text',
-                        'title': 'QR',
-                        'payload': 'QR payload'
-                    },
-                    {
-                        'content_type': 'text',
-                        'title': 'QR',
-                        'payload': 'QR payload'
-                    }
-                ]
-            }
+            },
+            'quick_replies': [
+                {
+                    'content_type': 'text',
+                    'title': 'QR',
+                    'payload': 'QR payload'
+                },
+                {
+                    'content_type': 'text',
+                    'title': 'QR',
+                    'payload': 'QR payload'
+                },
+            ],
         }
         assert expected == res.to_dict()
 

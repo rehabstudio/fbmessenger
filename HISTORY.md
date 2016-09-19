@@ -1,5 +1,9 @@
 # Release History
 
+## 3.1.1
+
+- Added method to delete persistent menu
+
 ## 3.1.0
 
 - Fixed quick replies, added location and images to quick replies

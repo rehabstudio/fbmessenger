@@ -33,7 +33,7 @@ class BaseAttachment(object):
             d['attachment']['payload']['attachment_id'] = self.attachment_id
 
         if self.quick_replies:
-            d['attachment']['quick_replies'] = self.quick_replies.to_dict()
+            d['quick_replies'] = self.quick_replies.to_dict()
 
         return d
 

@@ -169,6 +169,24 @@ def test_delete_get_started(client, monkeypatch):
     )
 
 
+def test_delete_persistent_menu(client, monkeypatch):
+    mock_delete = Mock()
+    mock_delete.return_value.status_code = 200
+    monkeypatch.setattr('requests.Session.delete', mock_delete)
+    client = MessengerClient(page_access_token=12345678)
+    client.delete_persistent_menu()
+
+    assert mock_delete.call_count == 1
+    mock_delete.assert_called_with(
+        'https://graph.facebook.com/v2.6/me/thread_settings',
+        params={'access_token': 12345678},
+        json={
+            'setting_type': 'call_to_actions',
+            'thread_state': 'existing_thread'
+        }
+    )
+
+
 def test_link_account(client, monkeypatch):
     mock_post = Mock()
     mock_post.return_value.status_code = 200

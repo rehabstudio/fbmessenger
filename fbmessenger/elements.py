@@ -79,10 +79,10 @@ class Element(object):
                  subtitle=None, buttons=None, quantity=None,
                  price=None, currency=None):
 
-        self._title = title
+        self.title = title
         self.item_url = item_url
         self.image_url = image_url
-        self._subtitle = subtitle
+        self.subtitle = subtitle
         self.buttons = buttons
         self.quantity = quantity
         self.price = price
@@ -90,18 +90,25 @@ class Element(object):
 
     @property
     def title(self):
-        if len(self._title) > 45:
-            raise ValueError(
-                'Title cannot be longer 45 characters'
-            )
         return self._title
+
+    @title.setter
+    def title(self, title):
+        if len(title) > 80:
+            raise ValueError(
+                'Title cannot be longer 80 characters'
+            )
+        self._title = title
 
     @property
     def subtitle(self):
-        if self._subtitle:
-            if len(self._subtitle) > 80:
-                raise ValueError('Subtitle cannot be longer 80 characters')
         return self._subtitle
+
+    @subtitle.setter
+    def subtitle(self, subtitle):
+        if subtitle is not None and len(subtitle) > 80:
+            raise ValueError('Subtitle cannot be longer 80 characters')
+        self._subtitle = subtitle
 
     def to_dict(self):
         d = {
@@ -111,7 +118,7 @@ class Element(object):
             d['item_url'] = self.item_url
         if self.image_url:
             d['image_url'] = self.image_url
-        if self._subtitle:
+        if self.subtitle:
             d['subtitle'] = self.subtitle
         if self.quantity:
             d['quantity'] = self.quantity

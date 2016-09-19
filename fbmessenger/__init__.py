@@ -88,6 +88,19 @@ class MessengerClient(object):
         )
         return r.json()
 
+    def delete_persistent_menu(self):  # pragma: no cover
+        r = self.session.delete(
+            'https://graph.facebook.com/v2.6/me/thread_settings',
+            params={
+                'access_token': self.page_access_token
+            },
+            json={
+                'setting_type': 'call_to_actions',
+                'thread_state': 'existing_thread'
+            }
+        )
+        return r.json()
+
     def link_account(self, account_linking_token):
         r = self.session.post(
             'https://graph.facebook.com/v2.6/me',

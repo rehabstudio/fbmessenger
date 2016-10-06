@@ -7,14 +7,31 @@
 
 A python library to communicate with the Facebook Messenger API's
 
+## Table of Contents
+<!-- MarkdownTOC depth="2" autolink="true" autoanchor="true" bracket="round" -->
 
+- [Installation](#installation)
+- [Example usage with Flask](#example-usage-with-flask)
+- [Elements](#elements)
+- [Attachments](#attachments)
+- [Templates](#templates)
+- [Sender Actions](#sender-actions)
+- [Quick Replies](#quick-replies)
+- [Thread settings](#thread-settings)
+
+<!-- /MarkdownTOC -->
+
+<a name="installation"></a>
 ## Installation
 
 Install from pip
 
-    pip install fbmessenger
+```bash
+pip install fbmessenger
+```
 
-## Facebook app setup
+<a name="facebook-app-setup"></a>
+### Facebook app setup
 
 - [Create a page](https://www.facebook.com/pages/create/) for your app, if you don't already have one
 - [Create an app](https://developers.facebook.com/quickstarts/?platform=web)
@@ -22,6 +39,7 @@ Install from pip
 - Select the Page to generate a page token
 
 
+<a name="example-usage-with-flask"></a>
 ## Example usage with Flask
 
 First you need to create a verify token, this can be any string e.g.
@@ -98,6 +116,7 @@ if __name__ == "__main__":
 ```
 
 
+<a name="elements"></a>
 ## Elements
 
 Import the elements (or just the ones you need)
@@ -131,6 +150,7 @@ btn = elements.Button(title='Postback button', payload='payload')
 messenger.send(btn.to_dict())
 ```
 
+<a name="attachments"></a>
 ## Attachments
 
 ### Images
@@ -161,6 +181,7 @@ file = attachments.File(url='http://example.com/file.txt')
 messenger.send(file.to_dict())
 ```
 
+<a name="templates"></a>
 ## Templates
 
 Import the templates (or just the ones you need)
@@ -237,6 +258,7 @@ res = templates.ReceiptTemplate(
 messenger.send(res.to_dict())
 ```
 
+<a name="sender-actions"></a>
 ## Sender Actions
 
 ### Typing on
@@ -260,6 +282,7 @@ mark_seen = SenderAction(sender_action='mark_seen')
 messenger.send_action(mark_seen.to_dict())
 ```
 
+<a name="quick-replies"></a>
 ## Quick Replies
 
 ```python
@@ -274,6 +297,7 @@ text['quick_replies'] = quick_replies.to_dict()
 messenger.send(text)
 ```
 
+<a name="thread-settings"></a>
 ## Thread settings
 
 ### Greeting Text
@@ -308,30 +332,3 @@ menu = new PersistentMenu(menu_items=[menu_item_1, menu_item_2])
 
 messenger.send(menu.to_dict())
 ```
-
-## Code Contributions
-
-When contributing code, you'll want to follow this checklist:
-
-1. Fork the repository on GitHub.
-2. Run the tests to confirm they all pass on your system. If they don't, you'll need to investigate why they fail. If you're unable to diagnose this yourself, raise it as a bug report by following the guidelines in this document: Bug Reports.
-3. Write tests that demonstrate your bug or feature. Ensure that they fail.
-4. Make your change.
-5. Run the entire test suite again, confirming that all tests pass including the ones you just added.
-6. Send a GitHub Pull Request to the main repository's master branch. 7. GitHub Pull Requests are the expected method of code collaboration on this project.
-
-### Creating a new release
-
-_nb. [Pandoc](http://pandoc.org/installing.html) is required as it is used to convert the README to reStructuredText format_
-
-
-- Commit latest changes
-- Update in `__version__` in `init.py`
-
-```bash
-git push --tags
-python setup.py sdist bdist_wheel
-twine upload -r pypi dist/fbmessenger-<version>*
-```
-
-

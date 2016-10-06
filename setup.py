@@ -79,12 +79,11 @@ setup(
     license='Apache',
     test_suite='tests',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'Topic :: Software Development :: Build Tools',
         'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
@@ -95,5 +94,5 @@ setup(
     packages=['fbmessenger'],
     cmdclass={'test': PyTest},
     tests_require=test_requirements,
-    keywords='Facebook Messenger',
+    keywords='Facebook Messenger Bot Chatbot',
 )

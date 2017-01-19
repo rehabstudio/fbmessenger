@@ -44,7 +44,8 @@ class QuickReplies(object):
 
     def __bool__(self):
         return bool(self.quick_replies)
-    __nonzero__=__bool__
+
+    __nonzero__ = __bool__
 
     def to_dict(self):
         return [

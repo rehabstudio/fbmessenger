@@ -1,5 +1,9 @@
 # Release History
 
+## 3.1.3
+
+- Empty QuickReplies should evaluate to false
+
 ## 3.1.2
 
 - Fixed quick replies in templates and attachments

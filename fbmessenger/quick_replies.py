@@ -42,6 +42,10 @@ class QuickReplies(object):
             raise ValueError('You cannot have more than 10 quick replies.')
         self.quick_replies = quick_replies
 
+    def __bool__(self):
+        return bool(self.quick_replies)
+    __nonzero__=__bool__
+
     def to_dict(self):
         return [
             quick_reply.to_dict() for quick_reply in self.quick_replies

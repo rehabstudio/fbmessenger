@@ -117,23 +117,24 @@ def test_set_greeting_text(client, monkeypatch):
     mock_post = Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
-        "result": "Successfully added new_thread's CTAs"
+        "result": "success"
     }
     monkeypatch.setattr('requests.Session.post', mock_post)
     client = MessengerClient(page_access_token=12345678)
     welcome_message = thread_settings.GreetingText(text='Welcome message')
-    resp = client.set_thread_setting(welcome_message.to_dict())
+    profile = thread_settings.MessengerProfile(greetings=[welcome_message])
+    resp = client.set_messenger_profile(profile.to_dict())
 
-    assert resp == {"result": "Successfully added new_thread's CTAs"}
+    assert resp == {"result": "success"}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/thread_settings',
+        'https://graph.facebook.com/v2.6/me/messenger_profile',
         params={'access_token': 12345678},
         json={
-            'setting_type': 'greeting',
-            'greeting': {
+            'greeting': [{
+                'locale': 'default',
                 'text': 'Welcome message'
-            }
+            }]
         }
     )
 
@@ -142,7 +143,7 @@ def test_set_greeting_text_too_long(client, monkeypatch):
     mock_post = Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
-        "result": "Successfully added new_thread's CTAs"
+        "result": "success"
     }
     monkeypatch.setattr('requests.Session.post', mock_post)
 
@@ -160,11 +161,12 @@ def test_delete_get_started(client, monkeypatch):
 
     assert mock_delete.call_count == 1
     mock_delete.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/thread_settings',
+        'https://graph.facebook.com/v2.6/me/messenger_profile',
         params={'access_token': 12345678},
         json={
-            'setting_type': 'call_to_actions',
-            'thread_state': 'new_thread'
+            'fields': [
+                'get_started',
+            ],
         }
     )
 
@@ -178,11 +180,12 @@ def test_delete_persistent_menu(client, monkeypatch):
 
     assert mock_delete.call_count == 1
     mock_delete.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/thread_settings',
+        'https://graph.facebook.com/v2.6/me/messenger_profile',
         params={'access_token': 12345678},
         json={
-            'setting_type': 'call_to_actions',
-            'thread_state': 'existing_thread'
+            'fields': [
+                'persistent_menu',
+            ],
         }
     )
 
@@ -231,28 +234,22 @@ def test_add_whitelisted_domains(client, monkeypatch):
     mock_post = Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
-        "result": [
-            "https://facebook.com"
-        ]
+        "result": "success",
     }
     monkeypatch.setattr('requests.Session.post', mock_post)
     client = MessengerClient(page_access_token=12345678)
-    res = client.update_whitelisted_domains('add', ['https://facebook.com'])
-    assert res == {"result": [
-        "https://facebook.com"
-    ]}
+    res = client.update_whitelisted_domains(['https://facebook.com'])
+    assert res == {"result": "success"}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/thread_settings',
+        'https://graph.facebook.com/v2.6/me/messenger_profile',
         params={
             'access_token': 12345678,
         },
         json={
-            'setting_type': 'domain_whitelisting',
             'whitelisted_domains': [
                 'https://facebook.com'
             ],
-            'domain_action_type': 'add'
         }
     )
 
@@ -261,28 +258,22 @@ def test_add_whitelisted_domains_not_as_list(client, monkeypatch):
     mock_post = Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
-        "result": [
-            "https://facebook.com"
-        ]
+        "result": "success",
     }
     monkeypatch.setattr('requests.Session.post', mock_post)
     client = MessengerClient(page_access_token=12345678)
-    res = client.update_whitelisted_domains('add', 'https://facebook.com')
-    assert res == {"result": [
-        "https://facebook.com"
-    ]}
+    res = client.update_whitelisted_domains('https://facebook.com')
+    assert res == {"result": "success"}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/thread_settings',
+        'https://graph.facebook.com/v2.6/me/messenger_profile',
         params={
             'access_token': 12345678,
         },
         json={
-            'setting_type': 'domain_whitelisting',
             'whitelisted_domains': [
                 'https://facebook.com'
             ],
-            'domain_action_type': 'add'
         }
     )
 
@@ -291,27 +282,21 @@ def test_remove_whitelisted_domains(client, monkeypatch):
     mock_post = Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
-        "result": [
-            "https://facebook.com"
-        ]
+        "result": "success",
     }
-    monkeypatch.setattr('requests.Session.post', mock_post)
+    monkeypatch.setattr('requests.Session.delete', mock_post)
     client = MessengerClient(page_access_token=12345678)
-    res = client.update_whitelisted_domains('remove', 'https://facebook.com')
-    assert res == {"result": [
-        "https://facebook.com"
-    ]}
+    res = client.remove_whitelisted_domains()
+    assert res == {"result": "success"}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/thread_settings',
+        'https://graph.facebook.com/v2.6/me/messenger_profile',
         params={
             'access_token': 12345678,
         },
         json={
-            'setting_type': 'domain_whitelisting',
-            'whitelisted_domains': [
-                'https://facebook.com'
+            'fields': [
+                'whitelisted_domains',
             ],
-            'domain_action_type': 'remove'
         }
     )

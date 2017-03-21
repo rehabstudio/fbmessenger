@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import collections
 from .quick_replies import QuickReplies
 
 
@@ -55,8 +56,11 @@ class ButtonTemplate(BaseTemplate):
         self.text = text
         self.quick_replies = quick_replies
 
-        if not isinstance(buttons, list):
+        if isinstance(buttons, collections.Iterable):
+            buttons = list(buttons)
+        else:
             buttons = [buttons]
+
         self.buttons = buttons
 
         super(ButtonTemplate, self).__init__(None, self.quick_replies)

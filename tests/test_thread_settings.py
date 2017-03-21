@@ -7,26 +7,24 @@ class TestThreadSettings:
 
     def test_greeting_text(self):
         res = thread_settings.GreetingText(text='Hello')
+        profile = thread_settings.MessengerProfile(greetings=[res])
         expected = {
-            'setting_type': 'greeting',
-            'greeting': {
-                'text': 'Hello'
-            }
+            'greeting': [{
+                'locale': 'default',
+                'text': 'Hello',
+            }]
         }
-        assert expected == res.to_dict()
+        assert expected == profile.to_dict()
 
     def test_get_started_button(self):
         res = thread_settings.GetStartedButton(payload='payload')
+        profile = thread_settings.MessengerProfile(get_started=res)
         expected = {
-            'setting_type': 'call_to_actions',
-            'thread_state': 'new_thread',
-            'call_to_actions': [
-                {
-                    'payload': 'payload'
-                }
-            ]
+            'get_started': {
+                'payload': 'payload'
+            }
         }
-        assert expected == res.to_dict()
+        assert expected == profile.to_dict()
 
     def test_persistent_menu_item_web_url(self):
         res = thread_settings.PersistentMenuItem(
@@ -51,6 +49,28 @@ class TestThreadSettings:
             'type': 'postback',
             'title': 'Link',
             'payload': 'payload'
+        }
+        assert expected == res.to_dict()
+
+    def test_persistent_menu_nested_item(self):
+        item = thread_settings.PersistentMenuItem(
+            item_type='postback',
+            title='Link',
+            payload='payload'
+        )
+        res = thread_settings.PersistentMenuItem(
+            item_type='nested',
+            title='Nested',
+            nested_items=[item],
+        )
+        expected = {
+            'type': 'nested',
+            'title': 'Nested',
+            'call_to_actions': [{
+                'type': 'postback',
+                'title': 'Link',
+                'payload': 'payload'
+                }]
         }
         assert expected == res.to_dict()
 
@@ -81,6 +101,29 @@ class TestThreadSettings:
             )
         assert str(err.value) == 'Payload cannot be longer 1000 characters.'
 
+    def test_missing_nested_items(self):
+        with pytest.raises(ValueError) as err:
+            thread_settings.PersistentMenuItem(
+                item_type='nested',
+                title='Nested',
+            )
+        assert str(err.value) == '`nested_items` must be supplied for `nested` type menu items.'
+
+    def test_too_many_nested_items(self):
+        item = thread_settings.PersistentMenuItem(
+            item_type='web_url',
+            title='Link',
+            url='https://facebook.com'
+        )
+
+        with pytest.raises(ValueError) as err:
+            thread_settings.PersistentMenuItem(
+                item_type='nested',
+                title='Nested',
+                nested_items=[item] * 6
+            )
+        assert str(err.value) == 'Cannot have more than 5 nested_items'
+
     def test_missing_url_for_web_url(self):
         with pytest.raises(ValueError) as err:
             thread_settings.PersistentMenuItem(
@@ -104,23 +147,26 @@ class TestThreadSettings:
             url='https://facebook.com'
         )
         res = thread_settings.PersistentMenu(menu_items=[item] * 2)
+        profile = thread_settings.MessengerProfile(persistent_menus=[res])
         expected = {
-            'setting_type': 'call_to_actions',
-            'thread_state': 'existing_thread',
-            'call_to_actions': [
-                {
-                    'type': 'web_url',
-                    'title': 'Link',
-                    'url': 'https://facebook.com'
-                },
-                {
-                    'type': 'web_url',
-                    'title': 'Link',
-                    'url': 'https://facebook.com'
-                }
-            ]
+            'persistent_menu': [{
+                'locale':'default',
+                'call_to_actions':[
+
+                    {
+                        'type': 'web_url',
+                        'title': 'Link',
+                        'url': 'https://facebook.com'
+                    },
+                    {
+                        'type': 'web_url',
+                        'title': 'Link',
+                        'url': 'https://facebook.com'
+                    }
+                ],
+            }],
         }
-        assert expected == res.to_dict()
+        assert expected == profile.to_dict()
 
     def test_persistent_menu_too_many_items(self):
         item = thread_settings.PersistentMenuItem(
@@ -128,10 +174,10 @@ class TestThreadSettings:
             title='Link',
             url='https://facebook.com'
         )
-        item_list = [item] * 6
+        item_list = [item] * 4
         with pytest.raises(ValueError) as err:
             thread_settings.PersistentMenu(menu_items=item_list)
-        assert str(err.value) == 'You cannot have more than 5 menu_items.'
+        assert str(err.value) == 'You cannot have more than 3 menu_items in top level.'
 
     def test_persistent_menu_no_items(self):
         with pytest.raises(ValueError) as err:

@@ -75,7 +75,7 @@ class MessengerClient(object):
         )
         return r.json()
 
-    def delete_get_started(self): # pragma: no cover
+    def delete_get_started(self):
         r = self.session.delete(
             'https://graph.facebook.com/v2.6/me/messenger_profile',
             params={
@@ -89,7 +89,7 @@ class MessengerClient(object):
         )
         return r.json()
 
-    def delete_persistent_menu(self): # pragma: no cover
+    def delete_persistent_menu(self):
         r = self.session.delete(
             'https://graph.facebook.com/v2.6/me/messenger_profile',
             params={

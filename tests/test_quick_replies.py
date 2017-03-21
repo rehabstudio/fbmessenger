@@ -1,6 +1,9 @@
+import logging
+
 import pytest
 
 from fbmessenger import quick_replies
+from fbmessenger.error_messages import CHARACTER_LIMIT_MESSAGE
 
 
 class TestQuickReplies:
@@ -19,11 +22,13 @@ class TestQuickReplies:
         }
         assert expected == res.to_dict()
 
-    def test_quick_reply_title_too_long(self):
-        with pytest.raises(ValueError) as err:
+    def test_quick_reply_title_too_long(self, caplog):
+        with caplog.at_level(logging.WARNING, logger='fbmessenger.elements'):
             quick_replies.QuickReply(title='Title is over the 20 character limit',
                                            payload='QR payload')
-        assert str(err.value) == 'Title cannot be longer 20 characters.'
+            assert caplog.record_tuples == [
+                ('fbmessenger.quick_replies', logging.WARNING,
+                  CHARACTER_LIMIT_MESSAGE.format(field='Title', maxsize=20))]
 
     def test_quick_reply_payload_too_long(self):
         payload = 'x' * 1001

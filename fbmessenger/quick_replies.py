@@ -1,3 +1,12 @@
+from __future__ import absolute_import
+
+import logging
+
+from .error_messages import CHARACTER_LIMIT_MESSAGE
+
+logger = logging.getLogger(__name__)
+
+
 class QuickReply(object):
 
     CONTENT_TYPES = [
@@ -12,7 +21,8 @@ class QuickReply(object):
         if content_type not in self.CONTENT_TYPES:
             raise ValueError('Invalid content_type provided.')
         if title and len(title) > 20:
-            raise ValueError('Title cannot be longer 20 characters.')
+            logger.warning(CHARACTER_LIMIT_MESSAGE.format(field='Title',
+                                                          maxsize=20))
         if payload and len(payload) > 1000:
             raise ValueError('Payload cannot be longer 1000 characters.')
 

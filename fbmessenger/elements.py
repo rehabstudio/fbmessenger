@@ -1,3 +1,12 @@
+from __future__ import absolute_import
+
+import logging
+
+from .error_messages import CHARACTER_LIMIT_MESSAGE
+
+logger = logging.getLogger(__name__)
+
+
 class Text(object):
     def __init__(self, text, quick_replies=None):
         self.text = text
@@ -39,7 +48,8 @@ class Button(object):
         if webview_height_ratio and webview_height_ratio not in self.WEBVIEW_HEIGHT_RATIOS:
             raise ValueError('Invalid webview_height_ratio provided.')
         if title and len(title) > 20:
-            raise ValueError('Title cannot be longer 20 characters.')
+            logger.warning(CHARACTER_LIMIT_MESSAGE.format(field='Title',
+                                                          maxsize=20))
 
         self.button_type = button_type
         self.title = title
@@ -95,9 +105,8 @@ class Element(object):
     @title.setter
     def title(self, title):
         if len(title) > 80:
-            raise ValueError(
-                'Title cannot be longer 80 characters'
-            )
+            logger.warning(CHARACTER_LIMIT_MESSAGE.format(field='Title',
+                                                          maxsize=80))
         self._title = title
 
     @property
@@ -107,7 +116,8 @@ class Element(object):
     @subtitle.setter
     def subtitle(self, subtitle):
         if subtitle is not None and len(subtitle) > 80:
-            raise ValueError('Subtitle cannot be longer 80 characters')
+            logger.warning(CHARACTER_LIMIT_MESSAGE.format(field='Subtitle',
+                                                          maxsize=80))
         self._subtitle = subtitle
 
     def to_dict(self):

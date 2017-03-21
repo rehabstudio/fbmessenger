@@ -1,7 +1,10 @@
+import logging
+
 import pytest
 
 from fbmessenger import elements
 from fbmessenger import quick_replies
+from fbmessenger.error_messages import CHARACTER_LIMIT_MESSAGE
 
 
 class TestElements:
@@ -71,12 +74,15 @@ class TestElements:
         }
         assert expected == res.to_dict()
 
-    def test_button_with_title_over_limit(self):
-        with pytest.raises(ValueError) as err:
-            res = elements.Button(button_type='web_url', title='This button text is over the limit',
+    def test_button_with_title_over_limit(self, caplog):
+        with caplog.at_level(logging.WARNING, logger='fbmessenger.elements'):
+            res = elements.Button(button_type='web_url',
+                                  title='This button text is over the limit',
                                   url='http://facebook.com')
             res.to_dict()
-        assert str(err.value) == 'Title cannot be longer 20 characters.'
+            assert caplog.record_tuples == [
+                ('fbmessenger.elements', logging.WARNING,
+                  CHARACTER_LIMIT_MESSAGE.format(field='Title', maxsize=20))]
 
     def test_element(self):
         btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
@@ -120,8 +126,8 @@ class TestElements:
             )
         assert str(err.value) == 'Invalid webview_height_ratio provided.'
 
-    def test_element_title_validation(self):
-        with pytest.raises(ValueError) as err:
+    def test_element_title_validation(self, caplog):
+        with caplog.at_level(logging.WARNING, logger='fbmessenger.elements'):
             btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
             res = elements.Element(
                 title='The title is too long and should throw an error.'
@@ -134,10 +140,12 @@ class TestElements:
                 ]
             )
             res.to_dict()
-        assert str(err.value) == 'Title cannot be longer 80 characters'
+            assert caplog.record_tuples == [
+                ('fbmessenger.elements', logging.WARNING,
+                  CHARACTER_LIMIT_MESSAGE.format(field='Title', maxsize=80))]
 
-    def test_element_subtitle_validation(self):
-        with pytest.raises(ValueError) as err:
+    def test_element_subtitle_validation(self, caplog):
+        with caplog.at_level(logging.WARNING, logger='fbmessenger.elements'):
             btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
             res = elements.Element(
                 title='Title',
@@ -150,7 +158,9 @@ class TestElements:
                 ]
             )
             res.to_dict()
-        assert str(err.value) == 'Subtitle cannot be longer 80 characters'
+            assert caplog.record_tuples == [
+                ('fbmessenger.elements', logging.WARNING,
+                  CHARACTER_LIMIT_MESSAGE.format(field='Subtitle', maxsize=80))]
 
     def test_adjustment(self):
         res = elements.Adjustment(name='discount', amount=1)

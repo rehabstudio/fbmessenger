@@ -34,6 +34,7 @@ test_requirements = [
     'pytest',
     'coverage',
     'pytest-cov',
+    'pytest-catchlog',
     'responses'
 ]
 

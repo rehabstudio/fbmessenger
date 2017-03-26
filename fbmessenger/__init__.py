@@ -65,9 +65,9 @@ class MessengerClient(object):
         )
         return r.json()
 
-    def set_thread_setting(self, data):
+    def set_messenger_profile(self, data):
         r = self.session.post(
-            'https://graph.facebook.com/v2.6/me/thread_settings',
+            'https://graph.facebook.com/v2.6/me/messenger_profile',
             params={
                 'access_token': self.page_access_token
             },
@@ -75,28 +75,30 @@ class MessengerClient(object):
         )
         return r.json()
 
-    def delete_get_started(self):  # pragma: no cover
+    def delete_get_started(self):
         r = self.session.delete(
-            'https://graph.facebook.com/v2.6/me/thread_settings',
+            'https://graph.facebook.com/v2.6/me/messenger_profile',
             params={
                 'access_token': self.page_access_token
             },
             json={
-                'setting_type': 'call_to_actions',
-                'thread_state': 'new_thread'
+                'fields':[
+                    'get_started'
+                ],
             }
         )
         return r.json()
 
-    def delete_persistent_menu(self):  # pragma: no cover
+    def delete_persistent_menu(self):
         r = self.session.delete(
-            'https://graph.facebook.com/v2.6/me/thread_settings',
+            'https://graph.facebook.com/v2.6/me/messenger_profile',
             params={
                 'access_token': self.page_access_token
             },
             json={
-                'setting_type': 'call_to_actions',
-                'thread_state': 'existing_thread'
+                'fields':[
+                    'persistent_menu'
+                ],
             }
         )
         return r.json()
@@ -124,18 +126,30 @@ class MessengerClient(object):
         )
         return r.json()
 
-    def update_whitelisted_domains(self, action_type, domains):
+    def update_whitelisted_domains(self, domains):
         if not isinstance(domains, list):
             domains = [domains]
         r = self.session.post(
-            'https://graph.facebook.com/v2.6/me/thread_settings',
+            'https://graph.facebook.com/v2.6/me/messenger_profile',
             params={
                 'access_token': self.page_access_token
             },
             json={
-                'setting_type': 'domain_whitelisting',
-                'domain_action_type': action_type,
                 'whitelisted_domains': domains
+            }
+        )
+        return r.json()
+
+    def remove_whitelisted_domains(self):
+        r = self.session.delete(
+            'https://graph.facebook.com/v2.6/me/messenger_profile',
+            params={
+                'access_token': self.page_access_token
+            },
+            json={
+                'fields':[
+                    'whitelisted_domains'
+                ],
             }
         )
         return r.json()
@@ -206,8 +220,8 @@ class BaseMessenger(object):
     def subscribe_app_to_page(self):
         return self.client.subscribe_app_to_page()
 
-    def set_thread_setting(self, data):
-        return self.client.set_thread_setting(data)
+    def set_messenger_profile(self, data):
+        return self.client.set_messenger_profile(data)
 
     def delete_get_started(self):
         return self.client.delete_get_started()
@@ -219,7 +233,7 @@ class BaseMessenger(object):
         return self.client.unlink_account(psid)
 
     def add_whitelisted_domains(self, domains):
-        return self.client.update_whitelisted_domains('add', domains)
+        return self.client.update_whitelisted_domains(domains)
 
-    def remove_whitelisted_domains(self, domains):
-        return self.client.update_whitelisted_domains('remove', domains)
+    def remove_whitelisted_domains(self):
+        return self.client.remove_whitelisted_domains()

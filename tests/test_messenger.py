@@ -220,9 +220,10 @@ def test_set_thread_setting(messenger, monkeypatch):
     mock.return_value = {
         'success': True
     }
-    monkeypatch.setattr(messenger.client, 'set_thread_setting', mock)
+    monkeypatch.setattr(messenger.client, 'set_messenger_profile', mock)
     welcome_message = thread_settings.GreetingText(text='Welcome message')
-    res = messenger.set_thread_setting(welcome_message.to_dict())
+    profile = thread_settings.MessengerProfile(greetings=[welcome_message])
+    res = messenger.set_messenger_profile(profile.to_dict())
     assert res == mock()
 
 
@@ -268,6 +269,6 @@ def test_remove_whitelisted_domains(messenger, monkeypatch):
     mock.return_value = {
         'success': True
     }
-    monkeypatch.setattr(messenger.client, 'update_whitelisted_domains', mock)
-    res = messenger.remove_whitelisted_domains('https://facebook.com')
+    monkeypatch.setattr(messenger.client, 'remove_whitelisted_domains', mock)
+    res = messenger.remove_whitelisted_domains()
     assert res == mock()

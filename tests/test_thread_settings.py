@@ -168,6 +168,40 @@ class TestThreadSettings:
         }
         assert expected == profile.to_dict()
 
+    def test_composer_input_disabled(self):
+        item = thread_settings.PersistentMenuItem(
+            item_type='web_url',
+            title='Link',
+            url='https://facebook.com'
+        )
+        res = thread_settings.PersistentMenu(menu_items=[item], composer_input_disabled=True)
+        profile = thread_settings.MessengerProfile(persistent_menus=[res])
+        expected = {
+            'persistent_menu': [{
+                'locale':'default',
+                'call_to_actions':[
+                    {
+                        'type': 'web_url',
+                        'title': 'Link',
+                        'url': 'https://facebook.com'
+                    }
+                ],
+                'composer_input_disabled': True,
+            }],
+        }
+        assert expected == profile.to_dict()
+
+    def test_composer_input_enabled(self):
+        res = thread_settings.PersistentMenu(composer_input_disabled=False)
+        profile = thread_settings.MessengerProfile(persistent_menus=[res])
+        expected = {
+            'persistent_menu': [{
+                'locale':'default',
+                'composer_input_disabled': False,
+            }],
+        }
+        assert expected == profile.to_dict()
+
     def test_persistent_menu_too_many_items(self):
         item = thread_settings.PersistentMenuItem(
             item_type='web_url',
@@ -182,4 +216,9 @@ class TestThreadSettings:
     def test_persistent_menu_no_items(self):
         with pytest.raises(ValueError) as err:
             thread_settings.PersistentMenu()
+        assert str(err.value) == 'You must supply at least one menu_item.'
+
+    def test_persistent_menu_no_items_input_disabled(self):
+        with pytest.raises(ValueError) as err:
+            thread_settings.PersistentMenu(composer_input_disabled=True)
         assert str(err.value) == 'You must supply at least one menu_item.'

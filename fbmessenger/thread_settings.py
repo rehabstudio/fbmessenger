@@ -72,22 +72,32 @@ class PersistentMenuItem(object):
 
 
 class PersistentMenu(object):
-    def __init__(self, menu_items=None, locale=None):
-        if not menu_items:
-            raise ValueError('You must supply at least one menu_item.')
+    def __init__(self, menu_items=None, locale=None, composer_input_disabled=None):
+        if composer_input_disabled != False:
+            if not menu_items:
+                raise ValueError('You must supply at least one menu_item.')
 
-        if len(menu_items) > 3:
-            raise ValueError('You cannot have more than 3 menu_items in top level.')
+            elif len(menu_items) > 3:
+                raise ValueError('You cannot have more than 3 menu_items in top level.')
+
         self.menu_items = menu_items
         self.locale = locale or DEFAULT_LOCALE
+        self.composer_input_disabled = composer_input_disabled
 
     def to_dict(self):
-        return {
+        res = {
             'locale': self.locale,
-            'call_to_actions': [
+        }
+
+        if self.menu_items:
+            res['call_to_actions'] = [
                 item.to_dict() for item in self.menu_items
             ]
-        }
+
+        if self.composer_input_disabled is not None:
+            res['composer_input_disabled'] = self.composer_input_disabled
+
+        return res
 
 
 class MessengerProfile(object):

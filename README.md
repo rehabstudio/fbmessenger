@@ -298,24 +298,26 @@ messenger.send(text)
 ```
 
 <a name="thread-settings"></a>
-## Thread settings
+## Messenger Profile
 
 ### Greeting Text
 
 ```python
 
-from fbmessenger.thread_settings import GreetingText
+from fbmessenger.thread_settings import GreetingText, MessengerProfile
 
-greeting_text = new GreetingText('Welcome to my bot')
-messenger.send(greeting_text.to_dict())
+greeting_text = GreetingText('Welcome to my bot')
+messenger_profile = MessengerProfile(greetings=[greeting_text])
+messenger.set_messenger_profile(messenger_profile.to_dict())
 ```
 ### Get Started Button
 
 ```python
-from fbmessenger.thread_settings import GetStartedButton
+from fbmessenger.thread_settings import GetStartedButton, MessengerProfile
 
-get_started = new GetStartedButton(payload='GET_STARTED')
-messenger.send(get_started.to_dict())
+get_started = GetStartedButton(payload='GET_STARTED')
+messenger_profile = MessengerProfile(get_started=get_started)
+messenger.set_messenger_profile(messenger_profile.to_dict())
 ```
 
 You can then check for this payload in the `postback` method
@@ -323,12 +325,13 @@ You can then check for this payload in the `postback` method
 ### Persistent Menu
 
 ```python
-from fbmessenger.thread_settings import PersistentMenu, PersistentMenuItem
+from fbmessenger.thread_settings import PersistentMenu, PersistentMenuItem, MessengerProfile
 
-menu_item_1 = new PersistentMenuItem(item_type='web_url', title='Menu Item 1', url='https://facebook.com')
-menu_item_2 = new PersistentMenuItem(item_type='postback', title='Menu Item 2', payload='PAYLOAD')
+menu_item_1 = PersistentMenuItem(item_type='web_url', title='Menu Item 1', url='https://facebook.com')
+menu_item_2 = PersistentMenuItem(item_type='postback', title='Menu Item 2', payload='PAYLOAD')
 
-menu = new PersistentMenu(menu_items=[menu_item_1, menu_item_2])
+menu = PersistentMenu(menu_items=[menu_item_1, menu_item_2])
 
-messenger.send(menu.to_dict())
+messenger_profile = MessengerProfile(persistent_menus=[menu])
+messenger.set_messenger_profile(messenger_profile.to_dict())
 ```

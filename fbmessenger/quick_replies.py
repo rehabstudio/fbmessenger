@@ -48,7 +48,7 @@ class QuickReply(object):
 
 class QuickReplies(object):
     def __init__(self, quick_replies):
-        if len(quick_replies) > 10:
+        if len(quick_replies) > 11:
             raise ValueError('You cannot have more than 10 quick replies.')
         self.quick_replies = quick_replies
 

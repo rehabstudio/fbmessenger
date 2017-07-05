@@ -87,7 +87,7 @@ class Element(object):
 
     def __init__(self, title, item_url=None, image_url=None,
                  subtitle=None, buttons=None, quantity=None,
-                 price=None, currency=None):
+                 price=None, currency=None, default_action=None):
 
         self.title = title
         self.item_url = item_url
@@ -97,6 +97,10 @@ class Element(object):
         self.quantity = quantity
         self.price = price
         self.currency = currency
+
+        if default_action and default_action.title:
+            raise ValueError('The default_action button may not have a title')
+        self.default_action = default_action
 
     @property
     def title(self):
@@ -136,6 +140,8 @@ class Element(object):
             d['price'] = self.price
         if self.currency:
             d['currency'] = self.currency
+        if self.default_action:
+            d['default_action'] = self.default_action.to_dict()
         if self.buttons:
             d['buttons'] = [
                 button.to_dict() for button in self.buttons

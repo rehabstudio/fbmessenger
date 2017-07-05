@@ -86,11 +86,13 @@ class TestElements:
 
     def test_element(self):
         btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
+        default = elements.Button(button_type='web_url', url='https://facebook.com')
         res = elements.Element(
             title='Element',
             item_url='http://facebook.com',
             image_url='http://facebook.com/image.jpg',
             subtitle='Subtitle',
+            default_action=default,
             buttons=[
                 btn
             ]
@@ -101,6 +103,10 @@ class TestElements:
             'item_url': 'http://facebook.com',
             'image_url': 'http://facebook.com/image.jpg',
             'subtitle': 'Subtitle',
+            'default_action': {
+                'type': 'web_url',
+                'url': 'https://facebook.com'
+            },
             'buttons': [
                 {
                     'type': 'web_url',
@@ -110,6 +116,22 @@ class TestElements:
             ]
         }
         assert expected == res.to_dict()
+
+    def test_default_action_validation(self):
+        btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
+        default = elements.Button(button_type='web_url', url='https://facebook.com', title='Facebook')
+        with pytest.raises(ValueError) as err:
+            elements.Element(
+                title='Element',
+                item_url='http://facebook.com',
+                image_url='http://facebook.com/image.jpg',
+                subtitle='Subtitle',
+                default_action=default,
+                buttons=[
+                    btn
+                ]
+            )
+        assert str(err.value) == 'The default_action button may not have a title'
 
     def test_button_type_validation(self):
         with pytest.raises(ValueError) as err:

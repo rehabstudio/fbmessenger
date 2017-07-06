@@ -4,7 +4,7 @@ import logging
 
 import requests
 
-__version__ = '4.0.0'
+__version__ = '4.0.1'
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

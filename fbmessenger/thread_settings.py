@@ -31,7 +31,9 @@ class PersistentMenuItem(object):
         'postback'
     ]
 
-    def __init__(self, item_type, title, nested_items=None, url=None, payload=None):
+    def __init__(self, item_type, title, nested_items=None, url=None,
+                 payload=None, fallback_url=None, messenger_extensions=None,
+                 webview_share_button=None):
         if item_type not in self.ITEM_TYPES:
             raise ValueError('Invalid item_type provided.')
         if len(title) > 30:
@@ -43,8 +45,15 @@ class PersistentMenuItem(object):
                 raise ValueError('`nested_items` must be supplied for `nested` type menu items.')
             if len(nested_items) > 5:
                 raise ValueError('Cannot have more than 5 nested_items')
-        if item_type == 'web_url' and url is None:
-            raise ValueError('`url` must be supplied for `web_url` type menu items.')
+        if item_type == 'web_url':
+            if url is None:
+                raise ValueError('`url` must be supplied for `web_url` type menu items.')
+        else:
+            if messenger_extensions is not None:
+                raise ValueError('`messenger_extensions` is only valid for item type `web_url`')
+            if webview_share_button is not None:
+                raise ValueError('`webview_share_button` is only valid for item type `web_url`')
+
         if item_type == 'postback' and payload is None:
             raise ValueError('`payload` must be supplied for `postback` type menu items.')
 
@@ -52,6 +61,9 @@ class PersistentMenuItem(object):
         self.title = title
         self.nested_items = nested_items
         self.url = url
+        self.fallback_url = fallback_url
+        self.messenger_extensions = messenger_extensions
+        self.webview_share_button = webview_share_button
         self.payload = payload
 
     def to_dict(self):
@@ -63,8 +75,15 @@ class PersistentMenuItem(object):
         if self.nested_items and self.item_type == 'nested':
             res['call_to_actions'] = [item.to_dict() for item in self.nested_items]
 
-        if self.url and self.item_type == 'web_url':
-            res['url'] = self.url
+        if self.item_type == 'web_url':
+            if self.url:
+                res['url'] = self.url
+            if self.fallback_url:
+                res['fallback_url'] = self.fallback_url
+            if self.messenger_extensions is not None:
+                res['messenger_extensions'] = self.messenger_extensions
+            if self.webview_share_button is False:
+                res['webview_share_button'] = 'hide'
 
         if self.payload and self.item_type == 'postback':
             res['payload'] = self.payload

@@ -39,6 +39,88 @@ class TestThreadSettings:
         }
         assert expected == res.to_dict()
 
+    def test_persistent_menu_item_web_url_fallback(self):
+        res = thread_settings.PersistentMenuItem(
+            item_type='web_url',
+            title='Link',
+            url='https://facebook.com',
+            fallback_url='https://facebook.com/fallback'
+        )
+        expected = {
+            'type': 'web_url',
+            'title': 'Link',
+            'url': 'https://facebook.com',
+            'fallback_url': 'https://facebook.com/fallback',
+        }
+        assert expected == res.to_dict()
+
+    def test_persistent_menu_messenger_extensions(self):
+        res = thread_settings.PersistentMenuItem(
+            item_type='web_url',
+            title='Link',
+            payload='payload',
+            url='https://facebook.com',
+            messenger_extensions=True
+        )
+        expected = {
+            'type': 'web_url',
+            'title': 'Link',
+            'url': 'https://facebook.com',
+            'messenger_extensions': True
+        }
+        assert expected == res.to_dict()
+
+    def test_persistent_menu_messenger_extensions_invalid(self):
+        with pytest.raises(ValueError) as err:
+            thread_settings.PersistentMenuItem(
+                item_type='postback',
+                title='Link',
+                payload='payload',
+                messenger_extensions=True
+            )
+        assert str(err.value) == '`messenger_extensions` is only valid for item type `web_url`'
+
+    def test_webview_share_button_invalid(self):
+        with pytest.raises(ValueError) as err:
+            thread_settings.PersistentMenuItem(
+                item_type='postback',
+                title='Link',
+                payload='payload',
+                webview_share_button=False
+            )
+        assert str(err.value) == '`webview_share_button` is only valid for item type `web_url`'
+
+    def test_webview_share_button_true(self):
+        res = thread_settings.PersistentMenuItem(
+            item_type='web_url',
+            title='Link',
+            payload='payload',
+            url='https://facebook.com',
+            webview_share_button=True
+        )
+        expected = {
+            'type': 'web_url',
+            'title': 'Link',
+            'url': 'https://facebook.com',
+        }
+        assert expected == res.to_dict()
+
+    def test_webview_share_button_false(self):
+        res = thread_settings.PersistentMenuItem(
+            item_type='web_url',
+            title='Link',
+            payload='payload',
+            url='https://facebook.com',
+            webview_share_button=False
+        )
+        expected = {
+            'type': 'web_url',
+            'title': 'Link',
+            'url': 'https://facebook.com',
+            'webview_share_button': 'hide'
+        }
+        assert expected == res.to_dict()
+
     def test_persistent_menu_item_postback(self):
         res = thread_settings.PersistentMenuItem(
             item_type='postback',

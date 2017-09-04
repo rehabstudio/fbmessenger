@@ -1,4 +1,7 @@
 # Release History
+## 4.1.0
+
+- Bring PersistentMenuItem up to date
 
 ## 4.0.1
 

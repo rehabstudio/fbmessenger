@@ -1,3 +1,7 @@
+from __future__ import absolute_import
+
+from .elements import WEBVIEW_HEIGHT_RATIOS
+
 DEFAULT_LOCALE = 'default'
 
 class GreetingText(object):
@@ -33,7 +37,7 @@ class PersistentMenuItem(object):
 
     def __init__(self, item_type, title, nested_items=None, url=None,
                  payload=None, fallback_url=None, messenger_extensions=None,
-                 webview_share_button=None):
+                 webview_share_button=None, webview_height_ratio=None):
         if item_type not in self.ITEM_TYPES:
             raise ValueError('Invalid item_type provided.')
         if len(title) > 30:
@@ -48,11 +52,15 @@ class PersistentMenuItem(object):
         if item_type == 'web_url':
             if url is None:
                 raise ValueError('`url` must be supplied for `web_url` type menu items.')
+            if webview_height_ratio and not webview_height_ratio in WEBVIEW_HEIGHT_RATIOS:
+                raise ValueError('Invalid webview_height_ratio provided.')
         else:
             if messenger_extensions is not None:
                 raise ValueError('`messenger_extensions` is only valid for item type `web_url`')
             if webview_share_button is not None:
                 raise ValueError('`webview_share_button` is only valid for item type `web_url`')
+            if webview_height_ratio is not None:
+                raise ValueError('`webview_height_ratio` is only valid for item type `web_url`')
 
         if item_type == 'postback' and payload is None:
             raise ValueError('`payload` must be supplied for `postback` type menu items.')
@@ -64,6 +72,7 @@ class PersistentMenuItem(object):
         self.fallback_url = fallback_url
         self.messenger_extensions = messenger_extensions
         self.webview_share_button = webview_share_button
+        self.webview_height_ratio = webview_height_ratio
         self.payload = payload
 
     def to_dict(self):
@@ -84,6 +93,8 @@ class PersistentMenuItem(object):
                 res['messenger_extensions'] = self.messenger_extensions
             if self.webview_share_button is False:
                 res['webview_share_button'] = 'hide'
+            if self.webview_height_ratio:
+                res['webview_height_ratio'] = self.webview_height_ratio
 
         if self.payload and self.item_type == 'postback':
             res['payload'] = self.payload

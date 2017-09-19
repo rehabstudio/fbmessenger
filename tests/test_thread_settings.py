@@ -90,6 +90,26 @@ class TestThreadSettings:
             )
         assert str(err.value) == '`webview_share_button` is only valid for item type `web_url`'
 
+    def test_webview_height_ratio_invalid(self):
+        with pytest.raises(ValueError) as err:
+            thread_settings.PersistentMenuItem(
+                item_type='postback',
+                title='Link',
+                payload='payload',
+                webview_height_ratio='anything'
+            )
+        assert str(err.value) == '`webview_height_ratio` is only valid for item type `web_url`'
+
+    def test_webview_height_ratio_invalid_value(self):
+        with pytest.raises(ValueError) as err:
+            thread_settings.PersistentMenuItem(
+                item_type='web_url',
+                title='Link',
+                url='https://facebook.com',
+                webview_height_ratio='anything'
+            )
+        assert str(err.value) == 'Invalid webview_height_ratio provided.'
+
     def test_webview_share_button_true(self):
         res = thread_settings.PersistentMenuItem(
             item_type='web_url',
@@ -118,6 +138,22 @@ class TestThreadSettings:
             'title': 'Link',
             'url': 'https://facebook.com',
             'webview_share_button': 'hide'
+        }
+        assert expected == res.to_dict()
+
+    def test_webview_height_ratio(self):
+        res = thread_settings.PersistentMenuItem(
+            item_type='web_url',
+            title='Link',
+            payload='payload',
+            url='https://facebook.com',
+            webview_height_ratio='tall',
+        )
+        expected = {
+            'type': 'web_url',
+            'title': 'Link',
+            'url': 'https://facebook.com',
+            'webview_height_ratio': 'tall'
         }
         assert expected == res.to_dict()
 

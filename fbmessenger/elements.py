@@ -6,6 +6,11 @@ from .error_messages import CHARACTER_LIMIT_MESSAGE
 
 logger = logging.getLogger(__name__)
 
+WEBVIEW_HEIGHT_RATIOS = [
+    'compact',
+    'tall',
+    'full',
+]
 
 class Text(object):
     def __init__(self, text, quick_replies=None):
@@ -33,19 +38,13 @@ class Button(object):
         'element_share',
     ]
 
-    WEBVIEW_HEIGHT_RATIOS = [
-        'compact',
-        'tall',
-        'full',
-    ]
-
     def __init__(self, button_type, title=None, url=None,
                  payload=None, webview_height_ratio=None,
                  messenger_extensions=None, fallback_url=None):
 
         if button_type not in self.BUTTON_TYPES:
             raise ValueError('Invalid button_type provided.')
-        if webview_height_ratio and webview_height_ratio not in self.WEBVIEW_HEIGHT_RATIOS:
+        if webview_height_ratio and webview_height_ratio not in WEBVIEW_HEIGHT_RATIOS:
             raise ValueError('Invalid webview_height_ratio provided.')
         if title and len(title) > 20:
             logger.warning(CHARACTER_LIMIT_MESSAGE.format(field='Title',

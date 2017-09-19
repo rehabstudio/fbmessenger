@@ -1,4 +1,15 @@
 # Release History
+## 4.1.0
+
+- Bring PersistentMenuItem up to date
+
+## 4.0.1
+
+- Add support for default_action to Element
+
+## 4.0.0
+
+- Support for new Messenger Profile
 
 ## 3.1.3
 

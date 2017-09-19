@@ -76,7 +76,7 @@ setup(
     long_description=long_description,
     url='https://github.com/rehabstudio/fbmessenger',
     author='Ricky Dunlop',
-    author_email='ricky@rehabstudio.com',
+    author_email='hello@rickydunlop.co.uk',
     license='Apache',
     test_suite='tests',
     classifiers=[

@@ -61,6 +61,25 @@ class TestTemplates:
         }
         assert expected == res.to_dict()
 
+    def test_button_template_with_too_many_buttons(self):
+        btn = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
+        with pytest.raises(ValueError) as err:
+            res = templates.ButtonTemplate(
+                text='Button template',
+                buttons=[btn]*4,
+            )
+            res.to_dict()
+        assert str(err.value) == 'You cannot have more than 3 buttons in the template.'
+
+    def test_button_template_with_no_buttons(self):
+        with pytest.raises(ValueError) as err:
+            res = templates.ButtonTemplate(
+                text='Button template',
+                buttons=[],
+            )
+            res.to_dict()
+        assert str(err.value) == 'At least 1 buttons are required.'
+
     def test_generic_template(self):
         btn = elements.Button(
             button_type='web_url',
@@ -231,6 +250,17 @@ class TestTemplates:
             res.to_dict()
         assert str(err.value) == 'You cannot have more than 10 elements in the template.'
 
+    def test_generic_template_with_no_elements(self):
+        with pytest.raises(ValueError) as err:
+            res = templates.GenericTemplate(elements=[])
+            res.to_dict()
+        assert str(err.value) == 'At least 1 elements are required.'
+
+    def test_template_with_invalid_quick_replies(self):
+        with pytest.raises(ValueError) as err:
+            templates.GenericTemplate(elements=None, quick_replies='wrong')
+        assert str(err.value) == 'quick_replies must be an instance of QuickReplies.'
+
     def test_receipt_template(self):
         element = elements.Element(
             title='Classic White T-Shirt',
@@ -317,7 +347,65 @@ class TestTemplates:
         }
         assert expected == res.to_dict()
 
-    def test_template_with_invalid_quick_replies(self):
-        with pytest.raises(ValueError) as err:
-            templates.GenericTemplate(elements=None, quick_replies='wrong')
-        assert str(err.value) == 'quick_replies must be an instance of QuickReplies.'
+    def test_list_template(self):
+        btn = elements.Button(
+            button_type='web_url',
+            title='Web button',
+            url='http://facebook.com'
+        )
+        elems = elements.Element(
+            title='Element',
+            image_url='http://facebook.com/image.jpg',
+            subtitle='Subtitle',
+            buttons=[
+                btn
+            ]
+        )
+        res = templates.ListTemplate(
+            elements=[elems] * 2,
+            buttons=[btn],
+            top_element_style='large',
+            )
+        expected = {
+            'attachment': {
+                'type': 'template',
+                'payload': {
+                    'template_type': 'list',
+                    'top_element_style':'large',
+                    'elements': [
+                        {
+                            'title': 'Element',
+                            'image_url': 'http://facebook.com/image.jpg',
+                            'subtitle': 'Subtitle',
+                            'buttons': [
+                                {
+                                    'type': 'web_url',
+                                    'title': 'Web button',
+                                    'url': 'http://facebook.com'
+                                }
+                            ]
+                        },
+                        {
+                            'title': 'Element',
+                            'image_url': 'http://facebook.com/image.jpg',
+                            'subtitle': 'Subtitle',
+                            'buttons': [
+                                {
+                                    'type': 'web_url',
+                                    'title': 'Web button',
+                                    'url': 'http://facebook.com'
+                                }
+                            ]
+                        }
+                    ],
+                    'buttons': [
+                        {
+                            'type': 'web_url',
+                            'title': 'Web button',
+                            'url': 'http://facebook.com'
+                        }
+                    ],
+                }
+            }
+        }
+        assert expected == res.to_dict()

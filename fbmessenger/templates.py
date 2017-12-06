@@ -5,11 +5,9 @@ from .quick_replies import QuickReplies
 
 
 class BaseTemplate(object):
-    def __init__(self, elements=None, quick_replies=None):
-        if elements and not isinstance(elements, list):
-            elements = [elements]
-        self._elements = elements
+    TEMPLATE_TYPE = 'base'
 
+    def __init__(self, quick_replies=None):
         if quick_replies and not isinstance(quick_replies, QuickReplies):
             raise ValueError('quick_replies must be an instance of QuickReplies.')
         self.quick_replies = quick_replies
@@ -17,14 +15,11 @@ class BaseTemplate(object):
         self._d = {
             'attachment': {
                 'type': 'template',
+                'payload': {
+                    'template_type': self.TEMPLATE_TYPE,
+                },
             },
         }
-
-    @property
-    def elements(self):
-        if self._elements and len(self._elements) > 10:
-            raise ValueError('You cannot have more than 10 elements in the template.')
-        return self._elements
 
     def to_dict(self):
         if self.quick_replies:
@@ -33,56 +28,140 @@ class BaseTemplate(object):
         return self._d
 
 
-class GenericTemplate(BaseTemplate):
+class ElementMixin(object):
+    MIN_ELEMENTS = 0
+    MAX_ELEMENTS = 0
 
-    def __init__(self, elements, quick_replies=None):
+    def __init__(self, elements=None, *args, **kwargs):
+        self.elements = elements
+
+        super(ElementMixin, self).__init__(*args, **kwargs)
+
+    @property
+    def elements(self):
+        return self._elements
+
+    @elements.setter
+    def elements(self, elements):
+        if elements:
+            if isinstance(elements, collections.Iterable):
+                elements = list(elements)
+            else:
+                elements = [elements]
+
         self._elements = elements
-        self.quick_replies = quick_replies
-        super(GenericTemplate, self).__init__(self._elements, self.quick_replies)
 
     def to_dict(self):
-        self._d['attachment']['payload'] = {
-            'template_type': 'generic',
-            'elements': [
+        if self.MIN_ELEMENTS and (not self.elements or len(self.elements) < self.MIN_ELEMENTS):
+            raise ValueError('At least {} elements are required.'.format(self.MIN_ELEMENTS))
+
+        if self.elements:
+            if len(self.elements) > self.MAX_ELEMENTS:
+                raise ValueError('You cannot have more than {} elements in the template.'.format(self.MAX_ELEMENTS))
+
+            self._d['attachment']['payload']['elements'] = [
                 element.to_dict() for element in self.elements
             ]
-        }
-        return super(GenericTemplate, self).to_dict()
+
+        return super(ElementMixin, self).to_dict()
 
 
-class ButtonTemplate(BaseTemplate):
+class ButtonMixin(object):
+    MIN_BUTTONS = 0
+    MAX_BUTTONS = 0
+
+    def __init__(self, buttons=None, *args, **kwargs):
+        self.buttons = buttons
+
+        super(ButtonMixin, self).__init__(*args, **kwargs)
+
+    @property
+    def buttons(self):
+        return self._buttons
+
+    @buttons.setter
+    def buttons(self, buttons):
+        if buttons:
+            if isinstance(buttons, collections.Iterable):
+                buttons = list(buttons)
+            else:
+                buttons = [buttons]
+
+        self._buttons = buttons
+
+    def to_dict(self):
+        if self.MIN_BUTTONS and (not self.buttons or len(self.buttons) < self.MIN_BUTTONS):
+            raise ValueError('At least {} buttons are required.'.format(self.MIN_BUTTONS))
+
+        if self.buttons:
+            if len(self.buttons) > self.MAX_BUTTONS:
+                raise ValueError('You cannot have more than {} buttons in the template.'.format(self.MAX_BUTTONS))
+
+            self._d['attachment']['payload']['buttons'] = [
+                button.to_dict() for button in self.buttons
+            ]
+
+        return super(ButtonMixin, self).to_dict()
+
+
+class GenericTemplate(ElementMixin, BaseTemplate):
+    TEMPLATE_TYPE = 'generic'
+
+    MIN_ELEMENTS = 1
+    MAX_ELEMENTS = 10
+
+    def __init__(self, elements, quick_replies=None):
+        super(GenericTemplate, self).__init__(elements=elements, quick_replies=quick_replies)
+
+
+class ButtonTemplate(ButtonMixin, BaseTemplate):
+    TEMPLATE_TYPE = 'button'
+
+    MIN_BUTTONS = 1
+    MAX_BUTTONS = 3
 
     def __init__(self, text, buttons, quick_replies=None):
         self.text = text
-        self.quick_replies = quick_replies
 
-        if isinstance(buttons, collections.Iterable):
-            buttons = list(buttons)
-        else:
-            buttons = [buttons]
-
-        self.buttons = buttons
-
-        super(ButtonTemplate, self).__init__(None, self.quick_replies)
+        super(ButtonTemplate, self).__init__(buttons=buttons, quick_replies=quick_replies)
 
     def to_dict(self):
-        self._d['attachment']['payload'] = {
-            'template_type': 'button',
-            'text': self.text,
-            'buttons': [
-                button.to_dict() for button in self.buttons
-            ]
-        }
+        self._d['attachment']['payload']['text'] = self.text
         return super(ButtonTemplate, self).to_dict()
 
 
-class ReceiptTemplate(BaseTemplate):
+class ListTemplate(ButtonMixin, ElementMixin, BaseTemplate):
+    TEMPLATE_TYPE = 'list'
+
+    MIN_BUTTONS = 0
+    MAX_BUTTONS = 1
+
+    MIN_ELEMENTS = 2
+    MAX_ELEMENTS = 4
+
+    def __init__(self, elements=None, buttons=None, quick_replies=None,
+                 top_element_style=None):
+        self.top_element_style = top_element_style
+
+        super(ListTemplate, self).__init__(elements=elements, buttons=buttons, quick_replies=quick_replies)
+
+    def to_dict(self):
+        if self.top_element_style:
+            self._d['attachment']['payload']['top_element_style'] = self.top_element_style
+
+        return super(ListTemplate, self).to_dict()
+
+
+class ReceiptTemplate(ElementMixin, BaseTemplate):
+    TEMPLATE_TYPE = 'receipt'
+
+    MIN_ELEMENTS = 0
+    MAX_ELEMENTS = 100
 
     def __init__(self, recipient_name, order_number, currency, payment_method,
                  elements, summary, order_url=None, timestamp=None,
                  address=None, adjustments=None, quick_replies=None):
 
-        self._elements = elements
         self.recipient_name = recipient_name
         self.order_number = order_number
         self.currency = currency
@@ -94,29 +173,27 @@ class ReceiptTemplate(BaseTemplate):
         self.adjustments = adjustments
         self.quick_replies = quick_replies
 
-        super(ReceiptTemplate, self).__init__(self._elements, self.quick_replies)
+        super(ReceiptTemplate, self).__init__(elements=elements, quick_replies=quick_replies)
 
     def to_dict(self):
-        self._d['attachment']['payload'] = {
-            'template_type': 'receipt',
+        payload = {
             'recipient_name': self.recipient_name,
             'order_number': self.order_number,
             'order_url': self.order_url,
             'currency': self.currency,
             'timestamp': self.timestamp,
             'payment_method': self.payment_method,
-            'elements': [
-                element.to_dict() for element in self.elements
-            ],
             'summary': self.summary
         }
 
         if self.address:
-            self._d['attachment']['payload']['address'] = self.address.to_dict()
+            payload['address'] = self.address.to_dict()
 
         if self.adjustments:
-            self._d['attachment']['payload']['adjustments'] = [
+            payload['adjustments'] = [
                 adjustment.to_dict() for adjustment in self.adjustments
             ]
+
+        self._d['attachment']['payload'].update(payload)
 
         return super(ReceiptTemplate, self).to_dict()

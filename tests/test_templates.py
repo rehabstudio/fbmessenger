@@ -95,13 +95,18 @@ class TestTemplates:
                 btn
             ]
         )
-        res = templates.GenericTemplate(elements=[elems] * 2, sharable=True)
+        res = templates.GenericTemplate(
+            elements=[elems] * 2,
+            image_aspect_ratio='square',
+            sharable=True,
+            )
         expected = {
             'attachment': {
                 'type': 'template',
                 'payload': {
                     'template_type': 'generic',
                     'sharable': True,
+                    'image_aspect_ratio': 'square',
                     'elements': [
                         {
                             'title': 'Element',

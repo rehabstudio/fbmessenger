@@ -122,12 +122,20 @@ class GenericTemplate(ElementMixin, SharableMixin, BaseTemplate):
     MIN_ELEMENTS = 1
     MAX_ELEMENTS = 10
 
-    def __init__(self, elements, quick_replies=None, **kwargs):
+    def __init__(self, elements, quick_replies=None, image_aspect_ratio=None, **kwargs):
+        self.image_aspect_ratio = image_aspect_ratio
+
         super(GenericTemplate, self).__init__(
             elements=elements,
             quick_replies=quick_replies,
             **kwargs
             )
+
+    def to_dict(self):
+        if self.image_aspect_ratio:
+            self._d['attachment']['payload']['image_aspect_ratio'] = self.image_aspect_ratio
+
+        return super(GenericTemplate, self).to_dict()
 
 
 class ButtonTemplate(ButtonMixin, BaseTemplate):

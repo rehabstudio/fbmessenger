@@ -95,12 +95,13 @@ class TestTemplates:
                 btn
             ]
         )
-        res = templates.GenericTemplate(elements=[elems] * 2)
+        res = templates.GenericTemplate(elements=[elems] * 2, sharable=True)
         expected = {
             'attachment': {
                 'type': 'template',
                 'payload': {
                     'template_type': 'generic',
+                    'sharable': True,
                     'elements': [
                         {
                             'title': 'Element',
@@ -155,6 +156,7 @@ class TestTemplates:
                 'type': 'template',
                 'payload': {
                     'template_type': 'generic',
+                    'sharable': False,
                     'elements': [
                         {
                             'title': 'Element',
@@ -201,6 +203,7 @@ class TestTemplates:
                 'type': 'template',
                 'payload': {
                     'template_type': 'generic',
+                    'sharable': False,
                     'elements': [
                         {
                             'title': 'Element',
@@ -302,6 +305,7 @@ class TestTemplates:
                 'type': 'template',
                 'payload': {
                     'template_type': 'receipt',
+                    'sharable': False,
                     'recipient_name': 'Stephane Crozatier',
                     'order_number': '12345678902',
                     'currency': 'USD',

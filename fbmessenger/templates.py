@@ -104,14 +104,30 @@ class ButtonMixin(object):
         return super(ButtonMixin, self).to_dict()
 
 
-class GenericTemplate(ElementMixin, BaseTemplate):
+class SharableMixin(object):
+    def __init__(self, sharable=False, *args, **kwargs):
+        self.sharable = bool(sharable)
+
+        super(SharableMixin, self).__init__(*args, **kwargs)
+
+    def to_dict(self):
+        self._d['attachment']['payload']['sharable'] = self.sharable
+
+        return super(SharableMixin, self).to_dict()
+
+
+class GenericTemplate(ElementMixin, SharableMixin, BaseTemplate):
     TEMPLATE_TYPE = 'generic'
 
     MIN_ELEMENTS = 1
     MAX_ELEMENTS = 10
 
-    def __init__(self, elements, quick_replies=None):
-        super(GenericTemplate, self).__init__(elements=elements, quick_replies=quick_replies)
+    def __init__(self, elements, quick_replies=None, **kwargs):
+        super(GenericTemplate, self).__init__(
+            elements=elements,
+            quick_replies=quick_replies,
+            **kwargs
+            )
 
 
 class ButtonTemplate(ButtonMixin, BaseTemplate):
@@ -120,10 +136,14 @@ class ButtonTemplate(ButtonMixin, BaseTemplate):
     MIN_BUTTONS = 1
     MAX_BUTTONS = 3
 
-    def __init__(self, text, buttons, quick_replies=None):
+    def __init__(self, text, buttons, quick_replies=None, **kwargs):
         self.text = text
 
-        super(ButtonTemplate, self).__init__(buttons=buttons, quick_replies=quick_replies)
+        super(ButtonTemplate, self).__init__(
+            buttons=buttons,
+            quick_replies=quick_replies,
+            **kwargs
+            )
 
     def to_dict(self):
         self._d['attachment']['payload']['text'] = self.text
@@ -139,11 +159,10 @@ class ListTemplate(ButtonMixin, ElementMixin, BaseTemplate):
     MIN_ELEMENTS = 2
     MAX_ELEMENTS = 4
 
-    def __init__(self, elements=None, buttons=None, quick_replies=None,
-                 top_element_style=None):
+    def __init__(self, elements, top_element_style=None, **kwargs):
         self.top_element_style = top_element_style
 
-        super(ListTemplate, self).__init__(elements=elements, buttons=buttons, quick_replies=quick_replies)
+        super(ListTemplate, self).__init__(elements=elements, **kwargs)
 
     def to_dict(self):
         if self.top_element_style:
@@ -152,7 +171,7 @@ class ListTemplate(ButtonMixin, ElementMixin, BaseTemplate):
         return super(ListTemplate, self).to_dict()
 
 
-class ReceiptTemplate(ElementMixin, BaseTemplate):
+class ReceiptTemplate(ElementMixin, SharableMixin, BaseTemplate):
     TEMPLATE_TYPE = 'receipt'
 
     MIN_ELEMENTS = 0
@@ -160,7 +179,8 @@ class ReceiptTemplate(ElementMixin, BaseTemplate):
 
     def __init__(self, recipient_name, order_number, currency, payment_method,
                  elements, summary, order_url=None, timestamp=None,
-                 address=None, adjustments=None, quick_replies=None):
+                 address=None, adjustments=None, quick_replies=None,
+                 **kwargs):
 
         self.recipient_name = recipient_name
         self.order_number = order_number
@@ -173,7 +193,11 @@ class ReceiptTemplate(ElementMixin, BaseTemplate):
         self.adjustments = adjustments
         self.quick_replies = quick_replies
 
-        super(ReceiptTemplate, self).__init__(elements=elements, quick_replies=quick_replies)
+        super(ReceiptTemplate, self).__init__(
+            elements=elements,
+            quick_replies=quick_replies,
+            **kwargs
+            )
 
     def to_dict(self):
         payload = {

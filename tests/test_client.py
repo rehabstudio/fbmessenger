@@ -38,7 +38,7 @@ def test_get_user_data(client, monkeypatch):
     assert resp == {"first_name": "Test", "last_name": "User", "profile_pic": "profile"}
     assert mock_get.call_count == 1
     mock_get.assert_called_with(
-        'https://graph.facebook.com/v2.6/12345678',
+        'https://graph.facebook.com/v2.11/12345678',
         params={
             'fields': 'first_name,last_name,profile_pic,locale,timezone,gender',
             'access_token': 12345678
@@ -59,7 +59,7 @@ def test_subscribe_app_to_page(client, monkeypatch):
     assert resp == {"success": True}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/subscribed_apps',
+        'https://graph.facebook.com/v2.11/me/subscribed_apps',
         params={'access_token': 12345678}
     )
 
@@ -82,7 +82,7 @@ def test_send_data(client, monkeypatch, entry):
     }
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/messages',
+        'https://graph.facebook.com/v2.11/me/messages',
         params={'access_token': 12345678},
         json={
             'recipient': {
@@ -102,7 +102,7 @@ def test_send_action(client, monkeypatch, entry):
 
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/messages',
+        'https://graph.facebook.com/v2.11/me/messages',
         params={'access_token': 12345678},
         json={
             'recipient': {
@@ -128,7 +128,7 @@ def test_set_greeting_text(client, monkeypatch):
     assert resp == {"result": "success"}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/messenger_profile',
+        'https://graph.facebook.com/v2.11/me/messenger_profile',
         params={'access_token': 12345678},
         json={
             'greeting': [{
@@ -161,7 +161,7 @@ def test_delete_get_started(client, monkeypatch):
 
     assert mock_delete.call_count == 1
     mock_delete.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/messenger_profile',
+        'https://graph.facebook.com/v2.11/me/messenger_profile',
         params={'access_token': 12345678},
         json={
             'fields': [
@@ -180,7 +180,7 @@ def test_delete_persistent_menu(client, monkeypatch):
 
     assert mock_delete.call_count == 1
     mock_delete.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/messenger_profile',
+        'https://graph.facebook.com/v2.11/me/messenger_profile',
         params={'access_token': 12345678},
         json={
             'fields': [
@@ -199,7 +199,7 @@ def test_link_account(client, monkeypatch):
 
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.6/me',
+        'https://graph.facebook.com/v2.11/me',
         params={
             'access_token': 12345678,
             'fields': 'recipient',
@@ -220,7 +220,7 @@ def test_unlink_account(client, monkeypatch):
     assert res == {"result": "unlink account success"}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/unlink_accounts',
+        'https://graph.facebook.com/v2.11/me/unlink_accounts',
         params={
             'access_token': 12345678,
         },
@@ -242,7 +242,7 @@ def test_add_whitelisted_domains(client, monkeypatch):
     assert res == {"result": "success"}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/messenger_profile',
+        'https://graph.facebook.com/v2.11/me/messenger_profile',
         params={
             'access_token': 12345678,
         },
@@ -266,7 +266,7 @@ def test_add_whitelisted_domains_not_as_list(client, monkeypatch):
     assert res == {"result": "success"}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/messenger_profile',
+        'https://graph.facebook.com/v2.11/me/messenger_profile',
         params={
             'access_token': 12345678,
         },
@@ -290,7 +290,7 @@ def test_remove_whitelisted_domains(client, monkeypatch):
     assert res == {"result": "success"}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.6/me/messenger_profile',
+        'https://graph.facebook.com/v2.11/me/messenger_profile',
         params={
             'access_token': 12345678,
         },

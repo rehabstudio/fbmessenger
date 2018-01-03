@@ -27,7 +27,7 @@ class MessengerClient(object):
 
     def send(self, payload, entry):
         r = self.session.post(
-            'https://graph.facebook.com/v2.6/me/messages',
+            'https://graph.facebook.com/v2.11/me/messages',
             params={
                 'access_token': self.page_access_token
             },
@@ -42,7 +42,7 @@ class MessengerClient(object):
 
     def send_action(self, sender_action, entry):
         r = self.session.post(
-            'https://graph.facebook.com/v2.6/me/messages',
+            'https://graph.facebook.com/v2.11/me/messages',
             params={
                 'access_token': self.page_access_token
             },
@@ -57,7 +57,7 @@ class MessengerClient(object):
 
     def subscribe_app_to_page(self):
         r = self.session.post(
-            'https://graph.facebook.com/v2.6/me/subscribed_apps',
+            'https://graph.facebook.com/v2.11/me/subscribed_apps',
             params={
                 'access_token': self.page_access_token
             }
@@ -66,7 +66,7 @@ class MessengerClient(object):
 
     def set_messenger_profile(self, data):
         r = self.session.post(
-            'https://graph.facebook.com/v2.6/me/messenger_profile',
+            'https://graph.facebook.com/v2.11/me/messenger_profile',
             params={
                 'access_token': self.page_access_token
             },
@@ -76,7 +76,7 @@ class MessengerClient(object):
 
     def delete_get_started(self):
         r = self.session.delete(
-            'https://graph.facebook.com/v2.6/me/messenger_profile',
+            'https://graph.facebook.com/v2.11/me/messenger_profile',
             params={
                 'access_token': self.page_access_token
             },
@@ -90,7 +90,7 @@ class MessengerClient(object):
 
     def delete_persistent_menu(self):
         r = self.session.delete(
-            'https://graph.facebook.com/v2.6/me/messenger_profile',
+            'https://graph.facebook.com/v2.11/me/messenger_profile',
             params={
                 'access_token': self.page_access_token
             },
@@ -104,7 +104,7 @@ class MessengerClient(object):
 
     def link_account(self, account_linking_token):
         r = self.session.post(
-            'https://graph.facebook.com/v2.6/me',
+            'https://graph.facebook.com/v2.11/me',
             params={
                 'access_token': self.page_access_token,
                 'fields': 'recipient',
@@ -115,7 +115,7 @@ class MessengerClient(object):
 
     def unlink_account(self, psid):
         r = self.session.post(
-            'https://graph.facebook.com/v2.6/me/unlink_accounts',
+            'https://graph.facebook.com/v2.11/me/unlink_accounts',
             params={
                 'access_token': self.page_access_token
             },
@@ -129,7 +129,7 @@ class MessengerClient(object):
         if not isinstance(domains, list):
             domains = [domains]
         r = self.session.post(
-            'https://graph.facebook.com/v2.6/me/messenger_profile',
+            'https://graph.facebook.com/v2.11/me/messenger_profile',
             params={
                 'access_token': self.page_access_token
             },
@@ -141,7 +141,7 @@ class MessengerClient(object):
 
     def remove_whitelisted_domains(self):
         r = self.session.delete(
-            'https://graph.facebook.com/v2.6/me/messenger_profile',
+            'https://graph.facebook.com/v2.11/me/messenger_profile',
             params={
                 'access_token': self.page_access_token
             },

@@ -17,7 +17,7 @@ class MessengerClient(object):
 
     def get_user_data(self, entry):
         r = self.session.get(
-            'https://graph.facebook.com/v2.6/{sender}'.format(sender=entry['sender']['id']),
+            'https://graph.facebook.com/v2.11/{sender}'.format(sender=entry['sender']['id']),
             params={
                 'fields': 'first_name,last_name,profile_pic,locale,timezone,gender',
                 'access_token': self.page_access_token

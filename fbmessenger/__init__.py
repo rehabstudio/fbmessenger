@@ -153,6 +153,22 @@ class MessengerClient(object):
         )
         return r.json()
 
+    def upload_attachment(self, attachment):
+        if not attachment.url:
+            raise ValueError('Attachment must have `url` specified')
+        if attachment.quick_replies:
+            raise ValueError('Attachment may not have `quick_replies`')
+        r = self.session.post(
+            'https://graph.facebook.com/v2.11/me/message_attachments',
+            params={
+                'access_token': self.page_access_token
+            },
+            json={
+                'message':  attachment.to_dict()
+            }
+        )
+        return r.json()
+
 
 class BaseMessenger(object):
     __metaclass__ = abc.ABCMeta
@@ -236,3 +252,6 @@ class BaseMessenger(object):
 
     def remove_whitelisted_domains(self):
         return self.client.remove_whitelisted_domains()
+
+    def upload_attachment(self, attachment):
+        return self.client.upload_attachment(attachment)

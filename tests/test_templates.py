@@ -1,5 +1,6 @@
 import pytest
 
+from fbmessenger import attachments
 from fbmessenger import elements
 from fbmessenger import templates
 from fbmessenger import quick_replies
@@ -414,6 +415,56 @@ class TestTemplates:
                             'url': 'http://facebook.com'
                         }
                     ],
+                }
+            }
+        }
+        assert expected == res.to_dict()
+
+    def test_media_template(self):
+        btn = elements.Button(
+            button_type='web_url',
+            title='Web button',
+            url='http://facebook.com'
+        )
+        attachment = attachments.Image(attachment_id='12345')
+        res = templates.MediaTemplate(attachment, buttons=[btn])
+        expected = {
+            'attachment': {
+                'type': 'template',
+                'payload': {
+                    'template_type': 'media',
+                    'elements': [
+                        {
+                            'media_type': 'image',
+                            'attachment_id': '12345',
+                            'buttons': [
+                                {
+                                    'type': 'web_url',
+                                    'title': 'Web button',
+                                    'url': 'http://facebook.com'
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+        assert expected == res.to_dict()
+
+    def test_media_template_no_buttons(self):
+        attachment = attachments.Image(attachment_id='12345')
+        res = templates.MediaTemplate(attachment)
+        expected = {
+            'attachment': {
+                'type': 'template',
+                'payload': {
+                    'template_type': 'media',
+                    'elements': [
+                        {
+                            'media_type': 'image',
+                            'attachment_id': '12345',
+                        }
+                    ]
                 }
             }
         }

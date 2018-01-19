@@ -12,6 +12,7 @@ WEBVIEW_HEIGHT_RATIOS = [
     'full',
 ]
 
+
 class Text(object):
     def __init__(self, text, quick_replies=None):
         self.text = text

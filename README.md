@@ -153,6 +153,16 @@ messenger.send(btn.to_dict())
 <a name="attachments"></a>
 ## Attachments
 
+You can upload attachments to Facebook for use in their other APIs:
+
+```python
+attachment = attachments.Image(url='https://example.com/image.jpg')
+client = MessengerClient(page_access_token=12345678)
+res = client.upload_attachment(attachment)
+print(res)
+{"attachment_id": "12345"}
+```
+
 ### Images
 
 ```python
@@ -255,6 +265,18 @@ res = templates.ReceiptTemplate(
     adjustments=[adjustment1, adjustment2],
     elements=[element]
 )
+messenger.send(res.to_dict())
+```
+
+### Media template
+```
+btn = elements.Button(
+    button_type='web_url',
+    title='Web button',
+    url='http://facebook.com'
+)
+attachment = attachments.Image(attachment_id='12345')
+res = templates.MediaTemplate(attachment, buttons=[btn])
 messenger.send(res.to_dict())
 ```
 

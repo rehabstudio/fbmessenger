@@ -138,6 +138,30 @@ class GenericTemplate(ElementMixin, SharableMixin, BaseTemplate):
         return super(GenericTemplate, self).to_dict()
 
 
+class MediaTemplate(BaseTemplate):
+    TEMPLATE_TYPE = 'media'
+
+    VALID_MEDIA_TYPES = ('image', 'video')
+
+    def __init__(self, media, buttons=None):
+        if media.attachment_type not in self.VALID_MEDIA_TYPES:
+            raise ValueError('Only image and video types are supported')
+        self.media = media
+        self.buttons = buttons
+        super(MediaTemplate, self).__init__()
+
+    def to_dict(self):
+        # Media's dict has an extra layer of structure we don't need
+        media_dict = self.media.to_dict()
+        element = media_dict['attachment']['payload']
+        element['media_type'] = self.media.attachment_type
+        if self.buttons:
+            element['buttons'] = [b.to_dict() for b in self.buttons]
+        self._d['attachment']['payload']['elements'] = [element]
+        return super(MediaTemplate, self).to_dict()
+
+
+
 class ButtonTemplate(ButtonMixin, BaseTemplate):
     TEMPLATE_TYPE = 'button'
 

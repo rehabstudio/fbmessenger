@@ -1,7 +1,12 @@
 from mock import Mock
 import pytest
 
-from fbmessenger import MessengerClient, thread_settings
+from fbmessenger import (
+    MessengerClient,
+    attachments,
+    quick_replies,
+    thread_settings,
+)
 
 
 @pytest.fixture
@@ -308,3 +313,51 @@ def test_remove_whitelisted_domains(client, monkeypatch):
             ],
         }
     )
+
+
+def test_upload_attachment(monkeypatch):
+    mock_post = Mock()
+    mock_post.return_value.status_code = 200
+    mock_post.return_value.json.return_value = {
+        "attachment_id": "12345",
+    }
+    monkeypatch.setattr('requests.Session.post', mock_post)
+
+    attachment = attachments.Image(url='https://some-image.com/image.jpg')
+    client = MessengerClient(page_access_token=12345678)
+    res = client.upload_attachment(attachment)
+    assert res == {"attachment_id": "12345"}
+    assert mock_post.call_count == 1
+    mock_post.assert_called_with(
+        'https://graph.facebook.com/v2.11/me/message_attachments',
+        params={
+            'access_token': 12345678,
+        },
+        json={
+            'message': {
+                'attachment': {
+                    'type': 'image',
+                    'payload': {
+                        'url': 'https://some-image.com/image.jpg'
+                    }
+                }
+            }
+        }
+    )
+
+
+def test_upload_url_required():
+    attachment = attachments.Image(attachment_id='12345')
+    client = MessengerClient(page_access_token=12345678)
+    with pytest.raises(ValueError):
+        client.upload_attachment(attachment)
+
+
+def test_upload_no_quick_replies():
+    replies = quick_replies.QuickReplies(
+        [quick_replies.QuickReply(title='hello', payload='hello')])
+    attachment = attachments.Image(
+        url='https://some-image.com/image.jpg', quick_replies=replies)
+    client = MessengerClient(page_access_token=12345678)
+    with pytest.raises(ValueError):
+        client.upload_attachment(attachment)

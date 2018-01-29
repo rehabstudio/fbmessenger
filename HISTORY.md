@@ -1,4 +1,9 @@
 # Release History
+
+## 5.0.0
+- Breaking API change - `messaging_type` is now required when sending
+  a message.
+
 ## 4.1.0
 
 - Bring PersistentMenuItem up to date

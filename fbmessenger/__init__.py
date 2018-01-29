@@ -4,12 +4,20 @@ import logging
 
 import requests
 
-__version__ = '4.3.1'
+__version__ = '5.0.0'
 
 logger = logging.getLogger(__name__)
 
 
 class MessengerClient(object):
+
+    # https://developers.facebook.com/docs/messenger-platform/send-messages#send_api_basics
+    MESSAGING_TYPES = {
+        'RESPONSE',
+        'UPDATE',
+        'MESSAGE_TAG',
+        'NON_PROMOTIONAL_SUBSCRIPTION'
+    }
 
     def __init__(self, page_access_token):
         self.page_access_token = page_access_token
@@ -25,13 +33,17 @@ class MessengerClient(object):
         )
         return r.json()
 
-    def send(self, payload, entry):
+    def send(self, payload, entry, messaging_type):
+        if messaging_type not in self.MESSAGING_TYPES:
+            raise ValueError(
+                '`{}` is not a valid `messaging_type`'.format(messaging_type))
         r = self.session.post(
             'https://graph.facebook.com/v2.11/me/messages',
             params={
                 'access_token': self.page_access_token
             },
             json={
+                'messaging_type': messaging_type,
                 'recipient': {
                     'id': entry['sender']['id']
                 },
@@ -207,8 +219,8 @@ class BaseMessenger(object):
     def get_user(self):
         return self.client.get_user_data(self.last_message)
 
-    def send(self, payload):
-        return self.client.send(payload, self.last_message)
+    def send(self, payload, messaging_type):
+        return self.client.send(payload, self.last_message, messaging_type)
 
     def send_action(self, sender_action):
         return self.client.send_action(sender_action, self.last_message)

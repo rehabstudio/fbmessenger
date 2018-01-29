@@ -68,7 +68,7 @@ class Messenger(BaseMessenger):
         super(Messenger, self).__init__(self.page_access_token)
 
     def message(self, message):
-        self.send({'text': 'Received: {0}'.format(message['message']['text'])})
+        self.send({'text': 'Received: {0}'.format(message['message']['text'])}, 'RESPONSE')
 
     def delivery(self, message):
         pass
@@ -123,22 +123,41 @@ Import the elements (or just the ones you need)
 
 	from fbmessenger import elements
 
+### Messaging type
+Starting from 7th May 2018, Facebook requires that all message sends
+must include the `messaging_type` property:
+
+  https://developers.facebook.com/docs/messenger-platform/reference/send-api
+
+This is passed in the `send()` calls below - in each case, we'll just
+use `RESPONSE`. You should use whatever value is appropriate for your
+application. Supported values are:
+
+- `RESPONSE`
+- `UPDATE`
+- `MESSAGE_TAG`
+- `NON_PROMOTIONAL_SUBSCRIPTION`
+
+
+See [Messaging Types](https://developers.facebook.com/docs/messenger-platform/send-messages/#messaging_types)
+for more information.
+
 ### Text
 
 You can pass a simple dict or use the Class
 
 ```python
-messenger.send({'text': msg})
+messenger.send({'text': msg}, 'RESPONSE')
 
 elem = elements.Text('Your Message')
-messenger.send(elem.to_dict())
+messenger.send(elem.to_dict(), 'RESPONSE')
 ```
 
 ### Web button
 
 ```python
 btn = elements.Button(title='Web button', url='http://example.com')
-messenger.send(btn.to_dict())
+messenger.send(btn.to_dict(), 'RESPONSE')
 ```
 
 ### Payload button
@@ -147,7 +166,7 @@ To use these buttons you must have the `message_deliveries` subscription enabled
 
 ```python
 btn = elements.Button(title='Postback button', payload='payload')
-messenger.send(btn.to_dict())
+messenger.send(btn.to_dict(), 'RESPONSE')
 ```
 
 <a name="attachments"></a>
@@ -157,28 +176,28 @@ messenger.send(btn.to_dict())
 
 ```python
 image = attachments.Image(url='http://example.com/image.jpg')
-messenger.send(image.to_dict())
+messenger.send(image.to_dict(), 'RESPONSE')
 ```
 
 ### Audio
 
 ```python
 audio = attachments.Image(url='http://example.com/audio.mp3')
-messenger.send(audio.to_dict())
+messenger.send(audio.to_dict(), 'RESPONSE')
 ```
 
 ### Video
 
 ```python
 video = attachments.Video(url='http://example.com/video.mp4')
-messenger.send(video.to_dict())
+messenger.send(video.to_dict(), 'RESPONSE')
 ```
 
 ### Files
 
 ```python
 file = attachments.File(url='http://example.com/file.txt')
-messenger.send(file.to_dict())
+messenger.send(file.to_dict(), 'RESPONSE')
 ```
 
 <a name="templates"></a>
@@ -202,7 +221,7 @@ elems = elements.Element(
     ]
 )
 res = templates.GenericTemplate(elements=[elems])
-messenger.send(res.to_dict())
+messenger.send(res.to_dict(), 'RESPONSE')
 ```
 
 ### Button template
@@ -214,7 +233,7 @@ res = templates.ButtonTemplate(
     text='Button template',
     buttons=[btn, btn2]
 )
-messenger.send(res.to_dict())
+messenger.send(res.to_dict(), 'RESPONSE')
 ```
 
 ### Receipt template
@@ -255,7 +274,7 @@ res = templates.ReceiptTemplate(
     adjustments=[adjustment1, adjustment2],
     elements=[element]
 )
-messenger.send(res.to_dict())
+messenger.send(res.to_dict(), 'RESPONSE')
 ```
 
 <a name="sender-actions"></a>
@@ -294,7 +313,7 @@ quick_replies = QuickReplies(quick_replies=[
 ])
 text = { text: 'A message' }
 text['quick_replies'] = quick_replies.to_dict()
-messenger.send(text)
+messenger.send(text, 'RESPONSE')
 ```
 
 <a name="thread-settings"></a>

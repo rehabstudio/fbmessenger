@@ -74,7 +74,7 @@ def test_send_data(client, monkeypatch, entry):
     monkeypatch.setattr('requests.Session.post', mock_post)
     client = MessengerClient(page_access_token=12345678)
     payload = {'text': 'Test message'}
-    resp = client.send(payload, entry)
+    resp = client.send(payload, entry, 'RESPONSE')
 
     assert resp == {
         "recipient_id": 12345678,
@@ -85,12 +85,20 @@ def test_send_data(client, monkeypatch, entry):
         'https://graph.facebook.com/v2.11/me/messages',
         params={'access_token': 12345678},
         json={
+            'messaging_type': 'RESPONSE',
             'recipient': {
                 'id': entry['sender']['id']
             },
             'message': payload
         }
     )
+
+
+def test_send_data_invalid_message_type():
+    client = MessengerClient(page_access_token=12345678)
+    payload = {'text': 'Test message'}
+    with pytest.raises(ValueError):
+        client.send(payload, entry, 'INVALID')
 
 
 def test_send_action(client, monkeypatch, entry):

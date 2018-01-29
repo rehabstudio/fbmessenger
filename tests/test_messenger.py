@@ -204,7 +204,7 @@ def test_send(messenger, monkeypatch):
         'success': True
     }
     monkeypatch.setattr(messenger.client, 'send', mock)
-    res = messenger.send({'text': 'message'})
+    res = messenger.send({'text': 'message'}, 'RESPONSE')
     assert res == mock()
 
 

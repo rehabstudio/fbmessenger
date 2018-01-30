@@ -469,3 +469,8 @@ class TestTemplates:
             }
         }
         assert expected == res.to_dict()
+
+    def test_media_template_invalid(self):
+        bad_attachment = attachments.File(url='https://some/file.doc')
+        with pytest.raises(ValueError):
+            templates.MediaTemplate(bad_attachment)

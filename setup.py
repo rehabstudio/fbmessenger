@@ -1,4 +1,3 @@
-from codecs import open
 import re
 import sys
 
@@ -8,26 +7,14 @@ from setuptools.command.test import test as TestCommand
 long_description = ''
 
 try:
-    import subprocess
     import pandoc
 
-    process = subprocess.Popen(
-        ['which pandoc'],
-        shell=True,
-        stdout=subprocess.PIPE,
-        universal_newlines=True
-    )
-
-    pandoc_path = process.communicate()[0]
-    pandoc_path = pandoc_path.strip('\n')
-
-    pandoc.core.PANDOC_PATH = pandoc_path
-
     doc = pandoc.Document()
-    doc.markdown = open('README.md').read()
-
-    long_description = doc.rst
-except:
+    with open('README.md', 'r') as readme:
+        doc.markdown = readme.read().encode('utf-8')
+        long_description = doc.rst.decode()
+except Exception as e:
+    print(e)
     pass
 
 test_requirements = [

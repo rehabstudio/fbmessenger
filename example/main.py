@@ -11,6 +11,7 @@ from fbmessenger.thread_settings import (
     GetStartedButton,
     PersistentMenuItem,
     PersistentMenu,
+    MessengerProfile,
 )
 
 
@@ -89,7 +90,7 @@ class Messenger(BaseMessenger):
 
     def message(self, message):
         action = process_message(message)
-        res = self.send(action)
+        res = self.send(action, 'RESPONSE')
         app.logger.debug('Response: {}'.format(res))
 
     def delivery(self, message):
@@ -107,9 +108,9 @@ class Messenger(BaseMessenger):
             txt = ('Hey, let\'s get started! Try sending me one of these messages: '
                    'text, image, video, "quick replies", '
                    'webview-compact, webview-tall, webview-full')
-            self.send({'text': txt})
+            self.send({'text': txt}, 'RESPONSE')
         if 'help' in payload:
-            self.send({'text': 'A help message or template can go here.'})
+            self.send({'text': 'A help message or template can go here.'}, 'RESPONSE')
 
     def optin(self, message):
         pass
@@ -117,10 +118,10 @@ class Messenger(BaseMessenger):
     def init_bot(self):
         self.add_whitelisted_domains('https://facebook.com/')
         greeting = GreetingText(text='Welcome to the fbmessenger bot demo.')
-        self.set_thread_setting(greeting.to_dict())
+        self.set_messenger_profile(greeting.to_dict())
 
         get_started = GetStartedButton(payload='start')
-        self.set_thread_setting(get_started.to_dict())
+        self.set_messenger_profile(get_started.to_dict())
 
         menu_item_1 = PersistentMenuItem(
             item_type='postback',
@@ -137,7 +138,7 @@ class Messenger(BaseMessenger):
             menu_item_2
         ])
 
-        res = self.set_thread_setting(persistent_menu.to_dict())
+        res = self.set_messenger_profile(persistent_menu.to_dict())
         app.logger.debug('Response: {}'.format(res))
 
 

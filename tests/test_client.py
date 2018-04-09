@@ -58,7 +58,6 @@ def test_subscribe_app_to_page(client, monkeypatch):
         "success": True
     }
     monkeypatch.setattr('requests.Session.post', mock_post)
-    client = MessengerClient(page_access_token=12345678)
     resp = client.subscribe_app_to_page()
 
     assert resp == {"success": True}
@@ -77,7 +76,6 @@ def test_send_data(client, monkeypatch, entry):
         "message_id": "mid.1456970487936:c34767dfe57ee6e339"
     }
     monkeypatch.setattr('requests.Session.post', mock_post)
-    client = MessengerClient(page_access_token=12345678)
     payload = {'text': 'Test message'}
     resp = client.send(payload, entry, 'RESPONSE')
 
@@ -99,8 +97,38 @@ def test_send_data(client, monkeypatch, entry):
     )
 
 
-def test_send_data_invalid_message_type():
-    client = MessengerClient(page_access_token=12345678)
+def test_send_data_notification_type(client, monkeypatch, entry):
+    mock_post = Mock()
+    mock_post.return_value.status_code = 200
+    mock_post.return_value.json.return_value = {
+        "recipient_id": 12345678,
+        "message_id": "mid.1456970487936:c34767dfe57ee6e339"
+    }
+    monkeypatch.setattr('requests.Session.post', mock_post)
+    payload = {'text': 'Test message'}
+    client.send(payload, entry, 'RESPONSE', notification_type='SILENT_PUSH')
+
+    mock_post.assert_called_with(
+        'https://graph.facebook.com/v2.11/me/messages',
+        params={'access_token': 12345678},
+        json={
+            'messaging_type': 'RESPONSE',
+            'recipient': {
+                'id': entry['sender']['id']
+            },
+            'message': payload,
+            'notification_type': 'SILENT_PUSH'
+        }
+    )
+
+
+def test_send_data_invalid_notification_type(client, entry):
+    payload = {'text': 'Test message'}
+    with pytest.raises(ValueError):
+        client.send(payload, entry, 'RESPONSE', notification_type='INVALID')
+
+
+def test_send_data_invalid_message_type(client, entry):
     payload = {'text': 'Test message'}
     with pytest.raises(ValueError):
         client.send(payload, entry, 'INVALID')
@@ -110,7 +138,6 @@ def test_send_action(client, monkeypatch, entry):
     mock_post = Mock()
     mock_post.return_value.status_code = 200
     monkeypatch.setattr('requests.Session.post', mock_post)
-    client = MessengerClient(page_access_token=12345678)
     client.send_action('typing_on', entry)
 
     assert mock_post.call_count == 1
@@ -133,7 +160,6 @@ def test_set_greeting_text(client, monkeypatch):
         "result": "success"
     }
     monkeypatch.setattr('requests.Session.post', mock_post)
-    client = MessengerClient(page_access_token=12345678)
     welcome_message = thread_settings.GreetingText(text='Welcome message')
     profile = thread_settings.MessengerProfile(greetings=[welcome_message])
     resp = client.set_messenger_profile(profile.to_dict())
@@ -152,7 +178,7 @@ def test_set_greeting_text(client, monkeypatch):
     )
 
 
-def test_set_greeting_text_too_long(client, monkeypatch):
+def test_set_greeting_text_too_long(monkeypatch):
     mock_post = Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
@@ -169,7 +195,6 @@ def test_delete_get_started(client, monkeypatch):
     mock_delete = Mock()
     mock_delete.return_value.status_code = 200
     monkeypatch.setattr('requests.Session.delete', mock_delete)
-    client = MessengerClient(page_access_token=12345678)
     client.delete_get_started()
 
     assert mock_delete.call_count == 1
@@ -188,7 +213,6 @@ def test_delete_persistent_menu(client, monkeypatch):
     mock_delete = Mock()
     mock_delete.return_value.status_code = 200
     monkeypatch.setattr('requests.Session.delete', mock_delete)
-    client = MessengerClient(page_access_token=12345678)
     client.delete_persistent_menu()
 
     assert mock_delete.call_count == 1
@@ -207,7 +231,6 @@ def test_link_account(client, monkeypatch):
     mock_post = Mock()
     mock_post.return_value.status_code = 200
     monkeypatch.setattr('requests.Session.post', mock_post)
-    client = MessengerClient(page_access_token=12345678)
     client.link_account(1234)
 
     assert mock_post.call_count == 1
@@ -228,7 +251,6 @@ def test_unlink_account(client, monkeypatch):
         "result": "unlink account success"
     }
     monkeypatch.setattr('requests.Session.post', mock_post)
-    client = MessengerClient(page_access_token=12345678)
     res = client.unlink_account(1234)
     assert res == {"result": "unlink account success"}
     assert mock_post.call_count == 1
@@ -250,7 +272,6 @@ def test_add_whitelisted_domains(client, monkeypatch):
         "result": "success",
     }
     monkeypatch.setattr('requests.Session.post', mock_post)
-    client = MessengerClient(page_access_token=12345678)
     res = client.update_whitelisted_domains(['https://facebook.com'])
     assert res == {"result": "success"}
     assert mock_post.call_count == 1
@@ -274,7 +295,6 @@ def test_add_whitelisted_domains_not_as_list(client, monkeypatch):
         "result": "success",
     }
     monkeypatch.setattr('requests.Session.post', mock_post)
-    client = MessengerClient(page_access_token=12345678)
     res = client.update_whitelisted_domains('https://facebook.com')
     assert res == {"result": "success"}
     assert mock_post.call_count == 1
@@ -298,7 +318,6 @@ def test_remove_whitelisted_domains(client, monkeypatch):
         "result": "success",
     }
     monkeypatch.setattr('requests.Session.delete', mock_post)
-    client = MessengerClient(page_access_token=12345678)
     res = client.remove_whitelisted_domains()
     assert res == {"result": "success"}
     assert mock_post.call_count == 1
@@ -315,7 +334,7 @@ def test_remove_whitelisted_domains(client, monkeypatch):
     )
 
 
-def test_upload_attachment(monkeypatch):
+def test_upload_attachment(client, monkeypatch):
     mock_post = Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
@@ -324,7 +343,6 @@ def test_upload_attachment(monkeypatch):
     monkeypatch.setattr('requests.Session.post', mock_post)
 
     attachment = attachments.Image(url='https://some-image.com/image.jpg')
-    client = MessengerClient(page_access_token=12345678)
     res = client.upload_attachment(attachment)
     assert res == {"attachment_id": "12345"}
     assert mock_post.call_count == 1
@@ -346,18 +364,16 @@ def test_upload_attachment(monkeypatch):
     )
 
 
-def test_upload_url_required():
+def test_upload_url_required(client):
     attachment = attachments.Image(attachment_id='12345')
-    client = MessengerClient(page_access_token=12345678)
     with pytest.raises(ValueError):
         client.upload_attachment(attachment)
 
 
-def test_upload_no_quick_replies():
+def test_upload_no_quick_replies(client):
     replies = quick_replies.QuickReplies(
         [quick_replies.QuickReply(title='hello', payload='hello')])
     attachment = attachments.Image(
         url='https://some-image.com/image.jpg', quick_replies=replies)
-    client = MessengerClient(page_access_token=12345678)
     with pytest.raises(ValueError):
         client.upload_attachment(attachment)

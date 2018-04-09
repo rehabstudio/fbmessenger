@@ -4,7 +4,7 @@ import logging
 
 import requests
 
-__version__ = '5.0.0'
+__version__ = '5.1.0'
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +17,13 @@ class MessengerClient(object):
         'UPDATE',
         'MESSAGE_TAG',
         'NON_PROMOTIONAL_SUBSCRIPTION'
+    }
+
+    # https://developers.facebook.com/docs/messenger-platform/reference/send-api/
+    NOTIFICATION_TYPES = {
+        'REGULAR',
+        'SILENT_PUSH',
+        'NO_PUSH'
     }
 
     def __init__(self, page_access_token):
@@ -33,22 +40,32 @@ class MessengerClient(object):
         )
         return r.json()
 
-    def send(self, payload, entry, messaging_type):
+    def send(self, payload, entry, messaging_type, notification_type=None):
         if messaging_type not in self.MESSAGING_TYPES:
             raise ValueError(
                 '`{}` is not a valid `messaging_type`'.format(messaging_type))
+
+        body = {
+            'messaging_type': messaging_type,
+            'recipient': {
+                'id': entry['sender']['id']
+            },
+            'message': payload
+        }
+
+        if notification_type:
+            if notification_type not in self.NOTIFICATION_TYPES:
+                raise ValueError(
+                    '`{}` is not a valid `notification_type`'.format(
+                        notification_type))
+            body['notification_type'] = notification_type
+
         r = self.session.post(
             'https://graph.facebook.com/v2.11/me/messages',
             params={
                 'access_token': self.page_access_token
             },
-            json={
-                'messaging_type': messaging_type,
-                'recipient': {
-                    'id': entry['sender']['id']
-                },
-                'message': payload
-            }
+            json=body
         )
         return r.json()
 

@@ -142,6 +142,26 @@ application. Supported values are:
 See [Messaging Types](https://developers.facebook.com/docs/messenger-platform/send-messages/#messaging_types)
 for more information.
 
+### Notification Type
+
+Any of the elements below may be sent in conjunction with a notification
+type (see the [Send API documentation](https://developers.facebook.com/docs/messenger-platform/reference/send-api/)
+for more details). `notification_type` is an optional parameter to the
+`.send()` call. For example:
+
+```python
+messenger.send({'text': msg}, 'RESPONSE', notification_type='SILENT_PUSH')
+```
+
+Supported values are are:
+- `REGULAR`
+- `SILENT_PUSH`
+- `NO_PUSH`
+
+If a value is not provided, then the notification preference will not
+be set and Facebook Messenger's default will apply (which is `REGULAR`
+at the time of writing).
+
 ### Text
 
 You can pass a simple dict or use the Class

@@ -1,5 +1,8 @@
 # Release History
 
+## 5.1.0
+- Add support for `notification_type` in the Send API.
+
 ## 5.0.0
 - Breaking API change - `messaging_type` is now required when sending
   a message.

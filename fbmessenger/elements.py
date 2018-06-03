@@ -29,6 +29,30 @@ class Text(object):
         return d
 
 
+class DynamicText(object):
+    def __init__(self, text, fallback_text=None, quick_replies=None):
+        self.text = text
+        self.fallback_text = fallback_text
+        self.quick_replies = quick_replies
+
+    def to_dict(self):
+        dynamic_text = {
+            'text': self.text,
+        }
+
+        if self.fallback_text:
+            dynamic_text['fallback_text'] = self.fallback_text
+
+        d = {
+            'dynamic_text': dynamic_text,
+        }
+
+        if self.quick_replies:
+            d['quick_replies'] = self.quick_replies.to_dict()
+
+        return d
+
+
 class Button(object):
     BUTTON_TYPES = [
         'web_url',

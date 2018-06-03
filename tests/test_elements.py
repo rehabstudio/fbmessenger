@@ -37,6 +37,35 @@ class TestElements:
         }
         assert expected == res.to_dict()
 
+    def test_dynamic_text(self):
+        res = elements.DynamicText('Hi, {{first_name}}!', 'Hello friend!')
+        expected = {
+            'dynamic_text': {
+                'text': 'Hi, {{first_name}}!',
+                'fallback_text': 'Hello friend!',
+            },
+        }
+        assert expected == res.to_dict()
+
+    def test_dynamic_text_with_quick_replies(self):
+        qr = quick_replies.QuickReply(title='QR', payload='QR payload')
+        qrs = quick_replies.QuickReplies(quick_replies=[qr])
+        res = elements.DynamicText('Hi, {{first_name}}!', 'Hello friend!', quick_replies=qrs)
+        expected = {
+            'dynamic_text': {
+                'text': 'Hi, {{first_name}}!',
+                'fallback_text': 'Hello friend!',
+            },
+            'quick_replies': [
+                {
+                    'content_type': 'text',
+                    'title': 'QR',
+                    'payload': 'QR payload'
+                },
+            ],
+        }
+        assert expected == res.to_dict()
+
     def test_web_button(self):
         res = elements.Button(button_type='web_url', title='Web button', url='http://facebook.com')
         expected = {

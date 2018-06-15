@@ -1,4 +1,5 @@
-from mock import Mock
+import requests
+import mock
 import pytest
 
 from fbmessenger import (
@@ -24,7 +25,7 @@ def entry():
 
 
 def test_get_user_data(client, monkeypatch):
-    mock_get = Mock()
+    mock_get = mock.Mock()
     mock_get.return_value.status_code = 200
     mock_get.return_value.json.return_value = {
         "first_name": "Test",
@@ -37,7 +38,6 @@ def test_get_user_data(client, monkeypatch):
             'id': 12345678
         }
     }
-    client = MessengerClient(page_access_token=12345678)
     resp = client.get_user_data(entry)
 
     assert resp == {"first_name": "Test", "last_name": "User", "profile_pic": "profile"}
@@ -52,7 +52,7 @@ def test_get_user_data(client, monkeypatch):
 
 
 def test_subscribe_app_to_page(client, monkeypatch):
-    mock_post = Mock()
+    mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
         "success": True
@@ -69,7 +69,7 @@ def test_subscribe_app_to_page(client, monkeypatch):
 
 
 def test_send_data(client, monkeypatch, entry):
-    mock_post = Mock()
+    mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
         "recipient_id": 12345678,
@@ -98,7 +98,7 @@ def test_send_data(client, monkeypatch, entry):
 
 
 def test_send_data_notification_type(client, monkeypatch, entry):
-    mock_post = Mock()
+    mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
         "recipient_id": 12345678,
@@ -135,7 +135,7 @@ def test_send_data_invalid_message_type(client, entry):
 
 
 def test_send_action(client, monkeypatch, entry):
-    mock_post = Mock()
+    mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     monkeypatch.setattr('requests.Session.post', mock_post)
     client.send_action('typing_on', entry)
@@ -154,7 +154,7 @@ def test_send_action(client, monkeypatch, entry):
 
 
 def test_set_greeting_text(client, monkeypatch):
-    mock_post = Mock()
+    mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
         "result": "success"
@@ -179,7 +179,7 @@ def test_set_greeting_text(client, monkeypatch):
 
 
 def test_set_greeting_text_too_long(monkeypatch):
-    mock_post = Mock()
+    mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
         "result": "success"
@@ -192,7 +192,7 @@ def test_set_greeting_text_too_long(monkeypatch):
 
 
 def test_delete_get_started(client, monkeypatch):
-    mock_delete = Mock()
+    mock_delete = mock.Mock()
     mock_delete.return_value.status_code = 200
     monkeypatch.setattr('requests.Session.delete', mock_delete)
     client.delete_get_started()
@@ -210,7 +210,7 @@ def test_delete_get_started(client, monkeypatch):
 
 
 def test_delete_persistent_menu(client, monkeypatch):
-    mock_delete = Mock()
+    mock_delete = mock.Mock()
     mock_delete.return_value.status_code = 200
     monkeypatch.setattr('requests.Session.delete', mock_delete)
     client.delete_persistent_menu()
@@ -228,7 +228,7 @@ def test_delete_persistent_menu(client, monkeypatch):
 
 
 def test_link_account(client, monkeypatch):
-    mock_post = Mock()
+    mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     monkeypatch.setattr('requests.Session.post', mock_post)
     client.link_account(1234)
@@ -245,7 +245,7 @@ def test_link_account(client, monkeypatch):
 
 
 def test_unlink_account(client, monkeypatch):
-    mock_post = Mock()
+    mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
         "result": "unlink account success"
@@ -266,7 +266,7 @@ def test_unlink_account(client, monkeypatch):
 
 
 def test_add_whitelisted_domains(client, monkeypatch):
-    mock_post = Mock()
+    mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
         "result": "success",
@@ -289,7 +289,7 @@ def test_add_whitelisted_domains(client, monkeypatch):
 
 
 def test_add_whitelisted_domains_not_as_list(client, monkeypatch):
-    mock_post = Mock()
+    mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
         "result": "success",
@@ -312,7 +312,7 @@ def test_add_whitelisted_domains_not_as_list(client, monkeypatch):
 
 
 def test_remove_whitelisted_domains(client, monkeypatch):
-    mock_post = Mock()
+    mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
         "result": "success",
@@ -335,7 +335,7 @@ def test_remove_whitelisted_domains(client, monkeypatch):
 
 
 def test_upload_attachment(client, monkeypatch):
-    mock_post = Mock()
+    mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
         "attachment_id": "12345",
@@ -377,3 +377,12 @@ def test_upload_no_quick_replies(client):
         url='https://some-image.com/image.jpg', quick_replies=replies)
     with pytest.raises(ValueError):
         client.upload_attachment(attachment)
+
+
+def test_default_session(client):
+    assert isinstance(client.session, requests.Session)
+
+
+def test_explicit_session():
+    client = MessengerClient(12345678, session=mock.sentinel.session)
+    assert client.session is mock.sentinel.session

@@ -264,38 +264,40 @@ class BaseMessenger(object):
                 elif message.get('read'):
                     return self.read(message)
 
-    def get_user(self):
-        return self.client.get_user_data(self.last_message)
+    def get_user(self, timeout=None):
+        return self.client.get_user_data(self.last_message, timeout=timeout)
 
-    def send(self, payload, messaging_type):
-        return self.client.send(payload, self.last_message, messaging_type)
+    def send(self, payload, messaging_type, timeout=None):
+        return self.client.send(
+            payload, self.last_message, messaging_type, timeout=timeout)
 
-    def send_action(self, sender_action):
-        return self.client.send_action(sender_action, self.last_message)
+    def send_action(self, sender_action, timeout=None):
+        return self.client.send_action(
+            sender_action, self.last_message, timeout=timeout)
 
     def get_user_id(self):
         return self.last_message['sender']['id']
 
-    def subscribe_app_to_page(self):
-        return self.client.subscribe_app_to_page()
+    def subscribe_app_to_page(self, timeout=None):
+        return self.client.subscribe_app_to_page(timeout=timeout)
 
-    def set_messenger_profile(self, data):
-        return self.client.set_messenger_profile(data)
+    def set_messenger_profile(self, data, timeout=None):
+        return self.client.set_messenger_profile(data, timeout=timeout)
 
-    def delete_get_started(self):
-        return self.client.delete_get_started()
+    def delete_get_started(self, timeout=None):
+        return self.client.delete_get_started(timeout=timeout)
 
-    def link_account(self, account_linking_token):
-        return self.client.link_account(account_linking_token)
+    def link_account(self, account_linking_token, timeout=None):
+        return self.client.link_account(account_linking_token, timeout=timeout)
 
-    def unlink_account(self, psid):
-        return self.client.unlink_account(psid)
+    def unlink_account(self, psid, timeout=None):
+        return self.client.unlink_account(psid, timeout=timeout)
 
-    def add_whitelisted_domains(self, domains):
-        return self.client.update_whitelisted_domains(domains)
+    def add_whitelisted_domains(self, domains, timeout=None):
+        return self.client.update_whitelisted_domains(domains, timeout=timeout)
 
-    def remove_whitelisted_domains(self):
-        return self.client.remove_whitelisted_domains()
+    def remove_whitelisted_domains(self, timeout=None):
+        return self.client.remove_whitelisted_domains(timeout=timeout)
 
-    def upload_attachment(self, attachment):
-        return self.client.upload_attachment(attachment)
+    def upload_attachment(self, attachment, timeout=None):
+        return self.client.upload_attachment(attachment, timeout=timeout)

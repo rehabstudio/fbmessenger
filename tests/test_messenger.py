@@ -196,6 +196,7 @@ def test_get_user(messenger, monkeypatch):
         'last_name': 'McTestface',
         'profile': 'profile'
     }
+    mock.assert_called_with({}, timeout=None)
 
 
 def test_send(messenger, monkeypatch):
@@ -205,14 +206,16 @@ def test_send(messenger, monkeypatch):
     }
     monkeypatch.setattr(messenger.client, 'send', mock)
     res = messenger.send({'text': 'message'}, 'RESPONSE')
-    assert res == mock()
+    assert res == mock.return_value
+    mock.assert_called_with({'text': 'message'}, {}, 'RESPONSE', timeout=None)
 
 
 def test_send_action(messenger, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(messenger.client, 'send_action', mock)
     res = messenger.send_action('typing_on')
-    assert res == mock()
+    assert res == mock.return_value
+    mock.assert_called_with('typing_on', {}, timeout=None)
 
 
 def test_set_thread_setting(messenger, monkeypatch):
@@ -224,7 +227,14 @@ def test_set_thread_setting(messenger, monkeypatch):
     welcome_message = thread_settings.GreetingText(text='Welcome message')
     profile = thread_settings.MessengerProfile(greetings=[welcome_message])
     res = messenger.set_messenger_profile(profile.to_dict())
-    assert res == mock()
+    assert res == mock.return_value
+    greeting = {
+        'greeting': [{
+            'locale': 'default',
+            'text': 'Welcome message'
+        }]
+    }
+    mock.assert_called_with(greeting, timeout=None)
 
 
 def test_delete_get_started(messenger, monkeypatch):
@@ -234,14 +244,16 @@ def test_delete_get_started(messenger, monkeypatch):
     }
     monkeypatch.setattr(messenger.client, 'delete_get_started', mock)
     res = messenger.delete_get_started()
-    assert res == mock()
+    assert res == mock.return_value
+    mock.assert_called_with(timeout=None)
 
 
 def test_link_account(messenger, monkeypatch):
     mock = Mock()
     monkeypatch.setattr(messenger.client, 'link_account', mock)
     res = messenger.link_account(1234)
-    assert res == mock()
+    assert res == mock.return_value
+    mock.assert_called_with(1234, timeout=None)
 
 
 def test_unlink_account(messenger, monkeypatch):
@@ -251,7 +263,8 @@ def test_unlink_account(messenger, monkeypatch):
     }
     monkeypatch.setattr(messenger.client, 'unlink_account', mock)
     res = messenger.unlink_account(1234)
-    assert res == mock()
+    assert res == mock.return_value
+    mock.assert_called_with(1234, timeout=None)
 
 
 def test_add_whitelisted_domains(messenger, monkeypatch):
@@ -261,7 +274,8 @@ def test_add_whitelisted_domains(messenger, monkeypatch):
     }
     monkeypatch.setattr(messenger.client, 'update_whitelisted_domains', mock)
     res = messenger.add_whitelisted_domains('https://facebook.com')
-    assert res == mock()
+    assert res == mock.return_value
+    mock.assert_called_with('https://facebook.com', timeout=None)
 
 
 def test_remove_whitelisted_domains(messenger, monkeypatch):
@@ -271,7 +285,8 @@ def test_remove_whitelisted_domains(messenger, monkeypatch):
     }
     monkeypatch.setattr(messenger.client, 'remove_whitelisted_domains', mock)
     res = messenger.remove_whitelisted_domains()
-    assert res == mock()
+    assert res == mock.return_value
+    mock.assert_called_with(timeout=None)
 
 
 def test_upload_attachment(messenger, monkeypatch):
@@ -282,4 +297,5 @@ def test_upload_attachment(messenger, monkeypatch):
     monkeypatch.setattr(messenger.client, 'upload_attachment', mock)
     attachment = {'some': 'data'}
     res = messenger.upload_attachment(attachment)
-    assert res == mock()
+    assert res == mock.return_value
+    mock.assert_called_with(attachment, timeout=None)

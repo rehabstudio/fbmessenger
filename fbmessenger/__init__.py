@@ -32,17 +32,19 @@ class MessengerClient(object):
             session = requests.Session()
         self.session = session
 
-    def get_user_data(self, entry):
+    def get_user_data(self, entry, timeout=None):
         r = self.session.get(
             'https://graph.facebook.com/v2.11/{sender}'.format(sender=entry['sender']['id']),
             params={
                 'fields': 'first_name,last_name,profile_pic,locale,timezone,gender',
                 'access_token': self.page_access_token
-            }
+            },
+            timeout=timeout
         )
         return r.json()
 
-    def send(self, payload, entry, messaging_type, notification_type=None):
+    def send(self, payload, entry, messaging_type, notification_type=None,
+             timeout=None):
         if messaging_type not in self.MESSAGING_TYPES:
             raise ValueError(
                 '`{}` is not a valid `messaging_type`'.format(messaging_type))
@@ -67,11 +69,12 @@ class MessengerClient(object):
             params={
                 'access_token': self.page_access_token
             },
-            json=body
+            json=body,
+            timeout=timeout
         )
         return r.json()
 
-    def send_action(self, sender_action, entry):
+    def send_action(self, sender_action, entry, timeout=None):
         r = self.session.post(
             'https://graph.facebook.com/v2.11/me/messages',
             params={
@@ -82,30 +85,33 @@ class MessengerClient(object):
                     'id': entry['sender']['id']
                 },
                 'sender_action': sender_action
-            }
+            },
+            timeout=timeout
         )
         return r.json()
 
-    def subscribe_app_to_page(self):
+    def subscribe_app_to_page(self, timeout=None):
         r = self.session.post(
             'https://graph.facebook.com/v2.11/me/subscribed_apps',
             params={
                 'access_token': self.page_access_token
-            }
+            },
+            timeout=None
         )
         return r.json()
 
-    def set_messenger_profile(self, data):
+    def set_messenger_profile(self, data, timeout=None):
         r = self.session.post(
             'https://graph.facebook.com/v2.11/me/messenger_profile',
             params={
                 'access_token': self.page_access_token
             },
-            json=data
+            json=data,
+            timeout=timeout
         )
         return r.json()
 
-    def delete_get_started(self):
+    def delete_get_started(self, timeout=None):
         r = self.session.delete(
             'https://graph.facebook.com/v2.11/me/messenger_profile',
             params={
@@ -115,11 +121,12 @@ class MessengerClient(object):
                 'fields':[
                     'get_started'
                 ],
-            }
+            },
+            timeout=timeout
         )
         return r.json()
 
-    def delete_persistent_menu(self):
+    def delete_persistent_menu(self, timeout=None):
         r = self.session.delete(
             'https://graph.facebook.com/v2.11/me/messenger_profile',
             params={
@@ -129,22 +136,24 @@ class MessengerClient(object):
                 'fields':[
                     'persistent_menu'
                 ],
-            }
+            },
+            timeout=timeout
         )
         return r.json()
 
-    def link_account(self, account_linking_token):
+    def link_account(self, account_linking_token, timeout=None):
         r = self.session.post(
             'https://graph.facebook.com/v2.11/me',
             params={
                 'access_token': self.page_access_token,
                 'fields': 'recipient',
                 'account_linking_token': account_linking_token
-            }
+            },
+            timeout=timeout
         )
         return r.json()
 
-    def unlink_account(self, psid):
+    def unlink_account(self, psid, timeout=None):
         r = self.session.post(
             'https://graph.facebook.com/v2.11/me/unlink_accounts',
             params={
@@ -152,11 +161,12 @@ class MessengerClient(object):
             },
             json={
                 'psid': psid
-            }
+            },
+            timeout=timeout
         )
         return r.json()
 
-    def update_whitelisted_domains(self, domains):
+    def update_whitelisted_domains(self, domains, timeout=None):
         if not isinstance(domains, list):
             domains = [domains]
         r = self.session.post(
@@ -166,11 +176,12 @@ class MessengerClient(object):
             },
             json={
                 'whitelisted_domains': domains
-            }
+            },
+            timeout=timeout
         )
         return r.json()
 
-    def remove_whitelisted_domains(self):
+    def remove_whitelisted_domains(self, timeout=None):
         r = self.session.delete(
             'https://graph.facebook.com/v2.11/me/messenger_profile',
             params={
@@ -180,11 +191,12 @@ class MessengerClient(object):
                 'fields':[
                     'whitelisted_domains'
                 ],
-            }
+            },
+            timeout=timeout
         )
         return r.json()
 
-    def upload_attachment(self, attachment):
+    def upload_attachment(self, attachment, timeout=None):
         if not attachment.url:
             raise ValueError('Attachment must have `url` specified')
         if attachment.quick_replies:
@@ -196,7 +208,8 @@ class MessengerClient(object):
             },
             json={
                 'message':  attachment.to_dict()
-            }
+            },
+            timeout=timeout
         )
         return r.json()
 

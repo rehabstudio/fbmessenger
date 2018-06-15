@@ -47,7 +47,8 @@ def test_get_user_data(client, monkeypatch):
         params={
             'fields': 'first_name,last_name,profile_pic,locale,timezone,gender',
             'access_token': 12345678
-        }
+        },
+        timeout=None
     )
 
 
@@ -64,7 +65,8 @@ def test_subscribe_app_to_page(client, monkeypatch):
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
         'https://graph.facebook.com/v2.11/me/subscribed_apps',
-        params={'access_token': 12345678}
+        params={'access_token': 12345678},
+        timeout=None
     )
 
 
@@ -93,7 +95,8 @@ def test_send_data(client, monkeypatch, entry):
                 'id': entry['sender']['id']
             },
             'message': payload
-        }
+        },
+        timeout=None
     )
 
 
@@ -118,7 +121,8 @@ def test_send_data_notification_type(client, monkeypatch, entry):
             },
             'message': payload,
             'notification_type': 'SILENT_PUSH'
-        }
+        },
+        timeout=None
     )
 
 
@@ -149,7 +153,8 @@ def test_send_action(client, monkeypatch, entry):
                 'id': entry['sender']['id']
             },
             'sender_action': 'typing_on'
-        }
+        },
+        timeout=None
     )
 
 
@@ -174,7 +179,8 @@ def test_set_greeting_text(client, monkeypatch):
                 'locale': 'default',
                 'text': 'Welcome message'
             }]
-        }
+        },
+        timeout=None
     )
 
 
@@ -205,7 +211,8 @@ def test_delete_get_started(client, monkeypatch):
             'fields': [
                 'get_started',
             ],
-        }
+        },
+        timeout=None
     )
 
 
@@ -223,7 +230,8 @@ def test_delete_persistent_menu(client, monkeypatch):
             'fields': [
                 'persistent_menu',
             ],
-        }
+        },
+        timeout=None
     )
 
 
@@ -240,7 +248,8 @@ def test_link_account(client, monkeypatch):
             'access_token': 12345678,
             'fields': 'recipient',
             'account_linking_token': 1234
-        }
+        },
+        timeout=None
     )
 
 
@@ -261,7 +270,8 @@ def test_unlink_account(client, monkeypatch):
         },
         json={
             'psid': 1234
-        }
+        },
+        timeout=None
     )
 
 
@@ -284,7 +294,8 @@ def test_add_whitelisted_domains(client, monkeypatch):
             'whitelisted_domains': [
                 'https://facebook.com'
             ],
-        }
+        },
+        timeout=None
     )
 
 
@@ -307,7 +318,8 @@ def test_add_whitelisted_domains_not_as_list(client, monkeypatch):
             'whitelisted_domains': [
                 'https://facebook.com'
             ],
-        }
+        },
+        timeout=None
     )
 
 
@@ -330,7 +342,8 @@ def test_remove_whitelisted_domains(client, monkeypatch):
             'fields': [
                 'whitelisted_domains',
             ],
-        }
+        },
+        timeout=None
     )
 
 
@@ -360,7 +373,8 @@ def test_upload_attachment(client, monkeypatch):
                     }
                 }
             }
-        }
+        },
+        timeout=None
     )
 
 

@@ -1,5 +1,9 @@
 # Release History
 
+## 5.2.0
+- The caller may now pass their own `requests.Session` object to
+  `MessengerClient`. This is useful for eg. configuring retry behaviour.
+
 ## 5.1.0
 - Add support for `notification_type` in the Send API.
 

@@ -4,7 +4,7 @@ import logging
 
 import requests
 
-__version__ = '5.1.0'
+__version__ = '5.2.0'
 
 logger = logging.getLogger(__name__)
 
@@ -26,9 +26,11 @@ class MessengerClient(object):
         'NO_PUSH'
     }
 
-    def __init__(self, page_access_token):
+    def __init__(self, page_access_token, session=None):
         self.page_access_token = page_access_token
-        self.session = requests.Session()
+        if session is None:
+            session = requests.Session()
+        self.session = session
 
     def get_user_data(self, entry):
         r = self.session.get(

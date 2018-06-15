@@ -12,6 +12,7 @@ A python library to communicate with the Facebook Messenger API's
 
 - [Installation](#installation)
 - [Example usage with Flask](#example-usage-with-flask)
+- [Timeouts](#timeouts)
 - [Elements](#elements)
 - [Attachments](#attachments)
 - [Templates](#templates)
@@ -115,6 +116,27 @@ if __name__ == "__main__":
     app.run(host='0.0.0.0')
 ```
 
+<a name="timeouts"></a>
+## Timeouts
+Any method on either the `BaseMessenger` or `MessengerClient` classes
+which perform network access accept an optional `timeout` parameter.
+This should be a number, and causes an exception to be raised if the
+server (ie. Facebook) has not started responding within `timeout`
+seconds (more precisely, if no bytes have been received on the
+underlying socket for `timeout` seconds). If no timeout is specified
+explicitly, requests do not time out. Note that in particular,
+`timeout` is *not* a time limit on the entire response download - just
+the initial connection.
+
+For example, this call will raise a socket timeout exception if
+the start of a response has not been received within 10 seconds:
+
+```
+messenger.send({'text': msg}, 'RESPONSE', timeout=10)
+```
+
+If no `timeout` is provided (the default) then connection attempts will
+not time out.
 
 <a name="elements"></a>
 ## Elements

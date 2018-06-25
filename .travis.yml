@@ -1,12 +1,20 @@
 language: python
 python:
-  - "2.7"
-  - "3.5"
+- '2.7'
+- '3.5'
 install:
-  - pip install -r requirements.txt
-  - pip install coveralls
+- pip install -r requirements.txt
+- pip install coveralls
 script:
-  - make test
-  - make coverage
+- make test
+- make coverage
 after_success:
-  - coveralls
+- coveralls
+deploy:
+  provider: pypi
+  user: "rickydunlop"
+  password:
+    secure: Xp0rrjZH+2jxY45MnarCLyQxrdvXg2tg8xfuGGcY8H/iYPILrUoItmNkWq4qLGujVbu8k9Y3PC9AC8tsx2PRymse+bs+sKO+gsulXR9XiCGSVANA/78KUBHWiQE2bUoe/CmrYLFgrXyhtkcbm+32SXtcJYClMsP+Isy1gPlkTf0DANKuIwTgtJwof08c4wdBHUEjFZ0DakyVtOH2nOuBX1TK3Zmc+llLy/9DUT19Azxjy8ImMZlNC1VAxvAXZXThP0QwQ494I+JprUugTNhR/+N+mVFN18RcLq/PPp3NhoDjcrrmvtmJGvg1AvQTzEMgnkWXwTeIrM16mezkUTiSu4vVbiWLXldpYM1vIunkvEw40giU1qYcdficZwS6YLBwfqGBbxYd1Tmn1xFdLJ/k1ABXv/03gEDh5n3K73CC0OsXn/YZEvc50oB2yNdCR14zBf/HE9KXFbkd7pSA4biFYivycExjxB25CtSXE8e93SSLmViatks7i9nnR1sJc9+9AGAb/It+R0+8wLQkAp8ucGKM5t5UkH174D9k8ypymPvSAf4DpcYDAyaItS+hi5pf9mzADjXrggUnTXa69bEMiMQFAa7aCroxNsHvfxFH3DgtG1BFl2hbMvnEC2PeEaTfwRIt/HYm6zhpPwOuGvswKyQTFKMEzT27iG2vmE9FEE8=
+  on:
+    tags: true
+  distributions: "sdist bdist_wheel"

@@ -1,5 +1,8 @@
 # Release History
 
+## 5.3.0 
+- Add share_contents support for share button
+
 ## 5.2.0
 - The caller may now pass their own `requests.Session` object to
   `MessengerClient`. This is useful for eg. configuring retry behaviour.

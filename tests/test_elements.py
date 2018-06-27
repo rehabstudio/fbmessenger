@@ -4,6 +4,7 @@ import pytest
 
 from fbmessenger import elements
 from fbmessenger import quick_replies
+from fbmessenger.templates import GenericTemplate
 from fbmessenger.error_messages import CHARACTER_LIMIT_MESSAGE
 
 
@@ -100,6 +101,58 @@ class TestElements:
             'webview_height_ratio': 'full',
             'messenger_extensions': 'true',
             'fallback_url': 'https://facebook.com'
+        }
+        assert expected == res.to_dict()
+
+    def test_share_button(self):
+        btn = elements.Button(
+            button_type='web_url',
+            title='Web button',
+            url='http://facebook.com'
+        )
+        element = elements.Element(
+            title='Element',
+            item_url='http://facebook.com',
+            image_url='http://facebook.com/image.jpg',
+            subtitle='Subtitle',
+            buttons=[
+                btn
+            ]
+        )
+        template = GenericTemplate(
+            elements=[element],
+        )
+
+        res = elements.Button(
+            button_type='element_share',
+            share_contents=template.to_dict()
+        )
+        expected = {
+            'type': 'element_share',
+            'share_contents': {
+                'attachment': {
+                    'type': 'template',
+                    'payload': {
+                        'template_type': 'generic',
+                        'sharable': False,
+                        'elements': [
+                            {
+                                'title': 'Element',
+                                'item_url': 'http://facebook.com',
+                                'image_url': 'http://facebook.com/image.jpg',
+                                'subtitle': 'Subtitle',
+                                'buttons': [
+                                    {
+                                        'type': 'web_url',
+                                        'title': 'Web button',
+                                        'url': 'http://facebook.com'
+                                    }
+                                ]
+                            },
+                        ]
+                    }
+                }
+            }
         }
         assert expected == res.to_dict()
 

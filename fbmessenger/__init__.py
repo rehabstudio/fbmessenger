@@ -44,7 +44,7 @@ class MessengerClient(object):
         return r.json()
 
     def send(self, payload, entry, messaging_type, notification_type=None,
-             timeout=None):
+             timeout=None, tag=None):
         if messaging_type not in self.MESSAGING_TYPES:
             raise ValueError(
                 '`{}` is not a valid `messaging_type`'.format(messaging_type))
@@ -56,6 +56,9 @@ class MessengerClient(object):
             },
             'message': payload
         }
+
+        if tag:
+            body['tag'] = tag
 
         if notification_type:
             if notification_type not in self.NOTIFICATION_TYPES:

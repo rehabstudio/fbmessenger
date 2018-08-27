@@ -138,6 +138,32 @@ def test_send_data_invalid_message_type(client, entry):
         client.send(payload, entry, 'INVALID')
 
 
+def test_send_data_with_tag(client, monkeypatch, entry):
+    mock_post = mock.Mock()
+    mock_post.return_value.status_code = 200
+    mock_post.return_value.json.return_value = {
+        "recipient_id": 12345678,
+        "message_id": "mid.1456970487936:c34767dfe57ee6e339"
+    }
+    monkeypatch.setattr('requests.Session.post', mock_post)
+    payload = {'text': 'Test message'}
+    client.send(payload, entry, 'MESSAGE_TAG', tag='ACCOUNT_UPDATE')
+
+    mock_post.assert_called_with(
+        'https://graph.facebook.com/v2.11/me/messages',
+        params={'access_token': 12345678},
+        json={
+            'messaging_type': 'MESSAGE_TAG',
+            'recipient': {
+                'id': entry['sender']['id']
+            },
+            'message': payload,
+            'tag': 'ACCOUNT_UPDATE'
+        },
+        timeout=None
+    )
+
+
 def test_send_action(client, monkeypatch, entry):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200

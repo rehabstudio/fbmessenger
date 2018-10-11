@@ -11,7 +11,9 @@ class QuickReply(object):
 
     CONTENT_TYPES = [
         'text',
-        'location'
+        'location',
+        'user_phone_number',
+        'user_email'
     ]
 
     def __init__(self, title=None, payload=None, image_url=None, content_type=None):

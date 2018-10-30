@@ -269,9 +269,9 @@ class BaseMessenger(object):
     def get_user(self, timeout=None):
         return self.client.get_user_data(self.last_message, timeout=timeout)
 
-    def send(self, payload, messaging_type, timeout=None):
+    def send(self, payload, messaging_type, timeout=None, tag=None):
         return self.client.send(
-            payload, self.last_message, messaging_type, timeout=timeout)
+            payload, self.last_message, messaging_type, timeout=timeout, tag=None)
 
     def send_action(self, sender_action, timeout=None):
         return self.client.send_action(

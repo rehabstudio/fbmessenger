@@ -1,5 +1,12 @@
 # Release History
 
+## 5.3.2 
+- Add missing tag parameter to BaseMessenger::send
+- Remove invalid message tag
+
+## 5.3.1 
+- Adding 2 quick replies content_type: userphone_number, user_mail
+
 ## 5.3.0 
 - Add share_contents support for share button
 

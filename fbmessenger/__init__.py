@@ -16,7 +16,6 @@ class MessengerClient(object):
         'RESPONSE',
         'UPDATE',
         'MESSAGE_TAG',
-        'NON_PROMOTIONAL_SUBSCRIPTION'
     }
 
     # https://developers.facebook.com/docs/messenger-platform/reference/send-api/

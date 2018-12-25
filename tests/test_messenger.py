@@ -196,7 +196,7 @@ def test_get_user(messenger, monkeypatch):
         'last_name': 'McTestface',
         'profile': 'profile'
     }
-    mock.assert_called_with({}, timeout=None)
+    mock.assert_called_with({}, fields=None, timeout=None)
 
 
 def test_send(messenger, monkeypatch):

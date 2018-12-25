@@ -31,11 +31,11 @@ class MessengerClient(object):
             session = requests.Session()
         self.session = session
 
-    def get_user_data(self, entry, timeout=None):
+    def get_user_data(self, entry, fields=None, timeout=None):
         r = self.session.get(
             'https://graph.facebook.com/v2.11/{sender}'.format(sender=entry['sender']['id']),
             params={
-                'fields': 'first_name,last_name,profile_pic,locale,timezone,gender',
+                'fields': 'first_name,last_name,profile_pic,locale,timezone,gender' if fields is None else fields,
                 'access_token': self.page_access_token
             },
             timeout=timeout
@@ -266,8 +266,8 @@ class BaseMessenger(object):
                 elif message.get('read'):
                     return self.read(message)
 
-    def get_user(self, timeout=None):
-        return self.client.get_user_data(self.last_message, timeout=timeout)
+    def get_user(self, fields=None, timeout=None):
+        return self.client.get_user_data(self.last_message, fields=fields, timeout=timeout)
 
     def send(self, payload, messaging_type, timeout=None, tag=None):
         return self.client.send(

@@ -52,6 +52,33 @@ def test_get_user_data(client, monkeypatch):
     )
 
 
+def test_get_user_data_fields(client, monkeypatch):
+    mock_get = mock.Mock()
+    mock_get.return_value.status_code == 200
+    mock_get.return_value.json.return_value = {
+        "first_name": "Test",
+        "last_name": "User",
+    }
+    monkeypatch.setattr('requests.Session.get', mock_get)
+    entry = {
+        'sender': {
+            'id': 12345678
+        }
+    }
+    resp = client.get_user_data(entry, fields='first_name,last_name')
+
+    assert resp == {"first_name": "Test", "last_name": "User"}
+    assert mock_get.call_count == 1
+    mock_get.assert_called_with(
+        'https://graph.facebook.com/v2.11/12345678',
+        params={
+            'fields': 'first_name,last_name',
+            'access_token': 12345678
+        },
+        timeout=None
+    )
+
+
 def test_subscribe_app_to_page(client, monkeypatch):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200

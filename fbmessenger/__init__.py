@@ -9,6 +9,9 @@ __version__ = '5.4.0'
 logger = logging.getLogger(__name__)
 
 
+DEFAULT_API_VERSION = 2.12
+
+
 class MessengerClient(object):
 
     # https://developers.facebook.com/docs/messenger-platform/send-messages#send_api_basics
@@ -25,15 +28,23 @@ class MessengerClient(object):
         'NO_PUSH'
     }
 
-    def __init__(self, page_access_token, session=None):
+    def __init__(self, page_access_token, **kwargs):
+        """
+            @required:
+                page_access_token
+            @optional:
+                session
+                api_version
+        """
+
         self.page_access_token = page_access_token
-        if session is None:
-            session = requests.Session()
-        self.session = session
+        self.session = kwargs.get('session', requests.Session())
+        self.api_version = kwargs.get('api_version', DEFAULT_API_VERSION)
+        self.graph_url = 'https://graph.facebook.com/v{api_version}'.format(api_version=self.api_version)
 
     def get_user_data(self, entry, fields=None, timeout=None):
         r = self.session.get(
-            'https://graph.facebook.com/v2.11/{sender}'.format(sender=entry['sender']['id']),
+            '{graph_url}/{sender}'.format(graph_url=self.graph_url, sender=entry['sender']['id']),
             params={
                 'fields': 'first_name,last_name,profile_pic,locale,timezone,gender' if fields is None else fields,
                 'access_token': self.page_access_token
@@ -67,7 +78,7 @@ class MessengerClient(object):
             body['notification_type'] = notification_type
 
         r = self.session.post(
-            'https://graph.facebook.com/v2.11/me/messages',
+            '{graph_url}/me/messages'.format(graph_url=self.graph_url),
             params={
                 'access_token': self.page_access_token
             },
@@ -78,7 +89,7 @@ class MessengerClient(object):
 
     def send_action(self, sender_action, entry, timeout=None):
         r = self.session.post(
-            'https://graph.facebook.com/v2.11/me/messages',
+            '{graph_url}/me/messages'.format(graph_url=self.graph_url),
             params={
                 'access_token': self.page_access_token
             },
@@ -94,7 +105,7 @@ class MessengerClient(object):
 
     def subscribe_app_to_page(self, timeout=None):
         r = self.session.post(
-            'https://graph.facebook.com/v2.11/me/subscribed_apps',
+            '{graph_url}/me/subscribed_apps'.format(graph_url=self.graph_url),
             params={
                 'access_token': self.page_access_token
             },
@@ -104,7 +115,7 @@ class MessengerClient(object):
 
     def set_messenger_profile(self, data, timeout=None):
         r = self.session.post(
-            'https://graph.facebook.com/v2.11/me/messenger_profile',
+            '{graph_url}/me/messenger_profile'.format(graph_url=self.graph_url),
             params={
                 'access_token': self.page_access_token
             },
@@ -115,7 +126,7 @@ class MessengerClient(object):
 
     def delete_get_started(self, timeout=None):
         r = self.session.delete(
-            'https://graph.facebook.com/v2.11/me/messenger_profile',
+            '{graph_url}/me/messenger_profile'.format(graph_url=self.graph_url),
             params={
                 'access_token': self.page_access_token
             },
@@ -130,7 +141,7 @@ class MessengerClient(object):
 
     def delete_persistent_menu(self, timeout=None):
         r = self.session.delete(
-            'https://graph.facebook.com/v2.11/me/messenger_profile',
+            '{graph_url}/me/messenger_profile'.format(graph_url=self.graph_url),
             params={
                 'access_token': self.page_access_token
             },
@@ -145,7 +156,7 @@ class MessengerClient(object):
 
     def link_account(self, account_linking_token, timeout=None):
         r = self.session.post(
-            'https://graph.facebook.com/v2.11/me',
+            '{graph_url}/me'.format(graph_url=self.graph_url),
             params={
                 'access_token': self.page_access_token,
                 'fields': 'recipient',
@@ -157,7 +168,7 @@ class MessengerClient(object):
 
     def unlink_account(self, psid, timeout=None):
         r = self.session.post(
-            'https://graph.facebook.com/v2.11/me/unlink_accounts',
+            '{graph_url}/me/unlink_accounts'.format(graph_url=self.graph_url),
             params={
                 'access_token': self.page_access_token
             },
@@ -172,7 +183,7 @@ class MessengerClient(object):
         if not isinstance(domains, list):
             domains = [domains]
         r = self.session.post(
-            'https://graph.facebook.com/v2.11/me/messenger_profile',
+            '{graph_url}/me/messenger_profile'.format(graph_url=self.graph_url),
             params={
                 'access_token': self.page_access_token
             },
@@ -185,7 +196,7 @@ class MessengerClient(object):
 
     def remove_whitelisted_domains(self, timeout=None):
         r = self.session.delete(
-            'https://graph.facebook.com/v2.11/me/messenger_profile',
+            '{graph_url}/me/messenger_profile'.format(graph_url=self.graph_url),
             params={
                 'access_token': self.page_access_token
             },
@@ -204,7 +215,7 @@ class MessengerClient(object):
         if attachment.quick_replies:
             raise ValueError('Attachment may not have `quick_replies`')
         r = self.session.post(
-            'https://graph.facebook.com/v2.11/me/message_attachments',
+            '{graph_url}/me/message_attachments'.format(graph_url=self.graph_url),
             params={
                 'access_token': self.page_access_token
             },

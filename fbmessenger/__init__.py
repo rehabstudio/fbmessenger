@@ -1,7 +1,9 @@
 from __future__ import absolute_import
 import abc
 import logging
-
+import hashlib
+import hmac
+import six
 import requests
 
 __version__ = '5.5.0'
@@ -35,20 +37,39 @@ class MessengerClient(object):
             @optional:
                 session
                 api_version
+                app_secret
         """
 
         self.page_access_token = page_access_token
         self.session = kwargs.get('session', requests.Session())
         self.api_version = kwargs.get('api_version', DEFAULT_API_VERSION)
         self.graph_url = 'https://graph.facebook.com/v{api_version}'.format(api_version=self.api_version)
+        self.app_secret = kwargs.get('app_secret')
+
+    @property
+    def auth_args(self):
+        if not hasattr(self, '_auth_args'):
+            auth = {
+                'access_token': self.page_access_token
+            }
+            if self.app_secret is not None:
+                appsecret_proof = self.generate_appsecret_proof(self.page_access_token, self.app_secret)
+                auth['appsecret_proof'] = appsecret_proof
+            self._auth_args = auth
+        return self._auth_args
 
     def get_user_data(self, entry, fields=None, timeout=None):
+        params = {}
+        if fields is not None and isinstance(fields, six.string_types):
+            params['fields'] = fields
+        else:
+            params['fields'] = 'first_name,last_name,profile_pic,locale,timezone,gender'
+
+        params.update(self.auth_args)
+
         r = self.session.get(
             '{graph_url}/{sender}'.format(graph_url=self.graph_url, sender=entry['sender']['id']),
-            params={
-                'fields': 'first_name,last_name,profile_pic,locale,timezone,gender' if fields is None else fields,
-                'access_token': self.page_access_token
-            },
+            params=params,
             timeout=timeout
         )
         return r.json()
@@ -79,9 +100,7 @@ class MessengerClient(object):
 
         r = self.session.post(
             '{graph_url}/me/messages'.format(graph_url=self.graph_url),
-            params={
-                'access_token': self.page_access_token
-            },
+            params=self.auth_args,
             json=body,
             timeout=timeout
         )
@@ -90,9 +109,7 @@ class MessengerClient(object):
     def send_action(self, sender_action, entry, timeout=None):
         r = self.session.post(
             '{graph_url}/me/messages'.format(graph_url=self.graph_url),
-            params={
-                'access_token': self.page_access_token
-            },
+            params=self.auth_args,
             json={
                 'recipient': {
                     'id': entry['sender']['id']
@@ -106,9 +123,7 @@ class MessengerClient(object):
     def subscribe_app_to_page(self, timeout=None):
         r = self.session.post(
             '{graph_url}/me/subscribed_apps'.format(graph_url=self.graph_url),
-            params={
-                'access_token': self.page_access_token
-            },
+            params=self.auth_args,
             timeout=None
         )
         return r.json()
@@ -116,9 +131,7 @@ class MessengerClient(object):
     def set_messenger_profile(self, data, timeout=None):
         r = self.session.post(
             '{graph_url}/me/messenger_profile'.format(graph_url=self.graph_url),
-            params={
-                'access_token': self.page_access_token
-            },
+            params=self.auth_args,
             json=data,
             timeout=timeout
         )
@@ -127,11 +140,9 @@ class MessengerClient(object):
     def delete_get_started(self, timeout=None):
         r = self.session.delete(
             '{graph_url}/me/messenger_profile'.format(graph_url=self.graph_url),
-            params={
-                'access_token': self.page_access_token
-            },
+            params=self.auth_args,
             json={
-                'fields':[
+                'fields': [
                     'get_started'
                 ],
             },
@@ -142,11 +153,9 @@ class MessengerClient(object):
     def delete_persistent_menu(self, timeout=None):
         r = self.session.delete(
             '{graph_url}/me/messenger_profile'.format(graph_url=self.graph_url),
-            params={
-                'access_token': self.page_access_token
-            },
+            params=self.auth_args,
             json={
-                'fields':[
+                'fields': [
                     'persistent_menu'
                 ],
             },
@@ -157,11 +166,10 @@ class MessengerClient(object):
     def link_account(self, account_linking_token, timeout=None):
         r = self.session.post(
             '{graph_url}/me'.format(graph_url=self.graph_url),
-            params={
-                'access_token': self.page_access_token,
+            params=dict({
                 'fields': 'recipient',
                 'account_linking_token': account_linking_token
-            },
+            }, **self.auth_args),
             timeout=timeout
         )
         return r.json()
@@ -169,9 +177,7 @@ class MessengerClient(object):
     def unlink_account(self, psid, timeout=None):
         r = self.session.post(
             '{graph_url}/me/unlink_accounts'.format(graph_url=self.graph_url),
-            params={
-                'access_token': self.page_access_token
-            },
+            params=self.auth_args,
             json={
                 'psid': psid
             },
@@ -184,9 +190,7 @@ class MessengerClient(object):
             domains = [domains]
         r = self.session.post(
             '{graph_url}/me/messenger_profile'.format(graph_url=self.graph_url),
-            params={
-                'access_token': self.page_access_token
-            },
+            params=self.auth_args,
             json={
                 'whitelisted_domains': domains
             },
@@ -197,9 +201,7 @@ class MessengerClient(object):
     def remove_whitelisted_domains(self, timeout=None):
         r = self.session.delete(
             '{graph_url}/me/messenger_profile'.format(graph_url=self.graph_url),
-            params={
-                'access_token': self.page_access_token
-            },
+            params=self.auth_args,
             json={
                 'fields':[
                     'whitelisted_domains'
@@ -216,15 +218,30 @@ class MessengerClient(object):
             raise ValueError('Attachment may not have `quick_replies`')
         r = self.session.post(
             '{graph_url}/me/message_attachments'.format(graph_url=self.graph_url),
-            params={
-                'access_token': self.page_access_token
-            },
+            params=self.auth_args,
             json={
                 'message':  attachment.to_dict()
             },
             timeout=timeout
         )
         return r.json()
+
+    @staticmethod
+    def generate_appsecret_proof(access_token, app_secret):
+        """
+            @inputs:
+                access_token: page access token
+                app_secret_token: app secret key
+            @outputs:
+                appsecret_proof: HMAC-SHA256 hash of page access token
+                    using app_secret as the key
+        """
+        if six.PY2:
+            hmac_object = hmac.new(str(app_secret), unicode(access_token), hashlib.sha256)
+        else:
+            hmac_object = hmac.new(bytearray(app_secret, 'utf8'), str(access_token).encode('utf8'), hashlib.sha256)
+        generated_hash = hmac_object.hexdigest()
+        return generated_hash
 
 
 class BaseMessenger(object):

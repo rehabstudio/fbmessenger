@@ -60,8 +60,11 @@ class MessengerClient(object):
 
     def get_user_data(self, entry, fields=None, timeout=None):
         params = {}
-        if fields is not None and isinstance(fields, six.string_types):
+
+        if isinstance(fields, six.string_types):
             params['fields'] = fields
+        elif isinstance(fields, (list, tuple)):
+            params['fields'] = ','.join(fields)
         else:
             params['fields'] = 'first_name,last_name,profile_pic,locale,timezone,gender'
 

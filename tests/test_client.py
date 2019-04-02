@@ -485,3 +485,23 @@ def test_default_session(client):
 def test_explicit_session():
     client = MessengerClient(12345678, session=mock.sentinel.session)
     assert client.session is mock.sentinel.session
+
+
+def test_generate_appsecret_proof():
+    client = MessengerClient(12345678, app_secret=12345678)
+    assert client.generate_appsecret_proof == 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560'
+
+
+def test_auth_args_without_app_secret():
+    client = MessengerClient(12345678)
+    assert client.auth_args == {
+        'access_token': 12345678,
+    }
+
+
+def test_auth_args_with_app_secret():
+    client = MessengerClient(12345678, app_secret=12345678)
+    assert client.auth_args == {
+        'access_token': 12345678,
+        'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
+    }

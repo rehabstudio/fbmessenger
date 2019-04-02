@@ -489,7 +489,8 @@ def test_explicit_session():
 
 def test_generate_appsecret_proof():
     client = MessengerClient(12345678, app_secret=12345678)
-    assert client.generate_appsecret_proof == 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560'
+    assert client.generate_appsecret_proof(12345678, 12345678) == \
+           'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560'
 
 
 def test_auth_args_without_app_secret():

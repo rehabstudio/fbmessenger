@@ -53,7 +53,7 @@ class MessengerClient(object):
                 'access_token': self.page_access_token
             }
             if self.app_secret is not None:
-                appsecret_proof = self.generate_appsecret_proof(self.page_access_token, self.app_secret)
+                appsecret_proof = self.generate_appsecret_proof()
                 auth['appsecret_proof'] = appsecret_proof
             self._auth_args = auth
         return self._auth_args
@@ -229,22 +229,16 @@ class MessengerClient(object):
         )
         return r.json()
 
-    @staticmethod
-    def generate_appsecret_proof(access_token, app_secret):
+    def generate_appsecret_proof(self):
         """
-            @inputs:
-                access_token: page access token
-                app_secret_token: app secret key
             @outputs:
                 appsecret_proof: HMAC-SHA256 hash of page access token
                     using app_secret as the key
         """
-        if six.PY2:
-            hmac_object = hmac.new(str(app_secret), unicode(access_token), hashlib.sha256)
-        else:
-            hmac_object = hmac.new(str(app_secret).encode('utf8'), str(access_token).encode('utf8'), hashlib.sha256)
-        generated_hash = hmac_object.hexdigest()
-        return generated_hash
+        app_secret = str(self.app_secret).encode('utf8')
+        access_token = str(self.page_access_token).encode('utf8')
+
+        return hmac.new(app_secret, access_token, hashlib.sha256).hexdigest()
 
 
 class BaseMessenger(object):

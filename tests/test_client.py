@@ -544,9 +544,8 @@ def test_explicit_session():
 
 
 def test_generate_appsecret_proof():
-    client = MessengerClient(12345678, app_secret=12345678)
-    assert client.generate_appsecret_proof(12345678, 12345678) == \
-           'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560'
+    client = MessengerClient('1595920652850039|OxHxLwLVJkTZhEjwlHqPgxKgzRVU', app_secret='2e82nk47smn29dnam298fnamq82')
+    assert client.generate_appsecret_proof() == '577b294b975cde92b75ef73c1469c7355bd7fb5e568d522f534dc539dec65b38'
 
 
 def test_auth_args_without_app_secret():
@@ -557,8 +556,8 @@ def test_auth_args_without_app_secret():
 
 
 def test_auth_args_with_app_secret():
-    client = MessengerClient(12345678, app_secret=12345678)
+    client = MessengerClient('1595920652850039|OxHxLwLVJkTZhEjwlHqPgxKgzRVU', app_secret='2e82nk47smn29dnam298fnamq82')
     assert client.auth_args == {
-        'access_token': 12345678,
-        'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
+        'access_token': '1595920652850039|OxHxLwLVJkTZhEjwlHqPgxKgzRVU',
+        'appsecret_proof': '577b294b975cde92b75ef73c1469c7355bd7fb5e568d522f534dc539dec65b38',
     }

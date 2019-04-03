@@ -53,7 +53,7 @@ def test_get_user_data(client, monkeypatch):
     )
 
 
-def test_get_user_data_fields(client, monkeypatch):
+def test_get_user_data_fields_string(client, monkeypatch):
     mock_get = mock.Mock()
     mock_get.return_value.status_code == 200
     mock_get.return_value.json.return_value = {
@@ -67,6 +67,62 @@ def test_get_user_data_fields(client, monkeypatch):
         }
     }
     resp = client.get_user_data(entry, fields='first_name,last_name')
+
+    assert resp == {"first_name": "Test", "last_name": "User"}
+    assert mock_get.call_count == 1
+    mock_get.assert_called_with(
+        'https://graph.facebook.com/v2.12/12345678',
+        params={
+            'fields': 'first_name,last_name',
+            'access_token': 12345678,
+            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
+        },
+        timeout=None
+    )
+
+
+def test_get_user_data_fields_list(client, monkeypatch):
+    mock_get = mock.Mock()
+    mock_get.return_value.status_code == 200
+    mock_get.return_value.json.return_value = {
+        "first_name": "Test",
+        "last_name": "User",
+    }
+    monkeypatch.setattr('requests.Session.get', mock_get)
+    entry = {
+        'sender': {
+            'id': 12345678,
+        }
+    }
+    resp = client.get_user_data(entry, fields=['first_name', 'last_name'])
+
+    assert resp == {"first_name": "Test", "last_name": "User"}
+    assert mock_get.call_count == 1
+    mock_get.assert_called_with(
+        'https://graph.facebook.com/v2.12/12345678',
+        params={
+            'fields': 'first_name,last_name',
+            'access_token': 12345678,
+            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
+        },
+        timeout=None
+    )
+
+
+def test_get_user_data_fields_tuple(client, monkeypatch):
+    mock_get = mock.Mock()
+    mock_get.return_value.status_code == 200
+    mock_get.return_value.json.return_value = {
+        "first_name": "Test",
+        "last_name": "User",
+    }
+    monkeypatch.setattr('requests.Session.get', mock_get)
+    entry = {
+        'sender': {
+            'id': 12345678,
+        }
+    }
+    resp = client.get_user_data(entry, fields=('first_name', 'last_name'))
 
     assert resp == {"first_name": "Test", "last_name": "User"}
     assert mock_get.call_count == 1
@@ -485,3 +541,24 @@ def test_default_session(client):
 def test_explicit_session():
     client = MessengerClient(12345678, session=mock.sentinel.session)
     assert client.session is mock.sentinel.session
+
+
+def test_generate_appsecret_proof():
+    client = MessengerClient(12345678, app_secret=12345678)
+    assert client.generate_appsecret_proof(12345678, 12345678) == \
+           'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560'
+
+
+def test_auth_args_without_app_secret():
+    client = MessengerClient(12345678)
+    assert client.auth_args == {
+        'access_token': 12345678,
+    }
+
+
+def test_auth_args_with_app_secret():
+    client = MessengerClient(12345678, app_secret=12345678)
+    assert client.auth_args == {
+        'access_token': 12345678,
+        'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
+    }

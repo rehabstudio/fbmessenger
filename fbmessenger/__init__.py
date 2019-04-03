@@ -6,7 +6,7 @@ import hmac
 import six
 import requests
 
-__version__ = '5.5.0'
+__version__ = '5.4.0'
 
 logger = logging.getLogger(__name__)
 
@@ -242,7 +242,7 @@ class MessengerClient(object):
         if six.PY2:
             hmac_object = hmac.new(str(app_secret), unicode(access_token), hashlib.sha256)
         else:
-            hmac_object = hmac.new(bytearray(app_secret, 'utf8'), str(access_token).encode('utf8'), hashlib.sha256)
+            hmac_object = hmac.new(str(app_secret).encode('utf8'), str(access_token).encode('utf8'), hashlib.sha256)
         generated_hash = hmac_object.hexdigest()
         return generated_hash
 

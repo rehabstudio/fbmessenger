@@ -282,7 +282,7 @@ class BaseMessenger(object):
 
     def send(self, payload, messaging_type, timeout=None, tag=None):
         return self.client.send(
-            payload, self.last_message, messaging_type, timeout=timeout, tag=None)
+            payload, self.last_message, messaging_type, timeout=timeout, tag=tag)
 
     def send_action(self, sender_action, timeout=None):
         return self.client.send_action(

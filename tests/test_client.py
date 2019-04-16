@@ -16,15 +16,11 @@ def client():
 
 
 @pytest.fixture
-def entry():
-    return {
-        'sender': {
-            'id': 12345678,
-        }
-    }
+def recipient_id():
+    return 987654321
 
 
-def test_get_user_data(client, monkeypatch):
+def test_get_user_data(client, monkeypatch, recipient_id):
     mock_get = mock.Mock()
     mock_get.return_value.status_code = 200
     mock_get.return_value.json.return_value = {
@@ -33,17 +29,13 @@ def test_get_user_data(client, monkeypatch):
         "profile_pic": "profile"
     }
     monkeypatch.setattr('requests.Session.get', mock_get)
-    entry = {
-        'sender': {
-            'id': 12345678,
-        }
-    }
-    resp = client.get_user_data(entry)
+    resp = client.get_user_data(recipient_id)
 
     assert resp == {"first_name": "Test", "last_name": "User", "profile_pic": "profile"}
     assert mock_get.call_count == 1
     mock_get.assert_called_with(
-        'https://graph.facebook.com/v2.12/12345678',
+        'https://graph.facebook.com/v{api_version}/{recipient_id}'.format(api_version=client.api_version,
+                                                                          recipient_id=recipient_id),
         params={
             'fields': 'first_name,last_name,profile_pic,locale,timezone,gender',
             'access_token': 12345678,
@@ -53,7 +45,7 @@ def test_get_user_data(client, monkeypatch):
     )
 
 
-def test_get_user_data_fields_string(client, monkeypatch):
+def test_get_user_data_fields_string(client, monkeypatch, recipient_id):
     mock_get = mock.Mock()
     mock_get.return_value.status_code == 200
     mock_get.return_value.json.return_value = {
@@ -61,17 +53,13 @@ def test_get_user_data_fields_string(client, monkeypatch):
         "last_name": "User",
     }
     monkeypatch.setattr('requests.Session.get', mock_get)
-    entry = {
-        'sender': {
-            'id': 12345678,
-        }
-    }
-    resp = client.get_user_data(entry, fields='first_name,last_name')
+    resp = client.get_user_data(recipient_id, fields='first_name,last_name')
 
     assert resp == {"first_name": "Test", "last_name": "User"}
     assert mock_get.call_count == 1
     mock_get.assert_called_with(
-        'https://graph.facebook.com/v2.12/12345678',
+        'https://graph.facebook.com/v{api_version}/{recipient_id}'.format(api_version=client.api_version,
+                                                                          recipient_id=recipient_id),
         params={
             'fields': 'first_name,last_name',
             'access_token': 12345678,
@@ -81,7 +69,7 @@ def test_get_user_data_fields_string(client, monkeypatch):
     )
 
 
-def test_get_user_data_fields_list(client, monkeypatch):
+def test_get_user_data_fields_list(client, monkeypatch, recipient_id):
     mock_get = mock.Mock()
     mock_get.return_value.status_code == 200
     mock_get.return_value.json.return_value = {
@@ -89,17 +77,13 @@ def test_get_user_data_fields_list(client, monkeypatch):
         "last_name": "User",
     }
     monkeypatch.setattr('requests.Session.get', mock_get)
-    entry = {
-        'sender': {
-            'id': 12345678,
-        }
-    }
-    resp = client.get_user_data(entry, fields=['first_name', 'last_name'])
+    resp = client.get_user_data(recipient_id, fields=['first_name', 'last_name'])
 
     assert resp == {"first_name": "Test", "last_name": "User"}
     assert mock_get.call_count == 1
     mock_get.assert_called_with(
-        'https://graph.facebook.com/v2.12/12345678',
+        'https://graph.facebook.com/v{api_version}/{recipient_id}'.format(api_version=client.api_version,
+                                                                          recipient_id=recipient_id),
         params={
             'fields': 'first_name,last_name',
             'access_token': 12345678,
@@ -109,7 +93,7 @@ def test_get_user_data_fields_list(client, monkeypatch):
     )
 
 
-def test_get_user_data_fields_tuple(client, monkeypatch):
+def test_get_user_data_fields_tuple(client, monkeypatch, recipient_id):
     mock_get = mock.Mock()
     mock_get.return_value.status_code == 200
     mock_get.return_value.json.return_value = {
@@ -117,17 +101,13 @@ def test_get_user_data_fields_tuple(client, monkeypatch):
         "last_name": "User",
     }
     monkeypatch.setattr('requests.Session.get', mock_get)
-    entry = {
-        'sender': {
-            'id': 12345678,
-        }
-    }
-    resp = client.get_user_data(entry, fields=('first_name', 'last_name'))
+    resp = client.get_user_data(recipient_id, fields=('first_name', 'last_name'))
 
     assert resp == {"first_name": "Test", "last_name": "User"}
     assert mock_get.call_count == 1
     mock_get.assert_called_with(
-        'https://graph.facebook.com/v2.12/12345678',
+        'https://graph.facebook.com/v{api_version}/{recipient_id}'.format(api_version=client.api_version,
+                                                                          recipient_id=recipient_id),
         params={
             'fields': 'first_name,last_name',
             'access_token': 12345678,
@@ -149,7 +129,7 @@ def test_subscribe_app_to_page(client, monkeypatch):
     assert resp == {"success": True}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.12/me/subscribed_apps',
+        'https://graph.facebook.com/v{api_version}/me/subscribed_apps'.format(api_version=client.api_version),
         params={
             'access_token': 12345678,
             'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
@@ -158,24 +138,24 @@ def test_subscribe_app_to_page(client, monkeypatch):
     )
 
 
-def test_send_data(client, monkeypatch, entry):
+def test_send_data(client, monkeypatch, recipient_id):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
-        "recipient_id": 12345678,
+        "recipient_id": recipient_id,
         "message_id": "mid.1456970487936:c34767dfe57ee6e339"
     }
     monkeypatch.setattr('requests.Session.post', mock_post)
     payload = {'text': 'Test message'}
-    resp = client.send(payload, entry, 'RESPONSE')
+    resp = client.send(payload, recipient_id, 'RESPONSE')
 
     assert resp == {
-        "recipient_id": 12345678,
+        "recipient_id": recipient_id,
         "message_id": "mid.1456970487936:c34767dfe57ee6e339",
     }
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.12/me/messages',
+        'https://graph.facebook.com/v{api_version}/me/messages'.format(api_version=client.api_version),
         params={
             'access_token': 12345678,
             'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
@@ -183,7 +163,7 @@ def test_send_data(client, monkeypatch, entry):
         json={
             'messaging_type': 'RESPONSE',
             'recipient': {
-                'id': entry['sender']['id'],
+                'id': recipient_id,
             },
             'message': payload,
         },
@@ -191,19 +171,19 @@ def test_send_data(client, monkeypatch, entry):
     )
 
 
-def test_send_data_notification_type(client, monkeypatch, entry):
+def test_send_data_notification_type(client, monkeypatch, recipient_id):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
-        "recipient_id": 12345678,
+        "recipient_id": recipient_id,
         "message_id": "mid.1456970487936:c34767dfe57ee6e339"
     }
     monkeypatch.setattr('requests.Session.post', mock_post)
     payload = {'text': 'Test message'}
-    client.send(payload, entry, 'RESPONSE', notification_type='SILENT_PUSH')
+    client.send(payload, recipient_id, 'RESPONSE', notification_type='SILENT_PUSH')
 
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.12/me/messages',
+        'https://graph.facebook.com/v{api_version}/me/messages'.format(api_version=client.api_version),
         params={
             'access_token': 12345678,
             'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
@@ -211,7 +191,7 @@ def test_send_data_notification_type(client, monkeypatch, entry):
         json={
             'messaging_type': 'RESPONSE',
             'recipient': {
-                'id': entry['sender']['id'],
+                'id': recipient_id,
             },
             'message': payload,
             'notification_type': 'SILENT_PUSH',
@@ -220,31 +200,31 @@ def test_send_data_notification_type(client, monkeypatch, entry):
     )
 
 
-def test_send_data_invalid_notification_type(client, entry):
+def test_send_data_invalid_notification_type(client, recipient_id):
     payload = {'text': 'Test message'}
     with pytest.raises(ValueError):
-        client.send(payload, entry, 'RESPONSE', notification_type='INVALID')
+        client.send(payload, recipient_id, 'RESPONSE', notification_type='INVALID')
 
 
-def test_send_data_invalid_message_type(client, entry):
+def test_send_data_invalid_message_type(client, recipient_id):
     payload = {'text': 'Test message'}
     with pytest.raises(ValueError):
-        client.send(payload, entry, 'INVALID')
+        client.send(payload, recipient_id, 'INVALID')
 
 
-def test_send_data_with_tag(client, monkeypatch, entry):
+def test_send_data_with_tag(client, monkeypatch, recipient_id):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
-        "recipient_id": 12345678,
+        "recipient_id": recipient_id,
         "message_id": "mid.1456970487936:c34767dfe57ee6e339"
     }
     monkeypatch.setattr('requests.Session.post', mock_post)
     payload = {'text': 'Test message'}
-    client.send(payload, entry, 'MESSAGE_TAG', tag='ACCOUNT_UPDATE')
+    client.send(payload, recipient_id, 'MESSAGE_TAG', tag='ACCOUNT_UPDATE')
 
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.12/me/messages',
+        'https://graph.facebook.com/v{api_version}/me/messages'.format(api_version=client.api_version),
         params={
             'access_token': 12345678,
             'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
@@ -252,7 +232,7 @@ def test_send_data_with_tag(client, monkeypatch, entry):
         json={
             'messaging_type': 'MESSAGE_TAG',
             'recipient': {
-                'id': entry['sender']['id'],
+                'id': recipient_id,
             },
             'message': payload,
             'tag': 'ACCOUNT_UPDATE',
@@ -261,22 +241,22 @@ def test_send_data_with_tag(client, monkeypatch, entry):
     )
 
 
-def test_send_action(client, monkeypatch, entry):
+def test_send_action(client, monkeypatch, recipient_id):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     monkeypatch.setattr('requests.Session.post', mock_post)
-    client.send_action('typing_on', entry)
+    client.send_action('typing_on', recipient_id)
 
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.12/me/messages',
+        'https://graph.facebook.com/v{api_version}/me/messages'.format(api_version=client.api_version),
         params={
             'access_token': 12345678,
             'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
         },
         json={
             'recipient': {
-                'id': entry['sender']['id'],
+                'id': recipient_id,
             },
             'sender_action': 'typing_on',
         },
@@ -298,7 +278,7 @@ def test_set_greeting_text(client, monkeypatch):
     assert resp == {"result": "success"}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.12/me/messenger_profile',
+        'https://graph.facebook.com/v{api_version}/me/messenger_profile'.format(api_version=client.api_version),
         params={
             'access_token': 12345678,
             'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
@@ -334,7 +314,7 @@ def test_delete_get_started(client, monkeypatch):
 
     assert mock_delete.call_count == 1
     mock_delete.assert_called_with(
-        'https://graph.facebook.com/v2.12/me/messenger_profile',
+        'https://graph.facebook.com/v{api_version}/me/messenger_profile'.format(api_version=client.api_version),
         params={
             'access_token': 12345678,
             'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
@@ -356,7 +336,7 @@ def test_delete_persistent_menu(client, monkeypatch):
 
     assert mock_delete.call_count == 1
     mock_delete.assert_called_with(
-        'https://graph.facebook.com/v2.12/me/messenger_profile',
+        'https://graph.facebook.com/v{api_version}/me/messenger_profile'.format(api_version=client.api_version),
         params={
             'access_token': 12345678,
             'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
@@ -378,7 +358,7 @@ def test_link_account(client, monkeypatch):
 
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.12/me',
+        'https://graph.facebook.com/v{api_version}/me'.format(api_version=client.api_version),
         params={
             'access_token': 12345678,
             'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
@@ -400,7 +380,7 @@ def test_unlink_account(client, monkeypatch):
     assert res == {"result": "unlink account success"}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.12/me/unlink_accounts',
+        'https://graph.facebook.com/v{api_version}/me/unlink_accounts'.format(api_version=client.api_version),
         params={
             'access_token': 12345678,
             'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
@@ -423,7 +403,7 @@ def test_add_whitelisted_domains(client, monkeypatch):
     assert res == {"result": "success"}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.12/me/messenger_profile',
+        'https://graph.facebook.com/v{api_version}/me/messenger_profile'.format(api_version=client.api_version),
         params={
             'access_token': 12345678,
             'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
@@ -448,7 +428,7 @@ def test_add_whitelisted_domains_not_as_list(client, monkeypatch):
     assert res == {"result": "success"}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.12/me/messenger_profile',
+        'https://graph.facebook.com/v{api_version}/me/messenger_profile'.format(api_version=client.api_version),
         params={
             'access_token': 12345678,
             'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
@@ -473,7 +453,7 @@ def test_remove_whitelisted_domains(client, monkeypatch):
     assert res == {"result": "success"}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.12/me/messenger_profile',
+        'https://graph.facebook.com/v{api_version}/me/messenger_profile'.format(api_version=client.api_version),
         params={
             'access_token': 12345678,
             'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
@@ -500,7 +480,7 @@ def test_upload_attachment(client, monkeypatch):
     assert res == {"attachment_id": "12345"}
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
-        'https://graph.facebook.com/v2.12/me/message_attachments',
+        'https://graph.facebook.com/v{api_version}/me/message_attachments'.format(api_version=client.api_version),
         params={
             'access_token': 12345678,
             'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',

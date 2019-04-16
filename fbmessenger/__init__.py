@@ -58,7 +58,7 @@ class MessengerClient(object):
             self._auth_args = auth
         return self._auth_args
 
-    def get_user_data(self, entry, fields=None, timeout=None):
+    def get_user_data(self, recipient_id, fields=None, timeout=None):
         params = {}
 
         if isinstance(fields, six.string_types):
@@ -71,13 +71,13 @@ class MessengerClient(object):
         params.update(self.auth_args)
 
         r = self.session.get(
-            '{graph_url}/{sender}'.format(graph_url=self.graph_url, sender=entry['sender']['id']),
+            '{graph_url}/{recipient_id}'.format(graph_url=self.graph_url, recipient_id=recipient_id),
             params=params,
             timeout=timeout
         )
         return r.json()
 
-    def send(self, payload, entry, messaging_type, notification_type=None,
+    def send(self, payload, recipient_id, messaging_type, notification_type=None,
              timeout=None, tag=None):
         if messaging_type not in self.MESSAGING_TYPES:
             raise ValueError(
@@ -86,9 +86,9 @@ class MessengerClient(object):
         body = {
             'messaging_type': messaging_type,
             'recipient': {
-                'id': entry['sender']['id']
+                'id': recipient_id,
             },
-            'message': payload
+            'message': payload,
         }
 
         if tag:
@@ -109,13 +109,13 @@ class MessengerClient(object):
         )
         return r.json()
 
-    def send_action(self, sender_action, entry, timeout=None):
+    def send_action(self, sender_action, recipient_id, timeout=None):
         r = self.session.post(
             '{graph_url}/me/messages'.format(graph_url=self.graph_url),
             params=self.auth_args,
             json={
                 'recipient': {
-                    'id': entry['sender']['id']
+                    'id': recipient_id,
                 },
                 'sender_action': sender_action
             },
@@ -127,7 +127,7 @@ class MessengerClient(object):
         r = self.session.post(
             '{graph_url}/me/subscribed_apps'.format(graph_url=self.graph_url),
             params=self.auth_args,
-            timeout=None
+            timeout=timeout
         )
         return r.json()
 
@@ -293,18 +293,19 @@ class BaseMessenger(object):
                     return self.read(message)
 
     def get_user(self, fields=None, timeout=None):
-        return self.client.get_user_data(self.last_message, fields=fields, timeout=timeout)
+        return self.client.get_user_data(self.get_user_id(), fields=fields, timeout=timeout)
 
     def send(self, payload, messaging_type, timeout=None, tag=None):
-        return self.client.send(
-            payload, self.last_message, messaging_type, timeout=timeout, tag=tag)
+        return self.client.send(payload, self.get_user_id(), messaging_type, timeout=timeout, tag=tag)
 
     def send_action(self, sender_action, timeout=None):
-        return self.client.send_action(
-            sender_action, self.last_message, timeout=timeout)
+        return self.client.send_action(sender_action, self.get_user_id(), timeout=timeout)
 
     def get_user_id(self):
-        return self.last_message['sender']['id']
+        try:
+            return self.last_message['sender']['id']
+        except KeyError:
+            return None
 
     def subscribe_app_to_page(self, timeout=None):
         return self.client.subscribe_app_to_page(timeout=timeout)

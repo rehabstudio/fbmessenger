@@ -62,6 +62,11 @@ def entry():
 
 
 @pytest.fixture
+def recipient_id():
+    return 12345678
+
+
+@pytest.fixture
 def payload_message():
     payload1 = copy.deepcopy(base_payload)
     payload1['entry'][0]['messaging'][0]['message'] = {
@@ -69,7 +74,6 @@ def payload_message():
         'seq': 73,
         'text': 'hello, world!'
     }
-    print(payload1)
     return payload1
 
 
@@ -80,7 +84,6 @@ def payload_message_read():
         'watermark': 1458668856253,
         'seq': 38
     }
-    print(payload2)
     return payload2
 
 
@@ -113,7 +116,6 @@ def payload_postback():
     payload['entry'][0]['messaging'][0]['postback'] = {
         'payload': 'USER_DEFINED_PAYLOAD'
     }
-    print(payload)
     return payload
 
 
@@ -196,7 +198,7 @@ def test_get_user(messenger, monkeypatch):
         'last_name': 'McTestface',
         'profile': 'profile'
     }
-    mock.assert_called_with({}, fields=None, timeout=None)
+    mock.assert_called_with(None, fields=None, timeout=None)
 
 
 def test_send(messenger, monkeypatch):
@@ -207,7 +209,7 @@ def test_send(messenger, monkeypatch):
     monkeypatch.setattr(messenger.client, 'send', mock)
     res = messenger.send({'text': 'message'}, 'RESPONSE')
     assert res == mock.return_value
-    mock.assert_called_with({'text': 'message'}, {}, 'RESPONSE', timeout=None, tag=None)
+    mock.assert_called_with({'text': 'message'}, None, 'RESPONSE', timeout=None, tag=None)
 
 
 def test_send_action(messenger, monkeypatch):
@@ -215,7 +217,7 @@ def test_send_action(messenger, monkeypatch):
     monkeypatch.setattr(messenger.client, 'send_action', mock)
     res = messenger.send_action('typing_on')
     assert res == mock.return_value
-    mock.assert_called_with('typing_on', {}, timeout=None)
+    mock.assert_called_with('typing_on', None, timeout=None)
 
 
 def test_set_thread_setting(messenger, monkeypatch):

@@ -1,5 +1,18 @@
 # Release History
 
+## 5.6.1
+- Update README
+- remove pytest-catchlog from requirements.txt
+
+## 5.6.0
+- Adds app secret support
+
+## 5.5.0
+- Adds ability to set API version
+
+## 5.4.0
+- Allows specifying fields when requesting user data
+
 ## 5.3.2 
 - Add missing tag parameter to BaseMessenger::send
 - Remove invalid message tag

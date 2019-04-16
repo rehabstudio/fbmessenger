@@ -38,6 +38,7 @@ pip install fbmessenger
 - [Create an app](https://developers.facebook.com/quickstarts/?platform=web)
 - Add the Messenger product
 - Select the Page to generate a page token
+- Use [App Secret](https://developers.facebook.com/docs/graph-api/securing-requests/) (optional)
 
 
 <a name="example-usage-with-flask"></a>
@@ -45,8 +46,9 @@ pip install fbmessenger
 
 First you need to create a verify token, this can be any string e.g.
 
-	'my_verify_token'
-
+```bash
+'my_verify_token'
+```
 
 ### Messenger class
 
@@ -64,9 +66,10 @@ from fbmessenger import BaseMessenger
 
 
 class Messenger(BaseMessenger):
-    def __init__(self, page_access_token):
+    def __init__(self, page_access_token, app_secret=None):
         self.page_access_token = page_access_token
-        super(Messenger, self).__init__(self.page_access_token)
+        self.app_secret = app_secret
+        self.client = MessengerClient(self.page_access_token, app_secret=self.app_secret)
 
     def message(self, message):
         self.send({'text': 'Received: {0}'.format(message['message']['text'])}, 'RESPONSE')
@@ -99,7 +102,7 @@ from flask import Flask, request
 app = Flask(__name__)
 app.debug = True
 
-messenger = Messenger(os.environ.get('FB_VERIFY_TOKEN'), os.environ.get('FB_PAGE_TOKEN'))
+messenger = Messenger(os.environ.get('FB_PAGE_TOKEN'))
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
@@ -158,7 +161,6 @@ application. Supported values are:
 - `RESPONSE`
 - `UPDATE`
 - `MESSAGE_TAG`
-- `NON_PROMOTIONAL_SUBSCRIPTION`
 
 
 See [Messaging Types](https://developers.facebook.com/docs/messenger-platform/send-messages/#messaging_types)
@@ -167,7 +169,7 @@ for more information.
 ### Notification Type
 
 Any of the elements below may be sent in conjunction with a notification
-type (see the [Send API documentation](https://developers.facebook.com/docs/messenger-platform/reference/send-api/)
+type (see the [Send API documentation](https://developers.facebook.com/docs/messenger-platform/reference/send-api/#payload)
 for more details). `notification_type` is an optional parameter to the
 `.send()` call. For example:
 
@@ -183,6 +185,25 @@ Supported values are are:
 If a value is not provided, then the notification preference will not
 be set and Facebook Messenger's default will apply (which is `REGULAR`
 at the time of writing).
+
+### Message Tags
+
+Message tags give you the ability to send messages to a person outside of the normally allowed 24-hour window 
+for a limited number of purposes that require continual notification or updates.
+
+```python
+messenger.send({'text': msg}, 'MESSAGE_TAG', tag='NON_PROMOTIONAL_SUBSCRIPTION')
+```
+
+Supported values are are:
+- `BUSINESS_PRODUCTIVITY`
+- `COMMUNITY_ALERT`
+- `CONFIRMED_EVENT_REMINDER`
+- `NON_PROMOTIONAL_SUBSCRIPTION`
+- for more see [Supported Tags](https://developers.facebook.com/docs/messenger-platform/send-messages/message-tags#supported_tags)
+
+See [Message Tags](https://developers.facebook.com/docs/messenger-platform/send-messages/message-tags)
+for more information.
 
 ### Text
 

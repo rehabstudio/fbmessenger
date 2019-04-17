@@ -299,8 +299,7 @@ class BaseMessenger(object):
                                 notification_type=notification_type, timeout=timeout, tag=tag)
 
     def send_action(self, sender_action, timeout=None):
-        return self.client.send_action(
-            sender_action, self.last_message, timeout=timeout)
+        return self.client.send_action(sender_action, self.last_message, timeout=timeout)
 
     def get_user_id(self):
         return self.last_message['sender']['id']

@@ -77,13 +77,16 @@ class MessengerClient(object):
         )
         return r.json()
 
-    def send(self, payload, entry, messaging_type, notification_type=None, timeout=None, tag=None):
+    def send(self, payload, entry, messaging_type=None, notification_type=None, timeout=None, tag=None):
         if messaging_type not in self.MESSAGING_TYPES:
-            raise ValueError(
-                '`{}` is not a valid `messaging_type`'.format(messaging_type))
+            messaging_type = 'RESPONSE'
+
+        if notification_type not in self.NOTIFICATION_TYPES:
+            notification_type = 'REGULAR'
 
         body = {
             'messaging_type': messaging_type,
+            'notification_type': notification_type,
             'recipient': {
                 'id': entry['sender']['id']
             },
@@ -92,13 +95,6 @@ class MessengerClient(object):
 
         if tag:
             body['tag'] = tag
-
-        if notification_type:
-            if notification_type not in self.NOTIFICATION_TYPES:
-                raise ValueError(
-                    '`{}` is not a valid `notification_type`'.format(
-                        notification_type))
-            body['notification_type'] = notification_type
 
         r = self.session.post(
             '{graph_url}/me/messages'.format(graph_url=self.graph_url),
@@ -294,8 +290,8 @@ class BaseMessenger(object):
     def get_user(self, fields=None, timeout=None):
         return self.client.get_user_data(self.last_message, fields=fields, timeout=timeout)
 
-    def send(self, payload, messaging_type, notification_type=None, timeout=None, tag=None):
-        return self.client.send(payload, self.last_message, messaging_type,
+    def send(self, payload, messaging_type=None, notification_type=None, timeout=None, tag=None):
+        return self.client.send(payload, self.last_message, messaging_type=messaging_type,
                                 notification_type=notification_type, timeout=timeout, tag=tag)
 
     def send_action(self, sender_action, timeout=None):

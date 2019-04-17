@@ -16,14 +16,14 @@ DEFAULT_API_VERSION = 2.12
 
 class MessengerClient(object):
 
-    # https://developers.facebook.com/docs/messenger-platform/send-messages#send_api_basics
+    # https://developers.facebook.com/docs/messenger-platform/send-messages#messaging_types
     MESSAGING_TYPES = {
         'RESPONSE',
         'UPDATE',
         'MESSAGE_TAG',
     }
 
-    # https://developers.facebook.com/docs/messenger-platform/reference/send-api/
+    # https://developers.facebook.com/docs/messenger-platform/reference/send-api/#payload
     NOTIFICATION_TYPES = {
         'REGULAR',
         'SILENT_PUSH',
@@ -77,12 +77,12 @@ class MessengerClient(object):
         )
         return r.json()
 
-    def send(self, payload, entry, messaging_type=None, notification_type=None, timeout=None, tag=None):
+    def send(self, payload, entry, messaging_type='RESPONSE', notification_type='REGULAR', timeout=None, tag=None):
         if messaging_type not in self.MESSAGING_TYPES:
-            messaging_type = 'RESPONSE'
+            raise ValueError('`{}` is not a valid `messaging_type`'.format(messaging_type))
 
         if notification_type not in self.NOTIFICATION_TYPES:
-            notification_type = 'REGULAR'
+            raise ValueError('`{}` is not a valid `notification_type`'.format(notification_type))
 
         body = {
             'messaging_type': messaging_type,
@@ -122,7 +122,7 @@ class MessengerClient(object):
         r = self.session.post(
             '{graph_url}/me/subscribed_apps'.format(graph_url=self.graph_url),
             params=self.auth_args,
-            timeout=None
+            timeout=timeout
         )
         return r.json()
 
@@ -290,7 +290,7 @@ class BaseMessenger(object):
     def get_user(self, fields=None, timeout=None):
         return self.client.get_user_data(self.last_message, fields=fields, timeout=timeout)
 
-    def send(self, payload, messaging_type=None, notification_type=None, timeout=None, tag=None):
+    def send(self, payload, messaging_type='RESPONSE', notification_type='REGULAR', timeout=None, tag=None):
         return self.client.send(payload, self.last_message, messaging_type=messaging_type,
                                 notification_type=notification_type, timeout=timeout, tag=tag)
 

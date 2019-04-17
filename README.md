@@ -174,7 +174,7 @@ for more details). `notification_type` is an optional parameter to the
 `.send()` call. For example:
 
 ```python
-messenger.send({'text': msg}, 'RESPONSE', notification_type='SILENT_PUSH')
+messenger.send({'text': msg}, 'RESPONSE', notification_type='REGULAR')
 ```
 
 Supported values are are:

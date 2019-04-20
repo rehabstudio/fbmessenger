@@ -20,7 +20,15 @@ def recipient_id():
     return 987654321
 
 
-def test_get_user_data(client, monkeypatch, recipient_id):
+@pytest.fixture
+def default_params():
+    return {
+        'access_token': 12345678,
+        'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
+    }
+
+
+def test_get_user_data(client, monkeypatch, recipient_id, default_params):
     mock_get = mock.Mock()
     mock_get.return_value.status_code = 200
     mock_get.return_value.json.return_value = {
@@ -36,16 +44,14 @@ def test_get_user_data(client, monkeypatch, recipient_id):
     mock_get.assert_called_with(
         'https://graph.facebook.com/v{api_version}/{recipient_id}'.format(api_version=client.api_version,
                                                                           recipient_id=recipient_id),
-        params={
+        params=dict({
             'fields': 'first_name,last_name,profile_pic,locale,timezone,gender',
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        }, **default_params),
         timeout=None
     )
 
 
-def test_get_user_data_fields_string(client, monkeypatch, recipient_id):
+def test_get_user_data_fields_string(client, monkeypatch, recipient_id, default_params):
     mock_get = mock.Mock()
     mock_get.return_value.status_code == 200
     mock_get.return_value.json.return_value = {
@@ -60,16 +66,14 @@ def test_get_user_data_fields_string(client, monkeypatch, recipient_id):
     mock_get.assert_called_with(
         'https://graph.facebook.com/v{api_version}/{recipient_id}'.format(api_version=client.api_version,
                                                                           recipient_id=recipient_id),
-        params={
+        params=dict({
             'fields': 'first_name,last_name',
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        }, **default_params),
         timeout=None
     )
 
 
-def test_get_user_data_fields_list(client, monkeypatch, recipient_id):
+def test_get_user_data_fields_list(client, monkeypatch, recipient_id, default_params):
     mock_get = mock.Mock()
     mock_get.return_value.status_code == 200
     mock_get.return_value.json.return_value = {
@@ -84,16 +88,14 @@ def test_get_user_data_fields_list(client, monkeypatch, recipient_id):
     mock_get.assert_called_with(
         'https://graph.facebook.com/v{api_version}/{recipient_id}'.format(api_version=client.api_version,
                                                                           recipient_id=recipient_id),
-        params={
+        params=dict({
             'fields': 'first_name,last_name',
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        }, **default_params),
         timeout=None
     )
 
 
-def test_get_user_data_fields_tuple(client, monkeypatch, recipient_id):
+def test_get_user_data_fields_tuple(client, monkeypatch, recipient_id, default_params):
     mock_get = mock.Mock()
     mock_get.return_value.status_code == 200
     mock_get.return_value.json.return_value = {
@@ -108,16 +110,14 @@ def test_get_user_data_fields_tuple(client, monkeypatch, recipient_id):
     mock_get.assert_called_with(
         'https://graph.facebook.com/v{api_version}/{recipient_id}'.format(api_version=client.api_version,
                                                                           recipient_id=recipient_id),
-        params={
+        params=dict({
             'fields': 'first_name,last_name',
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        }, **default_params),
         timeout=None
     )
 
 
-def test_subscribe_app_to_page(client, monkeypatch):
+def test_subscribe_app_to_page(client, monkeypatch, default_params):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
@@ -130,15 +130,12 @@ def test_subscribe_app_to_page(client, monkeypatch):
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
         'https://graph.facebook.com/v{api_version}/me/subscribed_apps'.format(api_version=client.api_version),
-        params={
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        params=default_params,
         timeout=None
     )
 
 
-def test_send_data(client, monkeypatch, recipient_id):
+def test_send_data(client, monkeypatch, recipient_id, default_params):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
@@ -156,10 +153,7 @@ def test_send_data(client, monkeypatch, recipient_id):
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
         'https://graph.facebook.com/v{api_version}/me/messages'.format(api_version=client.api_version),
-        params={
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        params=default_params,
         json={
             'messaging_type': 'RESPONSE',
             'notification_type': 'REGULAR',
@@ -172,7 +166,7 @@ def test_send_data(client, monkeypatch, recipient_id):
     )
 
 
-def test_send_data_notification_type(client, monkeypatch, recipient_id):
+def test_send_data_notification_type(client, monkeypatch, recipient_id, default_params):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
@@ -185,10 +179,7 @@ def test_send_data_notification_type(client, monkeypatch, recipient_id):
 
     mock_post.assert_called_with(
         'https://graph.facebook.com/v{api_version}/me/messages'.format(api_version=client.api_version),
-        params={
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        params=default_params,
         json={
             'messaging_type': 'RESPONSE',
             'notification_type': 'SILENT_PUSH',
@@ -213,7 +204,7 @@ def test_send_data_invalid_message_type(client, recipient_id):
         client.send(payload, recipient_id, 'INVALID')
 
 
-def test_send_data_with_tag(client, monkeypatch, recipient_id):
+def test_send_data_with_tag(client, monkeypatch, recipient_id, default_params):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
@@ -226,10 +217,7 @@ def test_send_data_with_tag(client, monkeypatch, recipient_id):
 
     mock_post.assert_called_with(
         'https://graph.facebook.com/v{api_version}/me/messages'.format(api_version=client.api_version),
-        params={
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        params=default_params,
         json={
             'messaging_type': 'MESSAGE_TAG',
             'notification_type': 'REGULAR',
@@ -243,7 +231,7 @@ def test_send_data_with_tag(client, monkeypatch, recipient_id):
     )
 
 
-def test_send_action(client, monkeypatch, recipient_id):
+def test_send_action(client, monkeypatch, recipient_id, default_params):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     monkeypatch.setattr('requests.Session.post', mock_post)
@@ -252,10 +240,7 @@ def test_send_action(client, monkeypatch, recipient_id):
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
         'https://graph.facebook.com/v{api_version}/me/messages'.format(api_version=client.api_version),
-        params={
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        params=default_params,
         json={
             'recipient': {
                 'id': recipient_id,
@@ -266,7 +251,7 @@ def test_send_action(client, monkeypatch, recipient_id):
     )
 
 
-def test_set_greeting_text(client, monkeypatch):
+def test_set_greeting_text(client, monkeypatch, default_params):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
@@ -281,10 +266,7 @@ def test_set_greeting_text(client, monkeypatch):
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
         'https://graph.facebook.com/v{api_version}/me/messenger_profile'.format(api_version=client.api_version),
-        params={
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        params=default_params,
         json={
             'greeting': [{
                 'locale': 'default',
@@ -308,7 +290,7 @@ def test_set_greeting_text_too_long(monkeypatch):
     assert str(err.value) == 'Text cannot be longer 160 characters.'
 
 
-def test_delete_get_started(client, monkeypatch):
+def test_delete_get_started(client, monkeypatch, default_params):
     mock_delete = mock.Mock()
     mock_delete.return_value.status_code = 200
     monkeypatch.setattr('requests.Session.delete', mock_delete)
@@ -317,10 +299,7 @@ def test_delete_get_started(client, monkeypatch):
     assert mock_delete.call_count == 1
     mock_delete.assert_called_with(
         'https://graph.facebook.com/v{api_version}/me/messenger_profile'.format(api_version=client.api_version),
-        params={
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        params=default_params,
         json={
             'fields': [
                 'get_started',
@@ -330,7 +309,7 @@ def test_delete_get_started(client, monkeypatch):
     )
 
 
-def test_delete_persistent_menu(client, monkeypatch):
+def test_delete_persistent_menu(client, monkeypatch, default_params):
     mock_delete = mock.Mock()
     mock_delete.return_value.status_code = 200
     monkeypatch.setattr('requests.Session.delete', mock_delete)
@@ -339,10 +318,7 @@ def test_delete_persistent_menu(client, monkeypatch):
     assert mock_delete.call_count == 1
     mock_delete.assert_called_with(
         'https://graph.facebook.com/v{api_version}/me/messenger_profile'.format(api_version=client.api_version),
-        params={
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        params=default_params,
         json={
             'fields': [
                 'persistent_menu',
@@ -352,7 +328,7 @@ def test_delete_persistent_menu(client, monkeypatch):
     )
 
 
-def test_link_account(client, monkeypatch):
+def test_link_account(client, monkeypatch, default_params):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     monkeypatch.setattr('requests.Session.post', mock_post)
@@ -361,17 +337,15 @@ def test_link_account(client, monkeypatch):
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
         'https://graph.facebook.com/v{api_version}/me'.format(api_version=client.api_version),
-        params={
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
+        params=dict({
             'fields': 'recipient',
             'account_linking_token': 1234,
-        },
+        }, **default_params),
         timeout=None
     )
 
 
-def test_unlink_account(client, monkeypatch):
+def test_unlink_account(client, monkeypatch, default_params):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
@@ -383,10 +357,7 @@ def test_unlink_account(client, monkeypatch):
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
         'https://graph.facebook.com/v{api_version}/me/unlink_accounts'.format(api_version=client.api_version),
-        params={
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        params=default_params,
         json={
             'psid': 1234,
         },
@@ -394,7 +365,7 @@ def test_unlink_account(client, monkeypatch):
     )
 
 
-def test_add_whitelisted_domains(client, monkeypatch):
+def test_add_whitelisted_domains(client, monkeypatch, default_params):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
@@ -406,10 +377,7 @@ def test_add_whitelisted_domains(client, monkeypatch):
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
         'https://graph.facebook.com/v{api_version}/me/messenger_profile'.format(api_version=client.api_version),
-        params={
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        params=default_params,
         json={
             'whitelisted_domains': [
                 'https://facebook.com',
@@ -419,7 +387,7 @@ def test_add_whitelisted_domains(client, monkeypatch):
     )
 
 
-def test_add_whitelisted_domains_not_as_list(client, monkeypatch):
+def test_add_whitelisted_domains_not_as_list(client, monkeypatch, default_params):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
@@ -431,10 +399,7 @@ def test_add_whitelisted_domains_not_as_list(client, monkeypatch):
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
         'https://graph.facebook.com/v{api_version}/me/messenger_profile'.format(api_version=client.api_version),
-        params={
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        params=default_params,
         json={
             'whitelisted_domains': [
                 'https://facebook.com',
@@ -444,7 +409,7 @@ def test_add_whitelisted_domains_not_as_list(client, monkeypatch):
     )
 
 
-def test_remove_whitelisted_domains(client, monkeypatch):
+def test_remove_whitelisted_domains(client, monkeypatch, default_params):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
@@ -456,10 +421,7 @@ def test_remove_whitelisted_domains(client, monkeypatch):
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
         'https://graph.facebook.com/v{api_version}/me/messenger_profile'.format(api_version=client.api_version),
-        params={
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        params=default_params,
         json={
             'fields': [
                 'whitelisted_domains',
@@ -469,7 +431,7 @@ def test_remove_whitelisted_domains(client, monkeypatch):
     )
 
 
-def test_upload_attachment(client, monkeypatch):
+def test_upload_attachment(client, monkeypatch, default_params):
     mock_post = mock.Mock()
     mock_post.return_value.status_code = 200
     mock_post.return_value.json.return_value = {
@@ -483,10 +445,7 @@ def test_upload_attachment(client, monkeypatch):
     assert mock_post.call_count == 1
     mock_post.assert_called_with(
         'https://graph.facebook.com/v{api_version}/me/message_attachments'.format(api_version=client.api_version),
-        params={
-            'access_token': 12345678,
-            'appsecret_proof': 'e220691b3e23647fc17c4b282bb469ac77fbadb8f5c77898294e42de95add560',
-        },
+        params=default_params,
         json={
             'message': {
                 'attachment': {

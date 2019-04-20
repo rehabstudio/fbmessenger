@@ -1,8 +1,13 @@
 # Release History
 
+## 6.0.0
+- Switch from message to recipient_id as method input
+
 ## 5.6.1
 - Update README
 - remove pytest-catchlog from requirements.txt
+- Add defaults for messaging_type & notification_type
+- Add notification_type to BaseMessenger.send
 
 ## 5.6.0
 - Adds app secret support

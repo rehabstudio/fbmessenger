@@ -158,7 +158,7 @@ This is passed in the `send()` calls below - in each case, we'll just
 use `RESPONSE`. You should use whatever value is appropriate for your
 application. Supported values are:
 
-- `RESPONSE`
+- `RESPONSE` _(default)_
 - `UPDATE`
 - `MESSAGE_TAG`
 
@@ -174,17 +174,13 @@ for more details). `notification_type` is an optional parameter to the
 `.send()` call. For example:
 
 ```python
-messenger.send({'text': msg}, 'RESPONSE', notification_type='SILENT_PUSH')
+messenger.send({'text': msg}, 'RESPONSE', notification_type='REGULAR')
 ```
 
 Supported values are are:
-- `REGULAR`
+- `REGULAR` _(default)_
 - `SILENT_PUSH`
 - `NO_PUSH`
-
-If a value is not provided, then the notification preference will not
-be set and Facebook Messenger's default will apply (which is `REGULAR`
-at the time of writing).
 
 ### Message Tags
 

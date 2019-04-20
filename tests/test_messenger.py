@@ -209,7 +209,8 @@ def test_send(messenger, monkeypatch):
     monkeypatch.setattr(messenger.client, 'send', mock)
     res = messenger.send({'text': 'message'}, 'RESPONSE')
     assert res == mock.return_value
-    mock.assert_called_with({'text': 'message'}, None, 'RESPONSE', timeout=None, tag=None)
+    mock.assert_called_with({'text': 'message'}, None, messaging_type='RESPONSE', notification_type='REGULAR',
+                            timeout=None, tag=None)
 
 
 def test_send_action(messenger, monkeypatch):

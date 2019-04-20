@@ -6,7 +6,7 @@ import hmac
 import six
 import requests
 
-__version__ = '5.6.1'
+__version__ = '6.0.0'
 
 logger = logging.getLogger(__name__)
 
@@ -16,14 +16,14 @@ DEFAULT_API_VERSION = 2.12
 
 class MessengerClient(object):
 
-    # https://developers.facebook.com/docs/messenger-platform/send-messages#send_api_basics
+    # https://developers.facebook.com/docs/messenger-platform/send-messages#messaging_types
     MESSAGING_TYPES = {
         'RESPONSE',
         'UPDATE',
         'MESSAGE_TAG',
     }
 
-    # https://developers.facebook.com/docs/messenger-platform/reference/send-api/
+    # https://developers.facebook.com/docs/messenger-platform/reference/send-api/#payload
     NOTIFICATION_TYPES = {
         'REGULAR',
         'SILENT_PUSH',
@@ -77,14 +77,16 @@ class MessengerClient(object):
         )
         return r.json()
 
-    def send(self, payload, recipient_id, messaging_type, notification_type=None,
-             timeout=None, tag=None):
+    def send(self, payload, recipient_id, messaging_type='RESPONSE', notification_type='REGULAR', timeout=None, tag=None):
         if messaging_type not in self.MESSAGING_TYPES:
-            raise ValueError(
-                '`{}` is not a valid `messaging_type`'.format(messaging_type))
+            raise ValueError('`{}` is not a valid `messaging_type`'.format(messaging_type))
+
+        if notification_type not in self.NOTIFICATION_TYPES:
+            raise ValueError('`{}` is not a valid `notification_type`'.format(notification_type))
 
         body = {
             'messaging_type': messaging_type,
+            'notification_type': notification_type,
             'recipient': {
                 'id': recipient_id,
             },
@@ -93,13 +95,6 @@ class MessengerClient(object):
 
         if tag:
             body['tag'] = tag
-
-        if notification_type:
-            if notification_type not in self.NOTIFICATION_TYPES:
-                raise ValueError(
-                    '`{}` is not a valid `notification_type`'.format(
-                        notification_type))
-            body['notification_type'] = notification_type
 
         r = self.session.post(
             '{graph_url}/me/messages'.format(graph_url=self.graph_url),
@@ -295,8 +290,9 @@ class BaseMessenger(object):
     def get_user(self, fields=None, timeout=None):
         return self.client.get_user_data(self.get_user_id(), fields=fields, timeout=timeout)
 
-    def send(self, payload, messaging_type, timeout=None, tag=None):
-        return self.client.send(payload, self.get_user_id(), messaging_type, timeout=timeout, tag=tag)
+    def send(self, payload, messaging_type='RESPONSE', notification_type='REGULAR', timeout=None, tag=None):
+        return self.client.send(payload, self.get_user_id(), messaging_type=messaging_type,
+                                notification_type=notification_type, timeout=timeout, tag=tag)
 
     def send_action(self, sender_action, timeout=None):
         return self.client.send_action(sender_action, self.get_user_id(), timeout=timeout)

@@ -162,6 +162,7 @@ def test_send_data(client, monkeypatch, recipient_id):
         },
         json={
             'messaging_type': 'RESPONSE',
+            'notification_type': 'REGULAR',
             'recipient': {
                 'id': recipient_id,
             },
@@ -190,11 +191,11 @@ def test_send_data_notification_type(client, monkeypatch, recipient_id):
         },
         json={
             'messaging_type': 'RESPONSE',
+            'notification_type': 'SILENT_PUSH',
             'recipient': {
                 'id': recipient_id,
             },
             'message': payload,
-            'notification_type': 'SILENT_PUSH',
         },
         timeout=None
     )
@@ -231,6 +232,7 @@ def test_send_data_with_tag(client, monkeypatch, recipient_id):
         },
         json={
             'messaging_type': 'MESSAGE_TAG',
+            'notification_type': 'REGULAR',
             'recipient': {
                 'id': recipient_id,
             },

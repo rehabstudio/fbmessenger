@@ -1,5 +1,4 @@
 import copy
-
 import pytest
 from mock import Mock
 
@@ -134,6 +133,12 @@ def test_get_user_id(messenger, entry):
     assert res == messenger.last_message['sender']['id']
 
 
+def test_get_user_id_not_exists(messenger):
+    messenger.last_message = {}
+    res = messenger.get_user_id()
+    assert res is None
+
+
 def test_messages(messenger, payload_message):
     mock_message = Mock()
     messenger.message = mock_message
@@ -184,7 +189,7 @@ def test_account_linking(messenger, payload_account_linking):
     mock_account_linking.assert_called_with(payload_account_linking['entry'][0]['messaging'][0])
 
 
-def test_get_user(messenger, monkeypatch):
+def test_get_user(messenger, monkeypatch, recipient_id):
     mock = Mock()
     mock.return_value = {
         'first_name': 'Testy',
@@ -192,33 +197,36 @@ def test_get_user(messenger, monkeypatch):
         'profile': 'profile'
     }
     monkeypatch.setattr(messenger.client, 'get_user_data', mock)
+    monkeypatch.setattr(messenger, 'get_user_id', lambda: recipient_id)
     user = messenger.get_user()
     assert user == {
         'first_name': 'Testy',
         'last_name': 'McTestface',
         'profile': 'profile'
     }
-    mock.assert_called_with(None, fields=None, timeout=None)
+    mock.assert_called_with(recipient_id, fields=None, timeout=None)
 
 
-def test_send(messenger, monkeypatch):
+def test_send(messenger, monkeypatch, recipient_id):
     mock = Mock()
     mock.return_value = {
         'success': True
     }
     monkeypatch.setattr(messenger.client, 'send', mock)
+    monkeypatch.setattr(messenger, 'get_user_id', lambda: recipient_id)
     res = messenger.send({'text': 'message'}, 'RESPONSE')
     assert res == mock.return_value
-    mock.assert_called_with({'text': 'message'}, None, messaging_type='RESPONSE', notification_type='REGULAR',
+    mock.assert_called_with({'text': 'message'}, recipient_id, messaging_type='RESPONSE', notification_type='REGULAR',
                             timeout=None, tag=None)
 
 
-def test_send_action(messenger, monkeypatch):
+def test_send_action(messenger, monkeypatch, recipient_id):
     mock = Mock()
     monkeypatch.setattr(messenger.client, 'send_action', mock)
+    monkeypatch.setattr(messenger, 'get_user_id', lambda: recipient_id)
     res = messenger.send_action('typing_on')
     assert res == mock.return_value
-    mock.assert_called_with('typing_on', None, timeout=None)
+    mock.assert_called_with('typing_on', recipient_id, timeout=None)
 
 
 def test_set_thread_setting(messenger, monkeypatch):

@@ -299,10 +299,7 @@ class BaseMessenger(object):
         return self.client.send_action(sender_action, self.get_user_id(), timeout=timeout)
 
     def get_user_id(self):
-        try:
-            return self.last_message['sender']['id']
-        except KeyError:
-            return None
+        return self.last_message['sender']['id']
 
     def subscribe_app_to_page(self, timeout=None):
         return self.client.subscribe_app_to_page(timeout=timeout)

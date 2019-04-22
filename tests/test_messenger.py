@@ -135,8 +135,8 @@ def test_get_user_id(messenger, entry):
 
 def test_get_user_id_not_exists(messenger):
     messenger.last_message = {}
-    res = messenger.get_user_id()
-    assert res is None
+    with pytest.raises(KeyError):
+        messenger.get_user_id()
 
 
 def test_messages(messenger, payload_message):

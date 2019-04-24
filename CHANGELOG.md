@@ -1,5 +1,8 @@
 # Release History
 
+## 6.0.0
+- Switch from message to recipient_id as method input
+
 ## 5.6.1
 - Update README
 - remove pytest-catchlog from requirements.txt

@@ -60,7 +60,6 @@ class Button(object):
         'phone_number',
         'account_link',
         'account_unlink',
-        'element_share',
     ]
 
     def __init__(self, button_type, title=None, url=None,
@@ -103,9 +102,6 @@ class Button(object):
                 d['messenger_extensions'] = 'true'
             if self.fallback_url:
                 d['fallback_url'] = self.fallback_url
-        if self.button_type == 'element_share':
-            if self.share_contents:
-                d['share_contents'] = self.share_contents
         return d
 
 

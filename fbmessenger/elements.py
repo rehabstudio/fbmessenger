@@ -64,7 +64,7 @@ class Button(object):
     ]
 
     def __init__(self, button_type, title=None, url=None,
-                 payload=None, webview_height_ratio=None,
+                 payload=None, webview_height_ratio=None, webview_share_button=None,
                  messenger_extensions=None, fallback_url=None,
                  share_contents=None):
 
@@ -75,12 +75,15 @@ class Button(object):
         if title and len(title) > 20:
             logger.warning(CHARACTER_LIMIT_MESSAGE.format(field='Title',
                                                           maxsize=20))
+        if button_type != 'web_url' and webview_share_button is not None:
+            raise ValueError('`webview_share_button` is only valid for button type `web_url`')
 
         self.button_type = button_type
         self.title = title
         self.url = url
         self.payload = payload
         self.webview_height_ratio = webview_height_ratio
+        self.webview_share_button = webview_share_button
         self.messenger_extensions = messenger_extensions
         self.fallback_url = fallback_url
         self.share_contents = share_contents
@@ -101,6 +104,8 @@ class Button(object):
                 d['webview_height_ratio'] = self.webview_height_ratio
             if self.messenger_extensions:
                 d['messenger_extensions'] = 'true'
+            if self.webview_share_button is False:
+                d['webview_share_button'] = 'hide'
             if self.fallback_url:
                 d['fallback_url'] = self.fallback_url
         if self.button_type == 'element_share':

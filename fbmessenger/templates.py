@@ -1,7 +1,11 @@
 from __future__ import absolute_import
 
-import collections
 from .quick_replies import QuickReplies
+
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 
 class BaseTemplate(object):
@@ -44,7 +48,7 @@ class ElementMixin(object):
     @elements.setter
     def elements(self, elements):
         if elements:
-            if isinstance(elements, collections.Iterable):
+            if isinstance(elements, Iterable):
                 elements = list(elements)
             else:
                 elements = [elements]
@@ -82,7 +86,7 @@ class ButtonMixin(object):
     @buttons.setter
     def buttons(self, buttons):
         if buttons:
-            if isinstance(buttons, collections.Iterable):
+            if isinstance(buttons, Iterable):
                 buttons = list(buttons)
             else:
                 buttons = [buttons]

@@ -1,3 +1,5 @@
+import io
+import os
 import re
 import sys
 
@@ -5,17 +7,15 @@ from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
 long_description = ''
+short_description='A python library to communicate with the Facebook Messenger API\'s'
+
 
 try:
-    import pandoc
+    with io.open(os.path.join(base_path, 'README.md'), encoding='utf-8') as f:
+        long_description = '\n' + f.read()
+except FileNotFoundError:
+    long_description = short_description
 
-    doc = pandoc.Document()
-    with open('README.md', 'r') as readme:
-        doc.markdown = readme.read().encode('utf-8')
-        long_description = doc.rst.decode()
-except Exception as e:
-    print(e)
-    pass
 
 test_requirements = [
     'pytest',
@@ -59,7 +59,7 @@ class PyTest(TestCommand):
 setup(
     name='fbmessenger',
     version=VERSION,
-    description='A python library to communicate with the Facebook Messenger API\'s',
+    description=short_description,
     long_description=long_description,
     url='https://github.com/rehabstudio/fbmessenger',
     author='Ricky Dunlop',

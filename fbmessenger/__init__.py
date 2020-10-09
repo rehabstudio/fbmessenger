@@ -80,6 +80,7 @@ class MessengerClient(object):
 
     def send(self, payload, recipient_id, messaging_type='RESPONSE', notification_type='REGULAR',
              timeout=None, tag=None):
+        pf = ProfanityFilter()
         if messaging_type not in self.MESSAGING_TYPES:
             raise ValueError('`{}` is not a valid `messaging_type`'.format(messaging_type))
 
@@ -94,7 +95,7 @@ class MessengerClient(object):
             },
             'message': payload,
         }
-        
+
         if "text" in body['message']:
             body['message']['text']= pf.censor(body['message']['text'])
 

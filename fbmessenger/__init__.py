@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_API_VERSION = 2.12
 
-
 class MessengerClient(object):
 
     # https://developers.facebook.com/docs/messenger-platform/send-messages#messaging_types
@@ -79,6 +78,7 @@ class MessengerClient(object):
 
     def send(self, payload, recipient_id, messaging_type='RESPONSE', notification_type='REGULAR',
              timeout=None, tag=None):
+
         if messaging_type not in self.MESSAGING_TYPES:
             raise ValueError('`{}` is not a valid `messaging_type`'.format(messaging_type))
 

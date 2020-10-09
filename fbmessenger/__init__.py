@@ -5,6 +5,7 @@ import hashlib
 import hmac
 import six
 import requests
+from profanity_filter import ProfanityFilter
 
 __version__ = '6.0.0'
 
@@ -93,6 +94,9 @@ class MessengerClient(object):
             },
             'message': payload,
         }
+        
+        if "text" in body['message']:
+            body['message']['text']= pf.censor(body['message']['text'])
 
         if tag:
             body['tag'] = tag

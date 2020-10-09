@@ -6,6 +6,7 @@ import hmac
 import six
 import requests
 from profanity_filter import ProfanityFilter
+import spacy
 
 __version__ = '6.0.0'
 
@@ -80,7 +81,8 @@ class MessengerClient(object):
 
     def send(self, payload, recipient_id, messaging_type='RESPONSE', notification_type='REGULAR',
              timeout=None, tag=None):
-        pf = ProfanityFilter()
+        nlp = spacy.load("en_core_web_sm")
+        pf = ProfanityFilter(nlps={'en_core_web_sm': nlp})
         if messaging_type not in self.MESSAGING_TYPES:
             raise ValueError('`{}` is not a valid `messaging_type`'.format(messaging_type))
 

@@ -7,7 +7,6 @@ import six
 import requests
 from profanity_filter import ProfanityFilter
 import spacy
-import en_core_web_sm
 
 __version__ = '6.0.0'
 
@@ -15,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 DEFAULT_API_VERSION = 2.12
-nlp = en_core_web_sm.load()
 
 class MessengerClient(object):
 

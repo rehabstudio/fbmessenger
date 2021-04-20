@@ -16,7 +16,7 @@ more-itertools==4.2.0
 pbr==3.1.1
 pkginfo==1.4.2
 pluggy==0.6.0
-py==1.5.3
+py==1.10.0
 pyandoc==0.2.0
 pycodestyle==2.4.0
 pyflakes==1.6.0

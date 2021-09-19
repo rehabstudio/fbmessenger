@@ -28,6 +28,30 @@ class GetStartedButton(object):
             }
 
 
+class IceBreakersItem(object):
+    def __init__(self, question, payload):
+        self.question = question
+        self.payload = payload
+
+    def to_dict(self):
+        return {
+            'question': self.question,
+            'payload': self.payload
+        }
+
+
+class IceBreakers(object):
+    def __init__(self, question_items):
+        if len(question_items) > 6:
+            raise ValueError('You cannot have more than 6 ice breakers items.')
+
+        self.question_items = question_items
+
+    def to_dict(self):
+        if self.question_items:
+            return [item.to_dict() for item in self.question_items]
+
+
 class PersistentMenuItem(object):
     ITEM_TYPES = [
         'nested',
@@ -131,10 +155,11 @@ class PersistentMenu(object):
 
 
 class MessengerProfile(object):
-    def __init__(self, greetings=None, get_started=None, persistent_menus=None):
+    def __init__(self, greetings=None, get_started=None, persistent_menus=None, ice_breakers=None):
         self.greetings = greetings
         self.get_started = get_started
         self.persistent_menus = persistent_menus
+        self.ice_breakers = ice_breakers
 
     def to_dict(self):
         res = {}
@@ -149,5 +174,8 @@ class MessengerProfile(object):
         if self.persistent_menus:
             res['persistent_menu'] = [
                 item.to_dict() for item in self.persistent_menus]
+
+        if self.ice_breakers:
+            res['ice_breakers'] = self.ice_breakers.to_dict()
 
         return res

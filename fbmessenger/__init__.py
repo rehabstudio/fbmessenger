@@ -149,6 +149,19 @@ class MessengerClient(object):
         )
         return r.json()
 
+    def delete_ice_breakers(self, timeout=None):
+        r = self.session.delete(
+            '{graph_url}/me/messenger_profile'.format(graph_url=self.graph_url),
+            params=self.auth_args,
+            json={
+                'fields': [
+                    'ice_breakers'
+                ],
+            },
+            timeout=timeout
+        )
+        return r.json()
+
     def delete_persistent_menu(self, timeout=None):
         r = self.session.delete(
             '{graph_url}/me/messenger_profile'.format(graph_url=self.graph_url),

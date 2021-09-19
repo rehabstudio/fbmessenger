@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Remove share button support (deprecated by Facebook)
+- Add icebreakers support 
 
 ## 6.0.0
 - Switch from message to recipient_id as method input

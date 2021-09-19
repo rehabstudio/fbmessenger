@@ -286,6 +286,36 @@ class TestThreadSettings:
         }
         assert expected == profile.to_dict()
 
+    def test_ice_breakers(self):
+        item = thread_settings.IceBreakersItem(
+            question="<QUESTION>",
+            payload="<PAYLOAD>"
+        )
+        res = thread_settings.IceBreakers(question_items=[item] * 2)
+        profile = thread_settings.MessengerProfile(ice_breakers=res)
+        expected = {
+            'ice_breakers': [
+                {
+                    "question": "<QUESTION>",
+                    "payload": "<PAYLOAD>"
+                },                    {
+                    "question": "<QUESTION>",
+                    "payload": "<PAYLOAD>"
+                },
+            ],
+        }
+        assert expected == profile.to_dict()
+
+    def test_ice_breakers_too_many_items(self):
+        item = thread_settings.IceBreakersItem(
+            question="<QUESTION>",
+            payload="<PAYLOAD>"
+        )
+        item_list = [item] * 7
+        with pytest.raises(ValueError) as err:
+            thread_settings.IceBreakers(question_items=item_list)
+        assert str(err.value) == 'You cannot have more than 6 ice breakers items.'
+
     def test_composer_input_disabled(self):
         item = thread_settings.PersistentMenuItem(
             item_type='web_url',

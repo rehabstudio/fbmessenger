@@ -11,7 +11,7 @@ short_description='A python library to communicate with the Facebook Messenger A
 
 
 try:
-    with io.open(os.path.join(base_path, 'README.md'), encoding='utf-8') as f:
+    with io.open('README.md', encoding='utf-8') as f:
         long_description = '\n' + f.read()
 except FileNotFoundError:
     long_description = short_description

@@ -11,7 +11,7 @@ short_description='A python library to communicate with the Facebook Messenger A
 
 
 try:
-    with io.open(os.path.join(base_path, 'README.md'), encoding='utf-8') as f:
+    with io.open('README.md', encoding='utf-8') as f:
         long_description = '\n' + f.read()
 except FileNotFoundError:
     long_description = short_description
@@ -22,7 +22,8 @@ test_requirements = [
     'coverage',
     'pytest-cov',
     'pytest-catchlog',
-    'responses'
+    'responses',
+    'mock',
 ]
 
 # Get the version
@@ -78,7 +79,10 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
     ],
-    install_requires=['requests>=2.0'],
+    install_requires=[
+        'requests>=2.0',
+        'six',
+    ],
     packages=['fbmessenger'],
     cmdclass={'test': PyTest},
     tests_require=test_requirements,

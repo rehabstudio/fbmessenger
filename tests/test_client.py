@@ -309,6 +309,25 @@ def test_delete_get_started(client, monkeypatch, default_params):
     )
 
 
+def test_delete_ice_breakers(client, monkeypatch, default_params):
+    mock_delete = mock.Mock()
+    mock_delete.return_value.status_code = 200
+    monkeypatch.setattr('requests.Session.delete', mock_delete)
+    client.delete_ice_breakers()
+
+    assert mock_delete.call_count == 1
+    mock_delete.assert_called_with(
+        'https://graph.facebook.com/v{api_version}/me/messenger_profile'.format(api_version=client.api_version),
+        params=default_params,
+        json={
+            'fields': [
+                'ice_breakers',
+            ],
+        },
+        timeout=None
+    )
+
+
 def test_delete_persistent_menu(client, monkeypatch, default_params):
     mock_delete = mock.Mock()
     mock_delete.return_value.status_code = 200

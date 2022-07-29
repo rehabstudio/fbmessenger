@@ -435,3 +435,18 @@ menu = PersistentMenu(menu_items=[menu_item_1, menu_item_2])
 messenger_profile = MessengerProfile(persistent_menus=[menu])
 messenger.set_messenger_profile(messenger_profile.to_dict())
 ```
+
+### Ice Breakers
+
+```python
+from fbmessenger.thread_settings import IceBreakers, IceBreakersItem, MessengerProfile
+
+ice_breaker_1 = IceBreakersItem(iquestion='<QUESTION1>', payload'PAYLOAD1')
+ice_breaker_2 = IceBreakersItem(iquestion='<QUESTION2>', payload'PAYLOAD2')
+
+ice_breakers = IceBreakers(question_items=[ice_breaker_1, ice_breaker_2]
+
+messenger_profile = MessengerProfile(ice_breakers=ice_breakers)
+messenger.set_messenger_profile(messenger_profile.to_dict())
+```
+You can then check for this payload in the `postback` method

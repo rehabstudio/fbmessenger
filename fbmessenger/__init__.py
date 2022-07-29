@@ -6,7 +6,7 @@ import hmac
 import six
 import requests
 
-__version__ = '6.0.0'
+__version__ = '6.1.0'
 
 logger = logging.getLogger(__name__)
 
@@ -143,6 +143,19 @@ class MessengerClient(object):
             json={
                 'fields': [
                     'get_started'
+                ],
+            },
+            timeout=timeout
+        )
+        return r.json()
+
+    def delete_ice_breakers(self, timeout=None):
+        r = self.session.delete(
+            '{graph_url}/me/messenger_profile'.format(graph_url=self.graph_url),
+            params=self.auth_args,
+            json={
+                'fields': [
+                    'ice_breakers'
                 ],
             },
             timeout=timeout

@@ -6,7 +6,7 @@ import hmac
 import six
 import requests
 
-__version__ = '6.0.1'
+__version__ = '6.1.0'
 
 logger = logging.getLogger(__name__)
 
